@@ -1,0 +1,73 @@
+/* Review screen styles stay inside this route, including responsive rules. */
+.offload-app {
+  color: var(--color-texto);
+  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  min-height: 100svh;
+  margin-inline: auto;
+  background: var(--color-fondo);
+  display: flex;
+  flex-direction: column;
+
+  h1, h2, h3 { font-family: inherit; }
+  :focus-visible { outline: 3px solid var(--color-acento); outline-offset: 5px; }
+
+  .screen-content { width: 100%; max-width: 640px; margin-inline: auto; padding: max(14px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 27px max(24px, env(safe-area-inset-left)); flex: 1; display: flex; flex-direction: column; }
+  .screen-toolbar { display: flex; align-items: center; gap: 14px; min-height: 45px; }
+  .back-button { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 50%; border: 0; color: var(--color-texto); background: var(--color-tarjeta); }
+  .toolbar-label { color: var(--color-texto-suave); font-size: 14px; }
+  .summary { text-align: center; padding-top: 16px; margin-bottom: 21px; }
+  .success-orb { display: grid; place-items: center; width: 80px; height: 80px; margin: 0 auto 15px; border-radius: 52% 46% 53% 43%; color: var(--color-fondo); background: radial-gradient(circle at 31% 24%, var(--color-orbe-luz), var(--color-acento) 35%, var(--color-orbe-sombra) 95%); box-shadow: 0 0 38px 9px color-mix(in srgb, var(--color-acento) 20%, transparent); }
+  .summary h1 { margin: 0; font-size: 38px; font-weight: 750; line-height: 1.35; letter-spacing: -1.9px; }
+  .summary > p { color: var(--color-texto-suave); font-size: 18px; line-height: 1.5; margin: 9px 0 0; }
+  .item-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+  .item-card { min-height: 72px; border-radius: 21px; background: var(--color-tarjeta); padding: 13px 16px; display: flex; align-items: center; gap: 13px; }
+  .item-icon { width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center; border-radius: 13px; background: var(--color-icono-fondo); color: var(--color-acento); }
+  .item-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .item-copy h2 { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 600; letter-spacing: -.15px; }
+  .item-copy p { margin: 4px 0 0; font-size: 14px; color: var(--color-texto-suave); line-height: 1.35; }
+  .item-type { font-size: 13px; color: var(--color-texto-suave); }
+  .conflict-card { background: var(--color-alerta-fondo); }
+  .conflict-card .item-icon { background: var(--color-alerta); color: var(--color-fondo); }
+  .primary-action { margin-top: auto; padding-top: 70px; }
+  .review-button { width: 100%; min-height: 62px; border: 0; border-radius: 40px; background: var(--color-acento); color: var(--color-fondo); font-size: 18px; font-weight: 600; transition: filter .18s, transform .18s; }
+  .review-button:hover { filter: brightness(1.08); }
+  .review-button:active { transform: scale(.98); }
+  .bottom-navigation { width: 100%; max-width: 640px; margin-inline: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--color-borde); padding: 17px max(9px, env(safe-area-inset-right)) max(13px, env(safe-area-inset-bottom)) max(9px, env(safe-area-inset-left)); }
+  .nav-item { min-height: 48px; border: 0; background: transparent; color: var(--color-texto-suave); display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; padding: 3px 0 0; }
+  .nav-icon { height: 25px; display: grid; place-items: center; position: relative; }
+  .nav-item.active { color: var(--color-acento); }
+  .nav-orb { width: 25px; height: 25px; border-radius: 50%; background: radial-gradient(circle at 30% 22%, var(--color-orbe-luz), var(--color-orbe-sombra)); }
+  .active .nav-orb { box-shadow: 0 0 24px 5px color-mix(in srgb, var(--color-acento) 25%, transparent); }
+  .active .nav-orb::after { content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--color-acento); bottom: -6px; left: calc(50% - 2px); }
+  .review-note { margin-top: 20px; padding: 0 5px; }
+  .review-note h2 { font-size: 17px; margin: 0 0 8px; }
+  .review-note p { font-size: 14px; line-height: 1.6; color: var(--color-texto-suave); margin: 0; }
+  /* Keep the original vertical order while using the desktop canvas. */
+  @media (min-width: 768px) {
+    .screen-content, .bottom-navigation { max-width: 1440px; }
+    .screen-content { padding-inline: clamp(32px, 5vw, 80px); }
+    .bottom-navigation { padding-inline: clamp(32px, 5vw, 80px); }
+  }
+  @media (min-width: 1024px) {
+    .screen-content { padding-top: 24px; padding-bottom: 28px; }
+    .summary { padding-top: 0; margin-bottom: 28px; }
+    .summary h1 { font-size: 44px; }
+    .summary > p { font-size: 19px; }
+    .item-list { gap: 12px; }
+    .item-card { min-height: 76px; padding: 16px 24px; gap: 20px; border-radius: 20px; }
+    .item-copy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 24px; }
+    .item-copy h2 { font-size: 17px; }
+    .item-copy p { margin: 0; font-size: 15px; }
+    .item-type { flex: 0 0 80px; text-align: right; font-size: 14px; }
+    .primary-action { display: flex; justify-content: center; padding-top: 32px; }
+    .review-button { width: 100%; min-height: 64px; border-radius: 20px; font-size: 18px; }
+    .review-button:active { transform: scale(.995); }
+    .bottom-navigation { padding-block: 16px; }
+    .nav-item { flex-direction: row; justify-content: center; gap: 12px; font-size: 14px; padding: 12px; border-radius: 14px; }
+    .nav-item:hover { background: var(--color-tarjeta); }
+    .review-note { padding: 20px 24px; border-left: 2px solid var(--color-alerta); }
+  }
+  @media (max-width: 360px) { .screen-content { padding-inline: 16px; } .item-card { gap: 10px; padding-inline: 12px; } .item-copy h2 { font-size: 14px; } .item-copy p { font-size: 12px; } .item-type { font-size: 11px; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+}

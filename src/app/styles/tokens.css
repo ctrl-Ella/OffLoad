@@ -55,3 +55,23 @@
   --font-display: 'Bricolage Grotesque', Figtree, system-ui, sans-serif;
   --font-sans: Figtree, system-ui, -apple-system, sans-serif;
 }
+
+/* Dark review screen: scoped so sign-in keeps its own palette. */
+.offload-app {
+  /* WCAG contrast: text/background 17,16:1; secondary/card 6,29:1;
+     mint/card 10,21:1; button 12,11:1; secondary/alert 5,80:1.
+     The border is decorative: navigation uses icons and labels. */
+  --color-fondo: #111111;
+  --color-texto: #f5f4f0;
+  --color-texto-suave: #a3a3a0;
+  --color-acento: #71e2ce;
+  --color-turquesa: #71e2ce;
+  --color-borde: #303030;
+  --color-tarjeta: #222222;
+  --color-icono-fondo: #2e4541;
+  --color-alerta: #ff634c;
+  --color-alerta-fondo: #3d211c;
+  --color-exterior: #f7f5f0;
+  --color-orbe-luz: #b7fff0;
+  --color-orbe-sombra: #2aa692;
+}
