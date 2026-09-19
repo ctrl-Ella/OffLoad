@@ -39,5 +39,7 @@ closes #
 
 <!--
 Recordatorio: quien escribe el código no aprueba su propia PR.
-Necesita el visto bueno de otra persona del equipo.
+
+Durante la hackatón GitHub ya no lo exige, así que depende de nosotras. Que no
+lo compruebe una máquina no lo hace opcional: lo hace nuestro.
 -->

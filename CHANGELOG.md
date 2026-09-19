@@ -16,6 +16,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/), y 
 - Esqueleto de la aplicación: configuración de TypeScript, Next.js, Tailwind y ESLint, esquema de Prisma y una página provisional. Con esto el proyecto ya se puede construir y desplegar.
 - Andamiaje del proyecto: instrucciones para las sesiones de Claude Code, agentes por carril, flujo de trabajo, plantillas de issue y de pull request, etiquetas e integración continua.
 
+### Cambiado
+
+- La aprobación obligatoria de las pull requests pasa a cero en `main` y en `dev` mientras dure la hackatón. Siguen exigiéndose la pull request y la integración continua en verde. Que otra persona revise sigue siendo el acuerdo del equipo, ahora sin una máquina que lo compruebe.
+
 ### Corregido
 
 - La integración continua fallaba al generar el cliente de Prisma. `prisma.config.ts` resuelve `DATABASE_URL` al cargarse, así que la variable de relleno pasa a estar a nivel de job y no solo en el paso de construir.
