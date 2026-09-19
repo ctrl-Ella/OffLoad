@@ -1,13 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "motion/react";
+import { AnimatePresence, motion, useSpring, useTransform } from "motion/react";
+import { useReducedMotionSafe } from "@/lib/motion";
 import { MIA_LABELS, MIA_SKY, type MiaState } from "./mia-states";
 import "./mia.css";
 
@@ -154,7 +149,7 @@ export function MiaFigure({
 }) {
   // Motion animates in JavaScript and bypasses the CSS media query, so it has
   // to be asked. The CSS loops in mia.css handle themselves.
-  const still = useReducedMotion() ?? false;
+  const still = useReducedMotionSafe();
 
   const { visorRef, x, y } = useGaze(still);
   // The mouth follows at a third. Moved as much as the eyes, the whole head

@@ -5,7 +5,7 @@
  *
  * Every state maps to something the system knows — a transcription running, a
  * tool running, a proposal waiting — so none of them claims what is not true.
- * The reasoning is in docs/specs/0002-mia-states-and-voice.md.
+ * The reasoning is in docs/specs/0003-mia-states-and-voice.md.
  */
 export type MiaState = "quiet" | "listening" | "preparing" | "asking" | "speaking";
 

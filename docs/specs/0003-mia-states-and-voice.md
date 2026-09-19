@@ -1,10 +1,10 @@
-# 0002 — Mia: the character, her five states, and her voice
+# 0003 — Mia: the character, her five states, and her voice
 
 | | |
 |---|---|
 | **Status** | Draft |
 | **Area** | frontend · backend |
-| **Issue** | #NN |
+| **Issue** | #21 |
 | **Date** | 2026-09-19 |
 
 ---
@@ -164,6 +164,8 @@ npm run dev
 
 **Three things the SLNG synthesis route does that the documentation does not make obvious**, all checked in the prototype: the `model` field in the body is the voice, not the model, which goes in the URL; `encoding`, `sample_rate` and `container` are listed as optional and the Aura route rejects them with a 400; and the WAV header declares two gigabytes, which is the unknown-size marker of a streamed response, not a truncated file.
 
-**The root layout declares `lang="en"`** while everything the family reads is Spanish. A screen reader will pronounce Mia's labels with English rules. Out of this work's scope, and worth a one-line fix soon.
+**Reduced motion is read through `useReducedMotionSafe`**, the project's hook, and not Motion's own: that one reads `matchMedia` during hydration and breaks it on a machine with reduced motion on. The CSS loops in `mia.css` do not need it, since their media query is CSS.
+
+**The skip link in the root layout pointed at `#contenido`** while every screen, this one included, marks its main content `id="content"`. Fixed here to `#content`: identifiers are English by the root rules, and a skip link that lands nowhere fails the first keyboard user.
 
 **Open question for whoever builds the call screen.** The state comes from the run, never from the audio: while the clip is loading, Mia stays in `asking`, and she only becomes `speaking` when playback starts. The prototype's room already does it this way.
