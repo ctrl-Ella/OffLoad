@@ -28,7 +28,7 @@ export function AudioWaveform({
       className="flex h-12 w-full items-center justify-center gap-[3px]"
       role="img"
       aria-label={
-        isActive ? "Nivel de audio mientras hablas" : "Nivel de audio en pausa"
+        isActive ? "Audio level while you speak" : "Audio level paused"
       }
     >
       {levels.map((level, index) => {

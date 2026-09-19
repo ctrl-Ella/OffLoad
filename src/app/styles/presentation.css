@@ -22,8 +22,8 @@
 .presentation-button:hover { transform: translateY(-2px); }
 .presentation-button-primary { background: var(--color-text); color: var(--color-white) !important; font-size: 16px; }
 .presentation-button-outline { border: 1px solid var(--color-border); color: var(--color-text); }
-.presentation-hero-art { position: relative; min-height: 520px; display: grid; place-items: center; overflow: hidden; border-radius: var(--radius-card); isolation: isolate; }
-.presentation-hero-art::before { content: ""; position: absolute; bottom: 3%; left: 50%; width: min(90%, 480px); height: 48%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(ellipse, color-mix(in srgb, var(--mia-glow-blue) 78%, transparent) 0%, color-mix(in srgb, var(--mia-glow-blue) 42%, transparent) 45%, transparent 75%); filter: blur(25px); pointer-events: none; }
+.presentation-hero-art { position: relative; min-height: 520px; display: grid; place-items: center; isolation: isolate; }
+.presentation-hero-art::before { content: ""; position: absolute; bottom: 10%; left: 50%; width: min(84%, 430px); height: 42%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(ellipse, color-mix(in srgb, var(--mia-glow-blue) 78%, transparent) 0%, color-mix(in srgb, var(--mia-glow-blue) 42%, transparent) 42%, transparent 68%); filter: blur(22px); pointer-events: none; }
 .presentation-orbit { position: absolute; width: 390px; aspect-ratio: 1; border: 1px solid var(--color-border); border-radius: 50%; }
 .presentation-orbit-two { width: 550px; border-color: var(--color-border); }
 .presentation-mascot { position: relative; z-index: 1; width: min(72%, 360px); filter: drop-shadow(0 18px 18px color-mix(in srgb, var(--color-text) 12%, transparent)); }
@@ -72,9 +72,6 @@
 .presentation-calendar-insight h3 { margin: 20px 0 10px; font-size: 25px; line-height: 1.15; }
 .presentation-calendar-insight p { color: var(--color-background); font-size: 13px; line-height: 1.6; }
 .presentation-calendar-insight > a { display: flex; align-items: center; gap: 8px; margin-top: 24px; color: var(--color-accent); font-size: 12px; font-weight: 700; }
-.presentation-footer { display: flex; align-items: center; justify-content: space-between; padding: 26px max(32px, calc((100vw - 1240px)/2)); border-top: 1px solid var(--color-border); }
-.presentation-footer > span { font: 800 24px 'Bricolage Grotesque', sans-serif; letter-spacing: -1px; }
-.presentation-footer p { color: var(--color-text-muted); font-size: 12px; }
 .presentation-mobile-nav { display: none; }
 
 @media (max-width: 900px) {
@@ -90,7 +87,7 @@
   .presentation-brand { font-size: 23px; }
   .presentation-hero { padding: 45px 0 58px; }
   .presentation-hero h1 { font-size: clamp(43px, 11vw, 61px); }
-  .presentation-hero-art { min-height: 355px; border-radius: var(--radius-card); }
+  .presentation-hero-art { min-height: 355px; }
   .presentation-mascot { width: min(72%, 245px); }
   .presentation-orbit { width: 260px; }
   .presentation-orbit-two { width: 370px; }
@@ -106,7 +103,6 @@
   .presentation-week { gap: 4px; padding: 0 12px 17px; }
   .presentation-week button { min-height: 62px; }
   .presentation-agenda-content { grid-template-columns: 1fr; padding: 22px 17px; }
-  .presentation-footer { padding: 24px 20px; }
 }
 
 @media (max-width: 380px) {

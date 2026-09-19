@@ -9,13 +9,13 @@
  */
 export type MiaState = "quiet" | "listening" | "preparing" | "asking" | "speaking";
 
-/** What is shown on screen. Spanish, because the family reads it. */
+/** What is shown on screen. */
 export const MIA_LABELS: Record<MiaState, string> = {
-  quiet: "Callada",
-  listening: "Escuchando",
-  preparing: "Preparando",
-  asking: "Pide la palabra",
-  speaking: "Hablando",
+  quiet: "Quiet",
+  listening: "Listening",
+  preparing: "Preparing",
+  asking: "Asking",
+  speaking: "Speaking",
 };
 
 /** The order they happen in: one full turn. */

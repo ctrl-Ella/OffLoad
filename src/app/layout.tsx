@@ -2,19 +2,17 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Offload · Menos carga mental, más tiempo para vivir",
+  title: "Offload · Less mental load, more time to live",
   description:
-    "Coordina los planes familiares, resuelve imprevistos y recupera tiempo para ti con Offload y Mia.",
+    "Coordinate family plans, handle the unexpected, and make more time for yourself with Offload and Mia.",
 };
 
-// `lang="es"` no es decorativo: sin él, un lector de pantalla pronuncia el
-// castellano con fonética inglesa y la página deja de entenderse.
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
-      <body className="antialiased"><a className="skip-link" href="#main-content">Saltar al contenido principal</a>{children}</body>
+    <html lang="en">
+      <body className="antialiased"><a className="skip-link" href="#content">Skip to main content</a>{children}</body>
     </html>
   );
 }

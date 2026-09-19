@@ -6,7 +6,7 @@ import { VerificationReturn } from "@/components/verification-return";
  *  character. With a free tunnel it changes on every restart. */
 
 export const metadata: Metadata = {
-  title: "Confirmando tu línea · OFFLOAD",
+  title: "Verifying your line · OFFLOAD",
   robots: { index: false },
 };
 

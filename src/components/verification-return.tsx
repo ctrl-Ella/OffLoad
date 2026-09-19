@@ -105,35 +105,35 @@ export function VerificationReturn() {
   return (
     <div aria-live="polite" className="flex flex-col gap-4">
       {outcome.state === "checking" && showChecking ? (
-        <Notice tone="good" title="Confirmando tu línea">
-          <p>Un segundo.</p>
+        <Notice tone="good" title="Verifying your line">
+          <p>One moment.</p>
         </Notice>
       ) : null}
 
       {outcome.state === "in" ? (
-        <Notice tone="good" title={`Hola, ${outcome.name}`}>
-          <p>Ya estás dentro.</p>
+        <Notice tone="good" title={`Hi, ${outcome.name}`}>
+          <p>You&apos;re signed in.</p>
         </Notice>
       ) : null}
 
       {outcome.state === "not-family" ? (
-        <Notice tone="alert" title="Línea confirmada">
+        <Notice tone="alert" title="Line verified">
           <p>
-            El teléfono acabado en {outcome.tail} es tuyo, pero no está en esta
-            casa. Que te añada alguien de la familia y vuelve a entrar.
+            The phone number ending in {outcome.tail} is yours, but it isn&apos;t part of this
+            household. Ask a family member to add you, then sign in again.
           </p>
         </Notice>
       ) : null}
 
       {outcome.state === "failed" ? (
-        <Notice tone="alert" title="Tu operador no ha podido confirmar la línea">
+        <Notice tone="alert" title="Your carrier couldn't verify your line">
           <p>
-            Puede que el wifi siguiera encendido. Vuelve a escribir tu número y
-            te llevo a la pantalla del código, o entra con Google.
+            Wi-Fi may still have been on. Enter your number again to receive a
+            code, or sign in with Google.
           </p>
           <p className="mt-3">
             <Link href="/" className="font-medium underline">
-              Volver a la portada
+              Back to home
             </Link>
           </p>
         </Notice>

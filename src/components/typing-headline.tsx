@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-const firstLine = "Menos carga mental.";
-const secondLine = "Más tiempo para vivir.";
+const firstLine = "Less mental load.";
+const secondLine = "More time to live.";
 const headline = firstLine + secondLine;
 
 export function TypingHeadline() {
