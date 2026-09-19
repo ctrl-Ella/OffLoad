@@ -233,3 +233,13 @@ Estas siguen pendientes y conviene cerrarlas antes de que cuesten caro.
 - **El niño necesita un nombre.** Aparece en pantallas, en avisos y en la voz de Mia. En cuanto se decida, se escribe aquí y deja de discutirse.
 - **Los rulesets de protección de ramas están sin aplicar.** Hasta que se ejecute `scripts/configurar-github.sh`, `main` y `dev` aceptan push directo y el flujo depende de la buena voluntad de cada una.
 - **Los scripts de prueba de `package.json` y los que nombra `TESTING.md`** todavía no coinciden. Hasta que se alineen, la fuente buena es `package.json`, que es lo que ejecuta la integración continua.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
