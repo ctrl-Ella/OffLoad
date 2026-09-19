@@ -1,0 +1,76 @@
+name: Feature
+description: Something new the product has to do
+title: "[area] "
+labels: ["type:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Replace `[area]` in the title with the right one:
+        `[frontend]` `[backend]` `[qa]` `[devops]` `[ia]` `[video]` `[docs]`
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - frontend
+        - backend
+        - ia
+        - video
+        - devops
+        - qa
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem it solves
+      description: What happens today that should not. No solutions yet.
+      placeholder: Right now there is no way for two people to see each other, and...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: |
+        How we will know it is done. Someone else has to be able to check them:
+        "it's fast" does not count, "it appears in under 3 seconds" does.
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      description: Path to the spec in docs/specs/ (write it first if it does not exist)
+      placeholder: docs/specs/0003-video-room.md
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Links, screenshots, dependencies on other issues
+    validations:
+      required: false
