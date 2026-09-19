@@ -35,6 +35,49 @@
 
   /* Bordes y separadores: 3,1:1 sobre el fondo. Elemento gráfico, no texto. */
   --color-borde: #b9b4ad;
+
+  /* -------------------------------------------------------------------
+     Paleta inmersiva: solo para la pantalla de escucha por voz.
+
+     No es un tema oscuro global. El recorrido del día, la tarjeta de
+     propuesta y el tiempo recuperado siguen sobre el fondo claro de arriba,
+     con las mismas cifras ya medidas — construirlos no entraba en esta
+     tarea, así que no hay motivo para dar por buena una app entera en
+     oscuro sin haber medido cada pantalla. Esta paleta se usa una vez, en
+     la pantalla donde Mia escucha: una superficie casi negra a pantalla
+     completa deja que la persona hable sin que la pantalla compita por
+     atención, y no deslumbra si se usa de noche.
+
+     Mismo listón que arriba (4,5:1 texto normal, 3:1 gráficos), mismo
+     método de medida (luminancia relativa WCAG, la fórmula de WebAIM).
+  ------------------------------------------------------------------- */
+  --color-fondo-inmersivo: #0b0d0d;
+
+  /* Texto principal sobre el fondo inmersivo: 18,1:1. */
+  --color-texto-inmersivo: #f5f7f7;
+
+  /* Texto secundario —la transcripción en vivo, las etiquetas de las
+     pestañas inactivas— sobre el fondo inmersivo: 8,8:1. */
+  --color-texto-suave-inmersivo: #a9afb1;
+
+  /* Turquesa sobre fondo inmersivo: 10,4:1. El turquesa claro de arriba se
+     queda en 4,0:1 aquí: pasa para gráficos pero no para texto. Sobre un
+     fondo casi negro aguanta un turquesa más vivo, con margen de sobra
+     también para texto, así que es el que pinta la esfera, la onda de
+     audio y la pestaña activa del menú. */
+  --color-turquesa-inmersivo: #3fd1c7;
+
+  /* Superficie de un elemento gráfico —el círculo del botón de volver, la
+     línea divisoria antes del menú— sobre fondo inmersivo: 3,2:1. Es el
+     mínimo del proyecto para gráficos: no baja de aquí. */
+  --color-superficie-inmersiva: #5a6364;
+
+  /* Aviso sobre fondo inmersivo: 8,5:1. Para cuando el reconocimiento de voz
+     no ha podido completarse —sin permiso de micrófono, sin transcripción—.
+     El texto ya dice qué ha pasado; este tono solo lo distingue a simple
+     vista de la transcripción normal, nunca es el único portador del
+     mensaje. */
+  --color-aviso-inmersivo: #ff8a80;
 }
 
 @layer base {

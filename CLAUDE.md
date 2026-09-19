@@ -12,7 +12,7 @@ Vale igual para una sesión local y para una sesión en el cloud. Si estás leye
 
 Una aplicación familiar que reparte la carga mental. Mia, el agente, encuentra los problemas antes de que nadie los vea, resuelve sola lo que no cambia el plan de nadie, y solo pide un sí o un no cuando hace falta. Lo que devuelve, medido, es tiempo.
 
-La interfaz es móvil primero y la entrada principal es la voz. Todo el producto está en español de España.
+La interfaz es móvil primero y la entrada principal es la voz. La interfaz —pantallas, código— va en inglés; la voz de Mia sigue en español de España, porque la red de apoyo, empezando por la abuela Rosa, habla español.
 
 ## Las personas
 
@@ -97,7 +97,7 @@ Estas están cubiertas por tests y bloquean el merge.
 - **En Mastra los modelos llevan prefijo `nebius/`.** En la API de Token Factory no lo llevan.
 - **Modalidad por carga:** `-fast` dentro de la videollamada, `base` para el resto, Batch API para el resumen semanal.
 - **Cabeceras de cuota.** Se lee `Retry-After` y se conmuta de `-fast` a base ante fallos sostenidos.
-- **Todo en español de España.** Código en inglés, textos de producto y prompts en es-ES.
+- **La interfaz va en inglés.** Código, identificadores y textos de pantalla en inglés. La voz de Mia —lo que escucha y dice por SLNG— y los prompts a Nebius siguen en es-ES: la red de apoyo, empezando por la abuela Rosa, habla español.
 
 ---
 
