@@ -1,4 +1,5 @@
-import { requireGoogleCredentials } from "@/lib/env";
+// With the extension, so Node can run it outside Next: `npm run demo:seed`.
+import { requireGoogleCredentials } from "./env.ts";
 
 /**
  * Google OAuth by hand, no SDK. `googleapis` is several megabytes and what is
@@ -49,6 +50,43 @@ export function consentUrl(state: string): string {
   });
 
   return `${AUTHORISE}?${params.toString()}`;
+}
+
+/**
+ * Turns a stored refresh token into an access token, which is what every call
+ * to Calendar and Tasks needs.
+ *
+ * Nothing is cached: an access token lasts an hour and caching it means
+ * deciding where, which is a question for the tool that ends up calling this on
+ * every run, not for the first caller.
+ */
+export async function accessToken(refreshToken: string): Promise<string> {
+  const { clientId, clientSecret } = requireGoogleCredentials();
+
+  const response = await fetch(EXCHANGE, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      refresh_token: refreshToken,
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  const tokens = (await response.json()) as TokenResponse;
+
+  if (!response.ok || !tokens.access_token) {
+    // `invalid_grant` is the one that matters: the permission was revoked, or
+    // the app is still in testing and Google expired the token after a week.
+    // Either way the person has to connect Google again.
+    throw new Error(
+      `Google refused the refresh token: ${tokens.error ?? response.status}` +
+        (tokens.error_description ? ` · ${tokens.error_description}` : ""),
+    );
+  }
+
+  return tokens.access_token;
 }
 
 export type GrantedPermission = {
