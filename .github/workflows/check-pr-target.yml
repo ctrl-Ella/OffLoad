@@ -1,15 +1,6 @@
-# Fails a pull request into `main` that does not come from `dev`.
-#
-# WHY THIS FILE EXISTS
-# The rule was written down and nothing enforced it. Two pull requests went
-# straight into `main` in one afternoon (#12 and #13), which left `main` holding
-# a stylesheet split that `dev` does not have, on a file `dev` had also touched.
-# Releases stop being a fast-forward and start being a conflict, and whoever
-# branches off `dev` is missing work that is already live.
-#
-# Branch protection cannot express this: it governs pushes, not where a pull
-# request points. So it is a check, and it belongs in the ruleset's required
-# status checks for `main` — otherwise it reports and does not block.
+# Branch protection governs pushes, not where a pull request points, so the
+# rule needs a check. It only blocks once it is in main's required status
+# checks.
 
 name: Check pull request target
 
@@ -22,7 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  target:
+  only-dev-into-main:
+    name: only dev into main
     runs-on: ubuntu-latest
     steps:
       - name: Only dev may open a pull request into main
