@@ -9,7 +9,7 @@ export function GoogleSignIn() {
   return (
     <form action="/api/auth/google" method="get">
       <Button type="submit" variant="secondary" icon={<GoogleMark />} className="w-full">
-        Sign in with Google
+        Entrar con Google
       </Button>
     </form>
   );

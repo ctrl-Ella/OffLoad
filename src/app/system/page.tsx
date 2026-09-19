@@ -9,8 +9,8 @@ import { MiaLive } from "./mia-live";
  */
 
 export const metadata: Metadata = {
-  title: "System · OFFLOAD",
-  description: "OFFLOAD components and all their states on one page.",
+  title: "Sistema · OFFLOAD",
+  description: "Los componentes de OFFLOAD y todos sus estados, en una sola página.",
 };
 
 export default function SystemPage() {
@@ -21,8 +21,8 @@ export default function SystemPage() {
     >
       <header>
         <p className="font-display text-xl font-bold tracking-tight text-ink">OFFLOAD</p>
-        <h1 className="mt-6 font-display text-[2rem] leading-[1.1] text-ink">System</h1>
-        <p className="mt-3 text-ink-muted">Every component and all its states in one place.</p>
+        <h1 className="mt-6 font-display text-[2rem] leading-[1.1] text-ink">Sistema</h1>
+        <p className="mt-3 text-ink-muted">Cada componente con todos sus estados a la vez.</p>
       </header>
 
       <section aria-labelledby="mia-heading" className="flex flex-col gap-6">
@@ -30,8 +30,8 @@ export default function SystemPage() {
           Mia
         </h2>
         <p className="max-w-prose text-ink-muted">
-          Five states, each tied to something the system knows. Four keep Mia&apos;s
-          face and have a distinct object; only Speaking clears the visor.
+          Cinco estados, y cada uno corresponde a algo que el sistema sabe. Cuatro conservan la
+          cara y se distinguen por un objeto; solo «Hablando» vacía el cristal.
         </p>
 
         <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
@@ -47,7 +47,7 @@ export default function SystemPage() {
           ))}
         </ul>
 
-        <h3 className="text-lg font-medium text-ink">Transitions</h3>
+        <h3 className="text-lg font-medium text-ink">Las transiciones</h3>
         <MiaLive />
       </section>
     </main>

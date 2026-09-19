@@ -39,11 +39,11 @@ type Phase =
   | { step: "inside"; name: string | null; tail: string };
 
 const DID_NOT_START =
-  "I couldn't start verification. Please try again in a moment.";
-const NO_CONNECTION = "I couldn't connect. Please try again in a moment.";
+  "No he podido empezar la comprobación. Vuelve a intentarlo en un momento.";
+const NO_CONNECTION = "No he podido conectar. Vuelve a intentarlo en un momento.";
 const NOT_CONFIGURED =
-  "I can't verify your line yet. The problem isn't with you or your number.";
-const BAD_CODE = "That code didn't work. Check the text message and try again.";
+  "Todavía no puedo comprobar tu línea. No es cosa tuya ni del número.";
+const BAD_CODE = "Ese código no vale. Mira el SMS otra vez.";
 
 type Props = {
   /** The other way in, passed as a slot: this component knows about phones and
@@ -102,7 +102,7 @@ export function PhoneSignIn({ alternative }: Props) {
     if (!PHONE_FORMAT.test(normalised)) {
       setFailure({
         scope: "number",
-        message: "Include the country code without spaces: 34600111222.",
+        message: "El número va con el prefijo del país y sin espacios: 34600111222.",
       });
       return;
     }
@@ -155,7 +155,7 @@ export function PhoneSignIn({ alternative }: Props) {
     const clean = code.replace(/\s/g, "");
 
     if (clean.length === 0) {
-      setFailure({ scope: "code", message: "Enter the code you received." });
+      setFailure({ scope: "code", message: "Escribe el código que te ha llegado." });
       return;
     }
 
@@ -209,14 +209,14 @@ export function PhoneSignIn({ alternative }: Props) {
     return (
       <div aria-live="polite">
         {phase.name ? (
-          <Notice tone="good" title={`Hi, ${phase.name}`}>
-            <p>You&apos;re signed in. You don&apos;t need to do anything else.</p>
+          <Notice tone="good" title={`Hola, ${phase.name}`}>
+            <p>Ya estás dentro. No hace falta que vuelvas a entrar.</p>
           </Notice>
         ) : (
-          <Notice tone="alert" title="Line verified">
+          <Notice tone="alert" title="Línea confirmada">
             <p>
-              The phone number ending in {phase.tail} is yours, but it isn&apos;t part of this
-              household. Ask a family member to add you, then sign in again.
+              El teléfono acabado en {phase.tail} es tuyo, pero no está en esta
+              casa. Que te añada alguien de la familia y vuelve a entrar.
             </p>
           </Notice>
         )}
@@ -233,10 +233,10 @@ export function PhoneSignIn({ alternative }: Props) {
 
     return (
       <div className="flex flex-col gap-5">
-        <Notice tone="good" title="I sent you a code">
+        <Notice tone="good" title="Te he mandado un código">
           <p>
-            Your carrier couldn&apos;t verify your line automatically, so I sent a text
-            message. Enter the code you just received.
+            Tu operador no ha podido confirmar la línea por su cuenta, así que va
+            por SMS. Escribe el código que acabas de recibir.
           </p>
         </Notice>
 
@@ -248,8 +248,8 @@ export function PhoneSignIn({ alternative }: Props) {
           }}
         >
           <Field
-            label="Text message code"
-            hint="The digits you just received"
+            label="Código del SMS"
+            hint="Los dígitos que te acaban de llegar"
             error={failure?.scope === "code" ? failure.message : undefined}
             type="text"
             inputMode="numeric"
@@ -262,12 +262,12 @@ export function PhoneSignIn({ alternative }: Props) {
           />
 
           <Button type="submit" loading={busy}>
-            {busy ? "Checking" : "Confirm"}
+            {busy ? "Comprobando" : "Confirmar"}
           </Button>
         </form>
 
         <Button variant="secondary" disabled={busy} onClick={startWithAnotherNumber}>
-          Use another number
+          Usar otro número
         </Button>
 
         {failure?.scope === "service" ? (
@@ -286,11 +286,11 @@ export function PhoneSignIn({ alternative }: Props) {
           icon={<Smartphone className="size-5" aria-hidden="true" />}
           onClick={() => setPhase({ step: "phone" })}
         >
-          Sign in with my phone
+          Entrar con mi teléfono
         </Button>
 
         <p className="text-center text-sm text-ink-muted">
-          Your carrier will verify it. No code to enter.
+          Lo confirma tu operador. No hay que escribir ningún código.
         </p>
 
         {alternative}
@@ -300,10 +300,10 @@ export function PhoneSignIn({ alternative }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <Notice title="Turn off Wi-Fi before you start">
+      <Notice title="Apaga el wifi antes de empezar">
         <p>
-          Verification uses your carrier&apos;s network. With Wi-Fi on, you may need
-          to enter a code instead.
+          La comprobación va por la red de tu operador. Con el wifi encendido no
+          sale por ahí y hay que teclear un código.
         </p>
       </Notice>
 
@@ -315,8 +315,8 @@ export function PhoneSignIn({ alternative }: Props) {
         }}
       >
         <Field
-          label="Your phone number"
-          hint="Include the country code without spaces: 34600111222"
+          label="Tu teléfono"
+          hint="Con el prefijo del país y sin espacios: 34600111222"
           error={failure?.scope === "number" ? failure.message : undefined}
           type="tel"
           inputMode="tel"
@@ -331,7 +331,7 @@ export function PhoneSignIn({ alternative }: Props) {
         {/* Only type="submit", no onClick: with both, one press asked for two
             verifications. Submit also answers Enter inside the field. */}
         <Button type="submit" loading={busy}>
-          {busy ? "Checking" : "Verify"}
+          {busy ? "Comprobando" : "Verificar"}
         </Button>
       </form>
 
@@ -345,7 +345,7 @@ export function PhoneSignIn({ alternative }: Props) {
       {/* Without this, someone on a screen reader never learns the button did
           anything: the state change is visual and nothing else. */}
       <p aria-live="polite" className="sr-only">
-        {busy ? "Checking your line." : ""}
+        {busy ? "Comprobando tu línea." : ""}
       </p>
     </div>
   );

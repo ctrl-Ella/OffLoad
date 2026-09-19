@@ -93,10 +93,10 @@ export type PlanItem = {
   type: "event" | "task" | "conflict";
 };
 
-const WEEKDAY_TIME_FORMAT = new Intl.DateTimeFormat("en-GB", {
+const WEEKDAY_TIME_FORMAT = new Intl.DateTimeFormat("es-ES", {
   weekday: "short",
 });
-const TIME_FORMAT = new Intl.DateTimeFormat("en-GB", {
+const TIME_FORMAT = new Intl.DateTimeFormat("es-ES", {
   hour: "2-digit",
   minute: "2-digit",
   hour12: false,
@@ -138,8 +138,8 @@ function findConflicts(items: ExtractedItem[]): PlanItem[] {
       if (rangesOverlap(a.start, a.end, b.start, b.end)) {
         const clash = a.start > b.start ? a.start : b.start;
         conflicts.push({
-          title: `Two places at ${TIME_FORMAT.format(clash)}`,
-          detail: `${a.title} and ${b.title} overlap`,
+          title: `Dos sitios a las ${TIME_FORMAT.format(clash)}`,
+          detail: `${a.title} y ${b.title} se solapan`,
           type: "conflict",
         });
       }
