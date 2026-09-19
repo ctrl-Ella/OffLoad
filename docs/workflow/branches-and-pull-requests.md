@@ -101,7 +101,7 @@ Cuando `dev` está estable y sin conflictos, se abre una PR de `dev` a `main`. E
 El repositorio es **público y está en una organización**, y eso permite (con plan gratuito)
 proteger las ramas de verdad. Las reglas están escritas en
 [`.github/rulesets/`](../../.github/rulesets/) y se aplican con
-[`scripts/configurar-github.sh`](../../scripts/configurar-github.sh).
+[`scripts/configure-github.sh`](../../scripts/configure-github.sh).
 
 | Rama | Qué impide |
 |---|---|
@@ -124,7 +124,7 @@ Nuestra rama por defecto es `main`, pero las PR van a `dev`. O sea: **`closes #1
 `dev` no cerraría la issue**, y nos habríamos pasado la hackatón cerrándolas a mano sin entender
 por qué.
 
-Por eso existe [`.github/workflows/cerrar-issues.yml`](../../.github/workflows/cerrar-issues.yml):
+Por eso existe [`.github/workflows/close-issues.yml`](../../.github/workflows/close-issues.yml):
 lee el cuerpo de la PR al mergearse en `dev` y cierra las issues que menciona. Sigue escribiéndose
 `closes #12` igual; solo cambia quién lo ejecuta.
 

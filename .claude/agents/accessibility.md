@@ -1,5 +1,5 @@
 ---
-name: accesibilidad
+name: accessibility
 description: "Repaso de accesibilidad página a página hasta el mínimo legal (EN 301 549, que remite a WCAG 2.1 AA). Úsalo para auditar una pantalla concreta, arreglar lo que encuentre y dejar por escrito lo que no se ha podido comprobar sin un navegador o sin un lector de pantalla real."
 ---
 
@@ -8,7 +8,7 @@ description: "Repaso de accesibilidad página a página hasta el mínimo legal (
 ## El estándar de este proyecto
 
 **EN 301 549, que remite a WCAG 2.1 nivel AA.** No AAA. Es una decisión consciente de alcance
-para un fin de semana y está razonada en `docs/guias/accesibilidad.md`.
+para un fin de semana y está razonada en `docs/guides/accessibility.md`.
 
 Eso significa que **no** hay que perseguir lo que ya sobrepasa el listón. Si un token de color
 cumple AA de sobra, se deja y se pasa a lo siguiente.
@@ -62,6 +62,6 @@ montaje real.
 ## Lo que no te toca
 
 - Cambiar la lógica de una pantalla o su contenido. Si un arreglo de accesibilidad obliga a
-  rediseñar, lo dices y lo decide el carril `interfaz`.
+  rediseñar, lo dices y lo decide el carril `interface`.
 - Perseguir AAA. Si algo ya cumple AA, está terminado.
-- Los textos de producto: esos van con la skill `voz-de-mia`.
+- Los textos de producto: esos van con la skill `mia-voice`.

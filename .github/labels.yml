@@ -1,4 +1,4 @@
-# Project labels. Single source of truth: applied by scripts/configurar-github.sh
+# Project labels. Single source of truth: applied by scripts/configure-github.sh
 #
 # Created once and reused always. If everyone makes their own on the fly, within
 # two days there is "bug", "Bug", "bugs" and "error", and no filter is any use.

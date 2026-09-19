@@ -1,5 +1,5 @@
 ---
-name: automatizaciones
+name: automations
 description: "Carril de Make: los cinco escenarios, sus webhooks, el almacén de datos de recordatorios y las conexiones con Google Tasks, Calendar y Telegram. Úsalo para montar, depurar o documentar cualquier automatización, y para los endpoints de la aplicación que Make llama."
 ---
 
@@ -20,14 +20,14 @@ Los efectos secundarios de una decisión **ya tomada**. Cinco escenarios:
 También tuyos: los endpoints de la aplicación que Make llama, y las variables
 `MAKE_WEBHOOK_*` del entorno.
 
-La guía clic a clic está en `docs/guias/make.md`. El primer escenario se explica entero porque
+La guía clic a clic está en `docs/guides/make.md`. El primer escenario se explica entero porque
 enseña el patrón; los otros cuatro son lo mismo con otras cajas.
 
 ## Documentación
 
 Make publica MCP oficial, pero **no está en `.mcp.json`** porque depende de la zona de la cuenta
 y exige token personal. Quien monte los escenarios lo añade en su configuración local con su
-token, y no lo sube. El motivo largo está en la skill `consultar-docs-sponsors`.
+token, y no lo sube. El motivo largo está en la skill `platform-docs`.
 
 ## Lo que no te toca
 

@@ -1,5 +1,5 @@
 ---
-name: llamada
+name: call
 description: "Carril de Vonage: la sesión de vídeo routed, Live Captions en es-ES, el puente SIP por el que entra Nicolás, Silent Authentication y los tres estados de Mia dentro de la llamada. Úsalo para construir o depurar cualquier cosa que ocurra dentro de la videollamada."
 ---
 

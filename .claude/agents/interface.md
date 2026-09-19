@@ -1,5 +1,5 @@
 ---
-name: interfaz
+name: interface
 description: "Carril de la interfaz: las tres pantallas de OFFLOAD, los tokens de color, la franja de traza, el recorrido del día y todo lo que se ve. Úsalo para construir o revisar componentes, pantallas y estilos con Next.js, React y Tailwind."
 ---
 
@@ -49,5 +49,5 @@ Instalado ahora mismo: Next 16.3.5 con App Router, React 19.3, Tailwind 4.3, Mot
   la cifra escrita al lado.
 - **Las cifras de tiempo llevan su origen visible**: calculado o estimación. Es la regla 6, y se
   ve en pantalla.
-- **Los textos los escribe Mia**, con la skill `voz-de-mia`. Un microcopy entusiasta convierte el
+- **Los textos los escribe Mia**, con la skill `mia-voice`. Un microcopy entusiasta convierte el
   producto en otra cosa.

@@ -1,5 +1,5 @@
 ---
-name: voz-de-mia
+name: mia-voice
 description: "Escribir o revisar cualquier texto que lea una persona usuaria de OFFLOAD: lo que dice Mia en pantalla o en voz alta, tarjetas de propuesta, avisos, mensajes de Telegram que salen de Make, el resumen del viernes, textos de error y microcopy de la interfaz. No aplica a commits, issues ni pull requests, que van con tono-colaboracion-tecnica."
 ---
 

@@ -97,7 +97,7 @@ These are covered by tests and they block the merge.
 - **In Mastra, model names carry the `nebius/` prefix.** In the Token Factory API they do not.
 - **Tier by load:** `-fast` inside the video call, `base` everywhere else, Batch API for the weekly summary.
 - **Quota headers.** Read `Retry-After`, and switch from `-fast` to base on sustained failures.
-- **Everything is in English.** Prose, code, identifiers, branch names, commit messages, issues, pull requests and product copy.
+- **Everything is in English.** Prose, code, identifiers, commit messages, issues, pull requests, product copy — and **file and folder names too**. `docs/guides/accessibility.md`, not `docs/guias/accesibilidad.md`. A path is read far more often than it is typed, and half-translated trees are the ones people misfile things into.
 
 ---
 
@@ -156,7 +156,7 @@ main                 production: what is stable, what ships
 
 **Nobody works directly on `main` or `dev`.** Every branch comes off an up-to-date `dev` and carries its issue number in the name. Pull requests always go **to `dev`**, never to `main`. `dev` to `main` is a separate pull request, and that is a release.
 
-One consequence worth keeping in mind: GitHub only closes issues from `closes #12` when the pull request targets the default branch, which here is `main`. Since ours target `dev`, `.github/workflows/cerrar-issues.yml` handles it.
+One consequence worth keeping in mind: GitHub only closes issues from `closes #12` when the pull request targets the default branch, which here is `main`. Since ours target `dev`, `.github/workflows/close-issues.yml` handles it.
 
 ### One spec per task, before the code
 
@@ -166,7 +166,7 @@ One consequence worth keeping in mind: GitHub only closes issues from `closes #1
 issue  →  spec  →  branch off dev  →  code  →  PR to dev  →  review  →  merge
 ```
 
-The spec lives in `docs/specs/`, is written from [`docs/specs/0000-plantilla.md`](docs/specs/0000-plantilla.md) and is linked from the issue. It defines what is in, what is deliberately out, what the contract is, and how you check it works.
+The spec lives in `docs/specs/`, is written from [`docs/specs/0000-template.md`](docs/specs/0000-template.md) and is linked from the issue. It defines what is in, what is deliberately out, what the contract is, and how you check it works.
 
 It earns its keep twice over a weekend: two people do not build the same piece two different ways, and a Claude Code session in the cloud can work alone without asking for the whole context again.
 
@@ -174,7 +174,7 @@ The full circuit is in [`docs/workflow/spec-driven-development.md`](docs/workflo
 
 ### Architecture decisions get written down
 
-When a decision closes off future options or is expensive to reverse — a database schema, a public API contract, a shared type, the route structure — it goes in [`docs/decisiones/`](docs/decisiones/), numbered, with its context, the alternatives rejected and the consequences.
+When a decision closes off future options or is expensive to reverse — a database schema, a public API contract, a shared type, the route structure — it goes in [`docs/decisions/`](docs/decisions/), numbered, with its context, the alternatives rejected and the consequences.
 
 It takes ten minutes to write and saves having the same argument again on Sunday morning. A decision that stops holding is not deleted: it is marked as superseded and the new one is written over it.
 
@@ -184,16 +184,16 @@ It takes ten minutes to write and saves having the same argument again on Sunday
 
 | Agent | Its lane |
 |---|---|
-| `orquestacion` | Mastra: the workflow, the two agents, the six tools and the state in Postgres |
-| `razonamiento` | Nebius: the two model tiers, structured output, quota and the benchmark |
-| `llamada` | Vonage: the video session, Live Captions, SIP and Silent Authentication |
-| `interfaz` | The three screens, the colour tokens and everything visible |
-| `automatizaciones` | Make: the five scenarios, their webhooks and the reminder store |
+| `orchestration` | Mastra: the workflow, the two agents, the six tools and the state in Postgres |
+| `reasoning` | Nebius: the two model tiers, structured output, quota and the benchmark |
+| `call` | Vonage: the video session, Live Captions, SIP and Silent Authentication |
+| `interface` | The three screens, the colour tokens and everything visible |
+| `automations` | Make: the five scenarios, their webhooks and the reminder store |
 | `qa` | Demo data, the spoken phrases, the rehearsal and the failure plan |
-| `accesibilidad` | The screen-by-screen pass against the project's bar |
-| `revisor-textos` | Spelling and grammar across everything published |
+| `accessibility` | The screen-by-screen pass against the project's bar |
+| `copy-editor` | Spelling and grammar across everything published |
 
-Plus two skills in `.claude/skills/`: `consultar-docs-sponsors`, for the platforms' living documentation, and `voz-de-mia`, for how the agent speaks.
+Plus two skills in `.claude/skills/`: `platform-docs`, for the platforms' living documentation, and `mia-voice`, for how the agent speaks.
 
 ---
 
@@ -215,16 +215,16 @@ Plus two skills in `.claude/skills/`: `consultar-docs-sponsors`, for the platfor
 |---|---|
 | `docs/workflow/` | How we work: branches and PRs, commits, issues and labels, spec driven development |
 | `docs/specs/` | One spec per task, plus the template |
-| `docs/decisiones/` | Architecture decisions, with their context and consequences |
-| `docs/guias/` | Guides by topic: accessibility, Make, deployment |
+| `docs/decisions/` | Architecture decisions, with their context and consequences |
+| `docs/guides/` | Guides by topic: accessibility, Make, deployment |
 | `.claude/agents/` | The eight agents, one per lane |
 | `.claude/skills/` | The platforms' living documentation, and Mia's voice |
 | `.github/` | Issue and PR templates, labels, CODEOWNERS, rulesets and continuous integration |
-| `scripts/configurar-github.sh` | Applies labels, the `dev` branch and the protection rules. Run once |
+| `scripts/configure-github.sh` | Applies labels, the `dev` branch and the protection rules. Run once |
 | `.mcp.json` | The Mastra and Vonage documentation MCPs |
 | `CHANGELOG.md` | What changed. One line per pull request |
 
-Folder names are still in Spanish. Renaming them breaks every internal link, so it is a separate job and it is not done yet.
+Paths are in English too, and that is the rule going forward: a new file or folder gets an English name from the start. Renaming one later means chasing every link that pointed at it.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: revisor-textos
+name: copy-editor
 description: "Revisa la ortografía y la gramática del español en todo lo que se va a publicar, antes de abrir una pull request: comentarios de código, mensajes de error, documentación, CHANGELOG, textos de interfaz, descripción de la PR y mensajes de commit. Corrige lo que es objetivamente incorrecto y avisa de lo que es criterio, sin reescribir."
 ---
 
@@ -29,7 +29,7 @@ mayúsculas, cifras, y los calcos del inglés que ya tienen palabra en español.
 
 una frase que se entiende pero suena rara, un párrafo largo, una elección de palabra discutible,
 el orden de una lista, o cualquier cosa de tono. Eso lo deciden `tono-colaboracion-tecnica`,
-`tono-colaboracion-tecnica` y `voz-de-mia`, no tú.
+`tono-colaboracion-tecnica` y `mia-voice`, no tú.
 
 Si dudas de en qué pila está algo, va en la segunda.
 

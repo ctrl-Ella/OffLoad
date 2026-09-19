@@ -30,7 +30,7 @@ La etiqueta `area:` va igualmente, porque es lo que permite filtrar.
 
 ## Las etiquetas
 
-Se crean **una vez** con [`scripts/configurar-github.sh`](../../scripts/configurar-github.sh) y se
+Se crean **una vez** con [`scripts/configure-github.sh`](../../scripts/configure-github.sh) y se
 reutilizan siempre. La fuente única es [`.github/labels.yml`](../../.github/labels.yml).
 
 Si creas etiquetas nuevas sobre la marcha, en dos días hay `bug`, `Bug`, `bugs` y `error`, y
@@ -88,12 +88,12 @@ está "en curso" no informa de nada.
 ## Cuándo se cierra una issue
 
 **Sola**, al mergear la PR que la resuelve en `dev`, gracias a
-[`.github/workflows/cerrar-issues.yml`](../../.github/workflows/cerrar-issues.yml). Tú solo
+[`.github/workflows/close-issues.yml`](../../.github/workflows/close-issues.yml). Tú solo
 escribes `closes #12` en el cuerpo de la PR.
 
 (Sin ese workflow no se cerraría: GitHub solo interpreta esas palabras clave si la PR apunta a la
 rama por defecto, y las nuestras van a `dev`. Está explicado en
-[ramas-y-pull-requests.md](ramas-y-pull-requests.md).)
+[branches-and-pull-requests.md](branches-and-pull-requests.md).)
 
 **Nunca cierres una issue a mano** porque "ya está hecho" si no hay PR mergeada. Si de verdad no
 hacía falta código, ciérrala con un comentario que diga por qué. Dentro de un mes, ese comentario

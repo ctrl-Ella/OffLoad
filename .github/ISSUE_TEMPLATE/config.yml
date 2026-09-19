@@ -4,11 +4,11 @@ blank_issues_enabled: false
 
 contact_links:
   - name: How we work
-    url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/workflow/ramas-y-pull-requests.md
+    url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/workflow/branches-and-pull-requests.md
     about: Branches, pull requests and reviews.
   - name: Before writing any code
     url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/workflow/spec-driven-development.md
     about: Every task carries a spec. The full circuit is here.
   - name: Accessibility
-    url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/guias/accesibilidad.md
+    url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/guides/accessibility.md
     about: The project's bar, and how each screen is checked against it.

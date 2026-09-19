@@ -20,7 +20,7 @@
 # WHAT IT DOES NOT DO
 #   - Create the repository or the organisation
 #   - Create the project board: that is done by hand, and auto-add is switched
-#     on from its own Workflows screen. See docs/workflow/issues-y-labels.md
+#     on from its own Workflows screen. See docs/workflow/issues-and-labels.md
 
 set -euo pipefail
 
@@ -185,5 +185,5 @@ One thing to know about automatic branch deletion: it also deletes the head
 branch of a pull request, and on a dev-to-main release that branch is `dev`.
 It is safe while `dev` is protected, because the rules forbid deleting it.
 
-Details in docs/workflow/issues-y-labels.md
+Details in docs/workflow/issues-and-labels.md
 END

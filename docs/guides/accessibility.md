@@ -21,7 +21,7 @@ Lo que **no** baja: nada de esto depende del nivel AA o AAA, y todo se sigue cum
 Foco siempre visible, teclado completo, etiquetas reales, `prefers-reduced-motion`, móvil en
 horizontal y zoom al 200 %.
 
-Un subagente, `accesibilidad`, repasa página a página contra este listón.
+Un subagente, `accessibility`, repasa página a página contra este listón.
 
 ---
 
