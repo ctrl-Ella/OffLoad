@@ -1,5 +1,5 @@
 ---
-name: orquestacion
+name: orchestration
 description: "Carril de Mastra: el workflow resolverConflicto, los dos agentes, las seis tools con esquema Zod y el estado persistido en Postgres. Úsalo para construir o depurar la máquina de estados, la suspensión y reanudación de un run, o cualquier tool del agente."
 ---
 
@@ -22,11 +22,11 @@ El workflow `resolverConflicto` y todo lo que vive dentro de Mastra.
 
 **MCP `mastra` antes de escribir**, siempre. La API ha cambiado de forma hace poco y un ejemplo
 de hace seis meses puede no compilar. Las trampas conocidas están en la skill
-`consultar-docs-sponsors`.
+`platform-docs`.
 
 ## Lo que no te toca
 
-- **Hablar con el modelo directamente.** Eso es del carril `razonamiento`: tú defines la tool y
+- **Hablar con el modelo directamente.** Eso es del carril `reasoning`: tú defines la tool y
   el esquema, él decide qué modelo y con qué modalidad.
 - **Escribir en un calendario.** Tu tool llama, pero la escritura solo ocurre después de una
   confirmación humana. Es la regla 1.

@@ -1,235 +1,238 @@
 # OFFLOAD
 
-Proyecto del equipo CTRL4ELLA para HackBarna AI Summit 26.
+Built by team CTRL4ELLA for HackBarna AI Summit 26.
 
-Este fichero es el contexto que necesita cualquier sesión de Claude Code para no volver a discutir decisiones que ya están tomadas. Si una propuesta contradice algo de aquí, la propuesta está mal.
+This file is the context any Claude Code session needs in order not to reopen decisions that are already made. If a proposal contradicts something here, the proposal is wrong.
 
-Vale igual para una sesión local y para una sesión en el cloud. Si estás leyendo esto desde una máquina remota, lee entera la sección **Cómo se trabaja** antes de tocar nada.
+It applies to a local session and to a cloud session alike. If you are reading this from a remote machine, read the **How we work** section in full before touching anything.
 
 ---
 
-## Qué es
+## What it is
 
-Una aplicación familiar que reparte la carga mental. Mia, el agente, encuentra los problemas antes de que nadie los vea, resuelve sola lo que no cambia el plan de nadie, y solo pide un sí o un no cuando hace falta. Lo que devuelve, medido, es tiempo.
+A family app that shares out the mental load. Mia, the agent, finds the problems before anyone sees them, resolves on her own whatever changes nobody's plans, and only asks for a yes or a no when it matters. What it gives back, measured, is time.
 
-La interfaz es móvil primero y la entrada principal es la voz. La interfaz —pantallas, código— va en inglés; la voz de Mia sigue en español de España, porque la red de apoyo, empezando por la abuela Rosa, habla español.
+The interface is mobile first and the main input is voice. Screens and code are in English; Mia's voice stays in Spanish from Spain, because the support circle — starting with grandma Rosa — speaks Spanish.
 
-## Las personas
+## The people
 
-| Nombre | Papel | Qué ve Mia de esa persona |
+| Name | Role | What Mia sees of them |
 |---|---|---|
-| Elvia | Usa la app | Agenda y tareas completas |
-| Carlos | Su pareja | Agenda y tareas completas |
-| Nicolás, abuela Rosa, vecina Marta | Red de apoyo | Solo nombre y teléfono |
-| Mia | El agente | — |
+| Elvia | Uses the app | Full calendar and tasks |
+| Carlos | Her partner | Full calendar and tasks |
+| Nicolás, grandma Rosa, neighbour Marta | Support network | Name and phone number only |
+| Mia | The agent | — |
 
-**Dos círculos, y la diferencia es estructural.** El núcleo conecta su Google y Mia ve sus agendas. La red de apoyo solo está en la lista de contactos: Mia no ve nada suyo, no puede saber si están libres, y **nunca afirma su disponibilidad**. Para saberlo hay que llamarles, y por eso existe la videollamada.
-
----
-
-## La regla que decide casi todo
-
-> **¿Esto cambia el plan de alguien?**
-
-- **No lo cambia** → Mia lo hace sola y lo notifica. Acoplar un recado a un trayecto que alguien ya iba a hacer, reordenar recordatorios, montar la lista de la compra.
-- **Sí lo cambia** → Mia lo prepara entero y pide un sí o un no. Una tarjeta, dos botones.
-- **No se resuelve con un sí o un no** → videollamada. Es la excepción, y que sea rara es la métrica de éxito.
+**Two circles, and the difference is structural.** The core connects their Google accounts and Mia sees their calendars. The support network only exists in the contact list: Mia sees nothing of theirs, cannot know whether they are free, and **never claims they are available**. Finding out means calling them, and that is why the video call exists.
 
 ---
 
-## La tesis técnica
+## The rule that decides almost everything
 
-> **El modelo interpreta, el workflow decide.**
+> **Does this change anyone's plans?**
 
-Detectar que dos paradas chocan es aritmética sobre horas y distancias, y no se le pregunta a un modelo de lenguaje. Al modelo se le da solo lo que una máquina determinista no sabe hacer: entender una frase dicha en voz alta y elegir a quién conviene pedirle qué.
-
-De los ocho pasos de un run, solo dos tocan un modelo, y el que más decide no lo toca.
+- **It does not** → Mia does it herself and says so. Attaching an errand to a trip someone was making anyway, reordering reminders, building the shopping list.
+- **It does** → Mia prepares the whole thing and asks for a yes or a no. One card, two buttons.
+- **A yes or a no will not settle it** → video call. It is the exception, and how rarely it happens is the measure of success.
 
 ---
 
-## Arquitectura
+## The technical thesis
 
-**Un workflow**, `resolverConflicto`. Máquina de estados persistida en Postgres. Se suspende esperando a una persona y se reanuda en el paso exacto. El conflicto es un estado suyo, no un error.
+> **The model interprets, the workflow decides.**
 
-**Dos agentes**, y no hay un tercero:
+Working out that two stops collide is arithmetic over times and distances, and you do not ask a language model for that. The model gets only what a deterministic machine cannot do: understanding a sentence said out loud, and choosing who is the right person to ask.
 
-- `interprete` · modelo pequeño · convierte habla en intención tipada
-- `negociadora` · modelo grande · construye la propuesta y la redacta
+Of the eight steps in a run, only two touch a model — and the one that decides the most touches none.
 
-**Seis tools**, todas con esquema Zod: `leerAgenda`, `crearParada`, `escribirEvento`, `escribirTarea`, `abrirLlamada`, `añadirParticipante`.
+---
 
-Los agentes no hablan entre ellos. Hablan a través del workflow.
+## Architecture
 
-## Quién pone qué
+**One workflow**, `resolveConflict`. A state machine persisted in Postgres. It suspends waiting for a person and resumes at the exact step. A conflict is one of its states, not an error.
 
-| Pieza | Responsabilidad | Lo que NO hace |
+**Two agents**, and there is no third:
+
+- `interpreter` · small model · turns speech into typed intent
+- `negotiator` · large model · builds the proposal and writes it
+
+**Six tools**, every one with a Zod schema: `readCalendar`, `createStop`, `writeEvent`, `writeTask`, `openCall`, `addParticipant`.
+
+The agents do not talk to each other. They talk through the workflow.
+
+## Who does what
+
+| Piece | Owns | Does NOT do |
 |---|---|---|
-| **Mastra** | Orquestación, estado, tools tipadas | Hablar con el modelo directamente ni escribir en calendarios |
-| **Nebius** | Todo el razonamiento, en dos niveles | Decidir, y tampoco audio: su catálogo es texto |
-| **Vonage** | La sesión de vídeo, Live Captions, el SIP de Nicolás, Silent Auth | La lógica. Fuera del núcleo es la única forma de llegar a alguien |
-| **SLNG** | Todo lo que Mia dice y lo que oye fuera de la llamada | Entender: devuelve texto, lo interpreta Nebius |
-| **Google** | Calendar y Tasks del núcleo | La red de apoyo, que no conecta nada |
-| **Make** | Los efectos secundarios de una decisión ya tomada | Razonar o decidir a quién se le pide qué |
+| **Mastra** | Orchestration, state, typed tools | Talk to the model directly, or write to calendars |
+| **Nebius** | All the reasoning, at two tiers | Decide — and not audio either: its catalogue is text |
+| **Vonage** | The video session, Live Captions, Nicolás's SIP leg, Silent Auth | The logic. Outside the core it is the only way to reach anyone |
+| **SLNG** | Everything Mia says and hears outside the call | Understanding: it returns text, Nebius interprets it |
+| **Google** | Calendar and Tasks for the core | The support network, which connects nothing |
+| **Make** | The side effects of a decision already taken | Reasoning, or choosing who gets asked what |
 
-**La frontera entre Mastra y Make:** si Mia necesita el resultado para seguir razonando o para enseñar algo en pantalla ahora, es una tool de Mastra. Si es una consecuencia que puede ocurrir un minuto más tarde, es Make.
-
----
-
-## Reglas que no se rompen
-
-Estas están cubiertas por tests y bloquean el merge.
-
-1. **Nunca se escribe en un calendario sin confirmación humana.**
-2. **Mia no emite audio sin que alguien le haya dado la palabra.** Pide la palabra, se enciende su recuadro, y espera.
-3. **Nunca se afirma la disponibilidad de alguien de la red de apoyo.** Fuera del núcleo, el estado correcto es "no lo sé".
-4. **Mia no anuncia nada que todavía no sea verdad.** Quitarle algo de encima a alguien y que luego no ocurra es peor que no haberlo intentado.
-5. **La cercanía se calcula entre paradas, nunca entre personas.** No se usa la ubicación real de nadie.
-6. **Las cifras de tiempo ahorrado se calculan o se declaran como estimación.** Nunca se infla un número.
+**The border between Mastra and Make:** if Mia needs the result to keep reasoning, or to show something on screen now, it is a Mastra tool. If it is a consequence that can happen a minute later, it is Make.
 
 ---
 
-## Convenciones de código
+## Rules that do not bend
 
-- **TypeScript.** La aplicación es Next.js, la orquestación es Mastra.
-- **Salida estructurada siempre.** `response_format: { type: "json_schema" }` en toda llamada a Nebius. Activa decodificación restringida en vLLM: el modelo no puede romper el esquema. No hay parseo defensivo ni reintentos de formato.
-- **Zod con `.describe()` en cada campo.** El esquema es el prompt. Menos instrucciones kilométricas.
-- **Los identificadores de modelo no van en el código.** Salen del entorno. Nebius retira checkpoints sin redirigir el tráfico.
-- **En Mastra los modelos llevan prefijo `nebius/`.** En la API de Token Factory no lo llevan.
-- **Modalidad por carga:** `-fast` dentro de la videollamada, `base` para el resto, Batch API para el resumen semanal.
-- **Cabeceras de cuota.** Se lee `Retry-After` y se conmuta de `-fast` a base ante fallos sostenidos.
-- **La interfaz va en inglés.** Código, identificadores y textos de pantalla en inglés. La voz de Mia —lo que escucha y dice por SLNG— y los prompts a Nebius siguen en es-ES: la red de apoyo, empezando por la abuela Rosa, habla español.
+These are covered by tests and they block the merge.
 
----
-
-## Antes de escribir código de Mastra o de Vonage
-
-Las dos plataformas se mueven más rápido que los datos de entrenamiento de cualquier modelo. **Consulta sus MCP de documentación antes de proponer una API**, en vez de escribir de memoria. Están configurados en `.mcp.json` del repositorio.
-
-Esto no es opcional: la mitad de los ejemplos de Vonage que circulan son de la generación antigua de TokBox, y la API de Mastra ha cambiado de forma recientemente.
+1. **Nothing is ever written to a calendar without human confirmation.**
+2. **Mia does not speak unless someone has given her the floor.** She asks for it, her tile lights up, and she waits.
+3. **Nobody in the support network is ever described as available.** Outside the core, the correct state is "I don't know".
+4. **Mia announces nothing that is not true yet.** Taking something off someone's plate and then not delivering is worse than never having offered.
+5. **Proximity is measured between stops, never between people.** Nobody's real location is used.
+6. **Time-saved figures are either computed or declared as estimates.** No number gets inflated.
 
 ---
 
-## Cómo se trabaja
+## Code conventions
 
-### Nada sale al remoto sin permiso de Irina
+- **TypeScript.** The app is Next.js, the orchestration is Mastra.
+- **Structured output, always.** `response_format: { type: "json_schema" }` on every Nebius call. It turns on constrained decoding in vLLM: the model cannot break the schema. No defensive parsing, no format retries.
+- **Zod with `.describe()` on every field.** The schema is the prompt. Fewer mile-long instructions.
+- **Model identifiers never live in the code.** They come from the environment. Nebius retires checkpoints without redirecting traffic.
+- **In Mastra, model names carry the `nebius/` prefix.** In the Token Factory API they do not.
+- **Tier by load:** `-fast` inside the video call, `base` everywhere else, Batch API for the weekly summary.
+- **Quota headers.** Read `Retry-After`, and switch from `-fast` to base on sustained failures.
+- **The interface is in English.** Prose, code, identifiers, commit messages, issues, pull requests, on-screen copy — and **file and folder names too**. `docs/guides/accessibility.md`, not `docs/guias/accesibilidad.md`. A path is read far more often than it is typed, and half-translated trees are the ones people misfile things into.
+- **Mia's voice stays in Spanish.** What she hears and says through SLNG, and the prompts to Nebius, are es-ES. This is not an exception to the rule above, it is the product: the support circle — starting with grandma Rosa — speaks Spanish, and an agent that answered her in English would not be usable by the person it exists for.
 
-`git push`, abrir un pull request, publicar en cualquier servicio externo o desplegar: **se pide permiso y se espera respuesta**. Anunciarlo no basta. Commits en local, todos los que hagan falta.
+---
 
-El motivo es que este repositorio es público. Un push no se deshace, solo se parchea encima.
+## Before writing Mastra or Vonage code
 
-### Lo que no entra en git, nunca
+Both platforms move faster than any model's training data. **Check their documentation MCP before proposing an API**, rather than writing from memory. They are configured in `.mcp.json`.
 
-- **`.env` y cualquier variante.** Lo que se versiona es `.env.example`, sin un solo valor real.
-- **`private.key` de Vonage y cualquier `.key` o `.pem`.** En Railway la clave viaja como variable de entorno y el proceso la escribe a `/tmp` al arrancar.
-- **`/docs-internos`.** El brief y los zips de referencia se quedan fuera: aquí viaja solo lo destilado.
+This is not optional: half the Vonage examples in circulation belong to the older TokBox generation, and the Mastra API changed shape recently.
 
-Si aparece un secreto ya commiteado, la clave está quemada aunque se borre el fichero: hay que rotarla. Avisa en cuanto lo veas.
+---
 
-### Cómo se escribe aquí
+## How we work
 
-Todo lo que se escribe en este repositorio es público y va firmado por el equipo: issues, descripciones de PR, comentarios de review, specs, ADR y documentación.
+### Nothing reaches the remote without Irina's go-ahead
 
-**Quién lo lee.** El jurado de la hackathon. Los patrocinadores, que miran si su plataforma se usó con criterio. Una desarrolladora que entra hoy sin contexto. Un perfil externo que llega al repositorio y se hace una idea del equipo por cómo está escrito. Un texto que funciona para las cuatro es un texto bien escrito.
+`git push`, opening a pull request, publishing to any external service, deploying: **ask, and wait for the answer**. Announcing it while you do it does not count. Local commits, as many as you like.
 
-**El registro es asertivo**, que no es duro ni es blando. Se dice el problema entero, se explica por qué importa y se propone una salida. Los dos extremos fallan igual: el comentario cortante que ahorra palabras a costa de quien lo recibe, y el tan suavizado que la otra persona no llega a entender que hay algo que cambiar.
+The reason is that this repository is public. A push cannot be undone, only patched over.
 
-Las reglas concretas:
+### What never goes into git
 
-- **Nada en negativo.** Los límites se cuentan como decisiones, porque lo son. «Descartamos la caché porque optimiza a escala y aquí no hay escala» dice más de un equipo que no mencionarla. «No nos dio tiempo» dice menos que «ese tiempo fue a la parte crítica».
-- **Ni flores ni quitárselas.** Las dos hablan de quien escribe en vez de del trabajo. El punto medio se llama precisión: «el clasificador acierta el 93 % sobre treinta casos reales», y no «funciona bastante bien» ni «una arquitectura potentísima». Un número comprobado convence más que cualquier adjetivo.
-- **Se habla del código, nunca de la persona.** «Este método hace dos cosas», y no «has mezclado responsabilidades».
-- **Cada señalamiento lleva su porqué y una propuesta.** Sin el motivo, una corrección es una orden.
-- **En una review, bloqueante y sugerencia se dicen con esas palabras.** Quien la recibe tiene que saber sin preguntar qué necesita cambiar para que se apruebe.
-- **Se entiende sin haber estado ahí.** Quien lo lee no vivió el día en que pasó, ni sabe qué significan esas siglas.
-- **Nada de minimizadores ni de ironía.** «Simplemente», «solo tienes que», «obviamente» y «es trivial» hacen sentir torpe a quien no lo ve. El sarcasmo por escrito no se distingue del reproche.
-- **Prosa en español de España. Código, identificadores y nombres de rama en inglés.** El registro es el mismo en los dos idiomas.
+- **`.env` and every variant of it.** What is versioned is `.env.example`, without a single real value.
+- **Vonage's `private.key`, and any `.key` or `.pem`.** On Railway the key travels as an environment variable and the process writes it to disk at start-up.
+- **`/docs-internos`.** The brief and the reference archives stay out: only distilled material travels here.
 
-La comprobación antes de publicar cualquier cosa son dos preguntas: **¿le resultaría agradable de leer a cualquiera de esas cuatro personas? ¿Se entiende sin haber estado ahí?** Si alguna respuesta es «no del todo», el texto no está terminado.
+If a secret turns out to be committed, the key is burnt even if you delete the file: it has to be rotated. Say so the moment you see it.
 
-### Las ramas
+### How we write here
+
+Everything written in this repository is public and signed by the team: issues, pull request descriptions, review comments, specs, decisions and documentation.
+
+**Who reads it.** The hackathon jury. The sponsors, checking whether their platform was used with judgement. A developer joining today with no context. Someone external who lands on the repository and forms a view of the team from how it reads. Text that works for all four is text that is well written.
+
+**The register is assertive**, which is neither harsh nor soft. State the whole problem, explain why it matters, propose a way out. Both extremes fail equally: the curt comment that saves words at the reader's expense, and the one so softened that the other person never realises something needs changing.
+
+The concrete rules:
+
+- **Nothing framed as a shortfall.** Limits are decisions, so they read as decisions. "We dropped the cache because it optimises at scale and there is no scale here" says more about a team than not mentioning it. "We ran out of time" says less than "that time went to the critical path".
+- **No self-praise, and no self-deprecation.** Both talk about the writer instead of the work. The middle ground is precision: "the classifier is right 93% of the time across thirty real cases", not "works pretty well" and not "a seriously powerful architecture". A checked number convinces more than any adjective.
+- **Talk about the code, never the person.** "This method does two things", not "you mixed up responsibilities".
+- **Every point raised carries its reason and a proposal.** Without the reason, a correction is an order.
+- **In a review, say "blocking" and "suggestion" in those words.** The person receiving it should know without asking what has to change for approval.
+- **It reads without having been there.** The reader did not live the day it happened, and does not know what those initials mean.
+- **No minimisers, no irony.** "Just", "you only need to", "obviously" and "it's trivial" make anyone who cannot see it feel slow. Sarcasm in writing is indistinguishable from reproach.
+- **Everything in English**, prose and code alike, and the register is the same throughout.
+
+The check before publishing anything is two questions: **would any of those four people find this pleasant to read? Does it read without having been there?** If either answer is "not quite", the text is not finished.
+
+### Branches
 
 ```text
-main                 producción: lo estable, lo que se entrega
- └── dev             donde trabajamos: todo pasa por aquí
-      └── feature/12-sala-de-video
+main                 production: what is stable, what ships
+ └── dev             where we work: everything goes through here
+      └── feature/12-video-room
 ```
 
-**Nadie trabaja directamente en `main` ni en `dev`.** Cada rama sale de `dev` actualizada y lleva el número de su issue en el nombre. Los pull request van **siempre hacia `dev`**, nunca a `main`. De `dev` a `main` se pasa con un PR aparte, y eso es una release.
+**Nobody works directly on `main` or `dev`.** Every branch comes off an up-to-date `dev` and carries its issue number in the name. Pull requests always go **to `dev`**, never to `main`. `dev` to `main` is a separate pull request, and that is a release.
 
-Una consecuencia que conviene tener presente: GitHub solo cierra issues con `closes #12` cuando el PR apunta a la rama por defecto, que aquí es `main`. Como los nuestros van a `dev`, de eso se encarga `.github/workflows/cerrar-issues.yml`.
+One consequence worth keeping in mind: GitHub only closes issues from `closes #12` when the pull request targets the default branch, which here is `main`. Since ours target `dev`, `.github/workflows/close-issues.yml` handles it.
 
-### Una spec por tarea, antes del código
+### One spec per task, before the code
 
-**Ninguna tarea empieza por el código.** El orden es siempre el mismo:
+**No task starts with the code.** The order is always the same:
 
 ```text
-issue  →  spec  →  rama desde dev  →  código  →  PR a dev  →  review  →  merge
+issue  →  spec  →  branch off dev  →  code  →  PR to dev  →  review  →  merge
 ```
 
-La spec vive en `docs/specs/`, se escribe con la plantilla de [`docs/specs/0000-plantilla.md`](docs/specs/0000-plantilla.md) y se enlaza desde el issue. Define qué entra, qué queda fuera a propósito, cuál es el contrato y cómo se comprueba que funciona.
+The spec lives in `docs/specs/`, is written from [`docs/specs/0000-template.md`](docs/specs/0000-template.md) and is linked from the issue. It defines what is in, what is deliberately out, what the contract is, and how you check it works.
 
-Sirve para dos cosas concretas en un fin de semana: que dos personas no construyan la misma pieza de dos formas distintas, y que una sesión de Claude Code en el cloud pueda trabajar sola sin volver a preguntar el contexto entero.
+It earns its keep twice over a weekend: two people do not build the same piece two different ways, and a Claude Code session in the cloud can work alone without asking for the whole context again.
 
-El circuito completo está en [`docs/workflow/spec-driven-development.md`](docs/workflow/spec-driven-development.md), y el resto del proceso en [`docs/workflow/`](docs/workflow/): ramas y pull requests, commits, e issues y etiquetas.
+The full circuit is in [`docs/workflow/spec-driven-development.md`](docs/workflow/spec-driven-development.md), and the rest of the process in [`docs/workflow/`](docs/workflow/): branches and pull requests, commits, issues and labels.
 
-### Las decisiones de arquitectura se escriben
+### Architecture decisions get written down
 
-Cuando una decisión cierra opciones futuras o es cara de revertir — esquema de base de datos, contrato de una API pública, un tipo compartido, la estructura de rutas — se registra en [`docs/decisiones/`](docs/decisiones/), numerada y con su contexto, sus alternativas descartadas y sus consecuencias.
+When a decision closes off future options or is expensive to reverse — a database schema, a public API contract, a shared type, the route structure — it goes in [`docs/decisions/`](docs/decisions/), numbered, with its context, the alternatives rejected and the consequences.
 
-Se escribe en diez minutos y evita volver a discutir lo mismo el domingo por la mañana. Una decisión que deja de valer no se borra: se marca como sustituida y se escribe la nueva encima.
+It takes ten minutes to write and saves having the same argument again on Sunday morning. A decision that stops holding is not deleted: it is marked as superseded and the new one is written over it.
 
-### Los agentes especializados
+### The specialised agents
 
-En `.claude/agents/` hay ocho perfiles con instrucciones propias. **Uno por carril**, para que cada uno tenga un terreno claro y no se pisen:
+`.claude/agents/` holds eight profiles with their own instructions. **One per lane**, so each has clear ground and they do not tread on each other:
 
-| Agente | Su carril |
+| Agent | Its lane |
 |---|---|
-| `orquestacion` | Mastra: el workflow, los dos agentes, las seis tools y el estado en Postgres |
-| `razonamiento` | Nebius: los dos niveles de modelo, la salida estructurada, la cuota y el banco de pruebas |
-| `llamada` | Vonage: la sesión de vídeo, Live Captions, el SIP y Silent Authentication |
-| `interfaz` | Las tres pantallas, los tokens de color y todo lo que se ve |
-| `automatizaciones` | Make: los cinco escenarios, sus webhooks y el almacén de recordatorios |
-| `qa` | Los datos de la demo, las frases habladas, el ensayo y el plan de caídas |
-| `accesibilidad` | El repaso pantalla a pantalla contra el estándar del proyecto |
-| `revisor-textos` | La ortografía y la gramática de todo lo que se publica |
+| `orchestration` | Mastra: the workflow, the two agents, the six tools and the state in Postgres |
+| `reasoning` | Nebius: the two model tiers, structured output, quota and the benchmark |
+| `call` | Vonage: the video session, Live Captions, SIP and Silent Authentication |
+| `interface` | The three screens, the colour tokens and everything visible |
+| `automations` | Make: the five scenarios, their webhooks and the reminder store |
+| `qa` | Demo data, the spoken phrases, the rehearsal and the failure plan |
+| `accessibility` | The screen-by-screen pass against the project's bar |
+| `copy-editor` | Spelling and grammar across everything published |
 
-Y dos skills en `.claude/skills/`: `consultar-docs-sponsors`, para la documentación viva de las plataformas, y `voz-de-mia`, para cómo habla el agente.
-
----
-
-## Lo que deliberadamente no hacemos
-
-- **Fine-tuning.** No hay datos propios y el problema es de orquestación.
-- **Caché semántica.** Optimiza a escala, y aquí no hay escala.
-- **Compensación tipo SAGA.** Con ocho pasos y un servicio crítico, un deshacer manual cubre lo mismo.
-- **Más agentes.** Dos cubren todo lo que hay que interpretar.
-- **Audio Connector con Pipecat.** Es por donde crece esto, pero Pipecat es un framework entero en Python.
-- **El agente de voz completo con unmute.** La versión redonda, y otro proyecto.
-- **Embeddings y reranker.** No hay corpus. Sería arquitectura para la foto.
+Plus two skills in `.claude/skills/`: `platform-docs`, for the platforms' living documentation, and `mia-voice`, for how the agent speaks.
 
 ---
 
-## Dónde está cada cosa
+## What we deliberately do not do
 
-| Ruta | Qué hay dentro |
+- **Fine-tuning.** There is no proprietary data and the problem is one of orchestration.
+- **Semantic caching.** It optimises at scale, and there is no scale here.
+- **SAGA-style compensation.** With eight steps and one critical service, a manual undo covers the same ground.
+- **More agents.** Two cover everything that needs interpreting.
+- **Audio Connector with Pipecat.** It is where this grows, but Pipecat is a whole framework in Python.
+- **The full voice agent with unmute.** The polished version, and a different project.
+- **Embeddings and a reranker.** There is no corpus. It would be architecture for the photo.
+
+---
+
+## Where everything lives
+
+| Path | What is inside |
 |---|---|
-| `docs/workflow/` | Cómo se trabaja: ramas y PR, commits, issues y etiquetas, spec driven development |
-| `docs/specs/` | Una spec por tarea, más la plantilla |
-| `docs/decisiones/` | Las decisiones de arquitectura, con su contexto y sus consecuencias |
-| `docs/guias/` | Guías por tema: accesibilidad y Make |
-| `.claude/agents/` | Los ocho agentes, uno por carril |
-| `.claude/skills/` | Documentación viva de las plataformas y la voz de Mia |
-| `.github/` | Plantillas de issue y de PR, etiquetas, CODEOWNERS, rulesets e integración continua |
-| `scripts/configurar-github.sh` | Aplica etiquetas, rama `dev` y reglas de protección. Se ejecuta una vez |
-| `.mcp.json` | Los MCP de documentación de Mastra y de Vonage |
-| `CHANGELOG.md` | Qué ha cambiado. Una línea por pull request |
+| `docs/workflow/` | How we work: branches and PRs, commits, issues and labels, spec driven development |
+| `docs/specs/` | One spec per task, plus the template |
+| `docs/decisions/` | Architecture decisions, with their context and consequences |
+| `docs/guides/` | Guides by topic: accessibility, Make and deployment |
+| `.claude/agents/` | The eight agents, one per lane |
+| `.claude/skills/` | The platforms' living documentation, and Mia's voice |
+| `.github/` | Issue and PR templates, labels, CODEOWNERS, rulesets and continuous integration |
+| `scripts/configure-github.sh` | Applies labels, the `dev` branch and the protection rules. Run once |
+| `.mcp.json` | The Mastra and Vonage documentation MCPs |
+| `CHANGELOG.md` | What changed. One line per pull request |
+
+Paths are in English too, and that is the rule going forward: a new file or folder gets an English name from the start. Renaming one later means chasing every link that pointed at it.
 
 ---
 
-## Decisiones abiertas
+## Open questions
 
-Estas siguen pendientes y conviene cerrarlas antes de que cuesten caro.
+Still unresolved, and worth closing before they get expensive.
 
-- **El niño necesita un nombre.** Aparece en pantallas, en avisos y en la voz de Mia. En cuanto se decida, se escribe aquí y deja de discutirse.
-- **Los rulesets de protección de ramas están sin aplicar.** Hasta que se ejecute `scripts/configurar-github.sh`, `main` y `dev` aceptan push directo y el flujo depende de la buena voluntad de cada una.
-- **Los scripts de prueba de `package.json` y los que nombra `TESTING.md`** todavía no coinciden. Hasta que se alineen, la fuente buena es `package.json`, que es lo que ejecuta la integración continua.
+- **The child needs a name.** He shows up on screens, in notifications and in Mia's voice. Once it is decided, it gets written here and stops being discussed.
+- **Required approvals are set to zero** on `main` and `dev` for the duration of the hackathon. A pull request and green CI are still enforced. Another person reviewing is still the team's agreement — there is simply no machine checking it now, and turning it back on afterwards is the first thing to restore.
+- **`/api/health` does not check Postgres yet.** It reports that the process is alive and says so in those words. Once the database client exists it has to run a real query: the app can be up with the database down, and that is exactly what a health check is for.

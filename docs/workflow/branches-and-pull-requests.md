@@ -74,8 +74,15 @@ comprobación que hay que completar de verdad:
 Es la regla que no se negocia. Si el mismo lado escribe el arreglo y la constancia de que
 funciona, el registro deja de verificar nada: se convierte en un trámite que nadie lee.
 
-Cada PR necesita la aprobación de **otra persona del equipo**. Y GitHub lo va a exigir, no es
-solo un acuerdo entre nosotras (ver más abajo).
+Cada PR la mira **otra persona del equipo** antes de mezclarse.
+
+**Esto es un acuerdo entre nosotras, y GitHub ya no lo exige.** Se quitó la aprobación
+obligatoria durante la hackatón: con una sola cuenta trabajando a ratos, la regla bloqueaba el
+propio andamiaje en lugar de proteger nada. Lo que GitHub sí sigue exigiendo es que haya pull
+request y que la CI esté en verde.
+
+Que no lo exija una máquina no lo hace opcional: lo hace nuestro. Y fuera de un fin de semana,
+esta es de las primeras cosas que conviene volver a activar.
 
 ### Revisar una PR de otra persona
 
@@ -101,12 +108,16 @@ Cuando `dev` está estable y sin conflictos, se abre una PR de `dev` a `main`. E
 El repositorio es **público y está en una organización**, y eso permite (con plan gratuito)
 proteger las ramas de verdad. Las reglas están escritas en
 [`.github/rulesets/`](../../.github/rulesets/) y se aplican con
-[`scripts/configurar-github.sh`](../../scripts/configurar-github.sh).
+[`scripts/configure-github.sh`](../../scripts/configure-github.sh).
 
 | Rama | Qué impide |
 |---|---|
-| `main` | Push directo · exige PR · exige 1 aprobación · exige CI en verde · no se puede borrar |
-| `dev` | Push directo · exige PR · exige 1 aprobación · exige CI en verde |
+| `main` | Push directo · reescritura del historial · exige PR · exige CI en verde · no se puede borrar |
+| `dev` | Push directo · reescritura del historial · exige PR · exige CI en verde · no se puede borrar |
+
+**La aprobación obligatoria está en cero durante la hackatón**, y es lo único que se ha aflojado.
+Que otra persona revise sigue siendo el acuerdo del equipo; lo que ya no hay es una máquina
+comprobándolo.
 
 No son decoración. Sin ellas, el flujo se lo salta quien va con prisa a las tres de la
 madrugada, que es exactamente cuando más falta hace.
@@ -124,7 +135,7 @@ Nuestra rama por defecto es `main`, pero las PR van a `dev`. O sea: **`closes #1
 `dev` no cerraría la issue**, y nos habríamos pasado la hackatón cerrándolas a mano sin entender
 por qué.
 
-Por eso existe [`.github/workflows/cerrar-issues.yml`](../../.github/workflows/cerrar-issues.yml):
+Por eso existe [`.github/workflows/close-issues.yml`](../../.github/workflows/close-issues.yml):
 lee el cuerpo de la PR al mergearse en `dev` y cierra las issues que menciona. Sigue escribiéndose
 `closes #12` igual; solo cambia quién lo ejecuta.
 

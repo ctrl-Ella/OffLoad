@@ -1,5 +1,5 @@
 ---
-name: razonamiento
+name: reasoning
 description: "Carril de Nebius Token Factory: los dos niveles de modelo, la salida estructurada por JSON Schema, el enrutado entre modelo pequeño y grande, las modalidades base y -fast, la cuota y el banco de pruebas. Úsalo para elegir modelo, medir, o depurar una llamada a Nebius."
 ---
 
@@ -30,7 +30,7 @@ Nebius **no publica MCP**: se consulta con WebFetch. Y antes de cada tanda, el c
 curl -H "Authorization: Bearer $NEBIUS_API_KEY" $NEBIUS_BASE_URL/models
 ```
 
-Dos trampas que cuestan una tarde, ampliadas en la skill `consultar-docs-sponsors`:
+Dos trampas que cuestan una tarde, ampliadas en la skill `platform-docs`:
 
 - El catálogo se mueve y **los checkpoints retirados no redirigen el tráfico**. Un identificador
   fijo en el código es una avería futura: salen del entorno.
@@ -42,7 +42,7 @@ Dos trampas que cuestan una tarde, ampliadas en la skill `consultar-docs-sponsor
   aritmética y no pasa por aquí.
 - **El audio.** El catálogo de Nebius es texto. Lo que Mia dice y oye fuera de la llamada es
   SLNG; dentro de la llamada, Live Captions de Vonage.
-- Definir tools y esquemas: eso es del carril `orquestacion`.
+- Definir tools y esquemas: eso es del carril `orchestration`.
 
 ## Lo que no puedes romper
 

@@ -10,7 +10,7 @@
 
    Cada token lleva anotado su contraste. El listón del proyecto es 4,5:1 para
    texto normal y 3:1 para texto grande y elementos gráficos, y el porqué de
-   ese nivel está en docs/guias/accesibilidad.md.
+   ese nivel está en docs/guides/accessibility.md.
 
    Si cambias un color, vuelve a medirlo. Un token es una promesa de
    contraste: si se cambia sin comprobar, la promesa se rompe en silencio.

@@ -1,5 +1,5 @@
 ---
-name: consultar-docs-sponsors
+name: platform-docs
 description: "Consultar la documentación viva de Mastra, Vonage, Nebius, SLNG, Make o Railway antes de escribir código contra ellas. Se activa siempre que se vaya a proponer una API, un parámetro, un identificador de modelo o una opción de configuración de cualquiera de esas seis plataformas, y también al depurar un error que venga de una de ellas."
 ---
 
@@ -97,7 +97,7 @@ Dos intentos fallidos antes de dar con esto, y merece la pena que estén escrito
 
 `node node_modules/@mastra/mcp-docs-server/dist/stdio.js` no depende de la resolución de
 ejecutables del sistema y funciona igual en Windows, macOS y Linux. Fijar la versión es además
-lo que ya decidió la [0002](../../../docs/decisiones/0002-versiones-fijadas-sin-rango.md).
+lo que ya decidió la [0002](../../../docs/decisions/0002-pinned-versions-no-ranges.md).
 
 Si algún día hay que actualizarlo: `npm install --save-exact @mastra/mcp-docs-server@<version>`.
 
@@ -109,7 +109,7 @@ zona de la cuenta y exige un token personal, así que puesto ahí sin credencial
 arrancar en la sesión de todo el mundo, todos los días.
 
 Quien vaya a construir los escenarios lo añade en su configuración local, con su token, y no lo
-sube. Mientras tanto, la guía de `docs/guias/make.md` cubre los cinco escenarios clic a clic.
+sube. Mientras tanto, la guía de `docs/guides/make.md` cubre los cinco escenarios clic a clic.
 
 ## Trampas que ya conocemos
 
@@ -335,7 +335,7 @@ Antes de consultar, conviene tener estas presentes, porque son las que hacen per
   *(Las cuatro medidas contra la API el 2026-09-18.)*
 - **El SDK oficial de JavaScript es `voiceai-sdk`, y va por la 0.2.0.** Una API de dos cifras por
   debajo de uno es superficie que puede cambiar de forma entre hackatón y demo: si se usa, se fija
-  la versión exacta, que es lo que ya pide la [0002](../../../docs/decisiones/0002-versiones-fijadas-sin-rango.md).
+  la versión exacta, que es lo que ya pide la [0002](../../../docs/decisions/0002-pinned-versions-no-ranges.md).
 
 **Railway**
 
@@ -362,6 +362,13 @@ Antes de consultar, conviene tener estas presentes, porque son las que hacen per
   de datos expuesta indefinidamente. Conviene comprobar con `tcp-proxy list` que queda en cero.
   El host y el puerto salen del `--json` del `create`, en `domain` y `proxyPort`.
   *(Comprobado el 2026-09-18.)*
+- **Pero ese JSON los trae anidados bajo `proxy`, no en la raíz:**
+  `{ "applicationPort": 5432, "staged": false, "committed": true, "proxy": { "id", "domain", "proxyPort" } }`.
+  Leerlos del primer nivel devuelve vacío, y ahí está la trampa de verdad: **cuando te enteras de
+  que no has podido leer el identificador, el proxy ya existe.** Un script que aborte en ese punto
+  por prudencia deja la base de datos abierta justamente por ser prudente. El borrado no puede
+  depender del parseo: si el `id` no sale del JSON, se saca de `tcp-proxy list`, que lo da en texto
+  plano. *(Pagado el 2026-09-19, con la base de datos expuesta unos minutos.)*
 - **Las credenciales de Postgres están en las variables del servicio `Postgres`**, no en las del
   servicio de la aplicación: `PGUSER`, `PGPASSWORD` y `PGDATABASE`. En el servicio de la aplicación
   solo está `DATABASE_URL`, que apunta a la interna.

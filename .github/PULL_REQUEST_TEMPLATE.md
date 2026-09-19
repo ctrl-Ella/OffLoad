@@ -1,43 +1,45 @@
-## Qué hace
+## What it does
 
-<!-- En una o dos frases. Si necesitas más, quizá son dos PR. -->
+<!-- One or two sentences. If you need more, this may be two pull requests. -->
 
 closes #
 
-## Por qué
+## Why
 
-<!-- El contexto que no se ve en el código. Qué se descartó y por qué, si viene al caso. -->
+<!-- The context the code does not show. What was rejected and why, if it matters. -->
 
-## Cómo comprobarlo
+## How to check it
 
-<!-- Los pasos que va a seguir quien revise. Que se basten solos. -->
+<!-- The steps whoever reviews will follow. They should stand on their own. -->
 
 1.
 2.
 3.
 
-## Antes de pedir revisión
+## Before asking for review
 
-- [ ] `npm run typecheck` pasa
-- [ ] `npm run lint` pasa
-- [ ] La **spec** de `docs/specs/` está actualizada (o no aplica, y lo digo abajo)
-- [ ] La **documentación** afectada está actualizada
-- [ ] El **CHANGELOG** tiene una línea sobre esto
-- [ ] El cuerpo lleva `closes #NN` con el número real
-- [ ] No hay claves, tokens ni archivos `.key` en el diff
+- [ ] `npm run typecheck` passes
+- [ ] `npm run lint` passes
+- [ ] The **spec** in `docs/specs/` is up to date (or does not apply, and I say so below)
+- [ ] The **documentation** affected is up to date
+- [ ] The **CHANGELOG** has a line about this
+- [ ] The body carries `closes #NN` with the real number
+- [ ] No keys, tokens or `.key` files in the diff
 
-## Si toca interfaz
+## If it touches the interface
 
-- [ ] Se puede usar solo con teclado, y el foco se ve siempre
-- [ ] Probado a **200% de zoom**
-- [ ] Probado en **móvil en horizontal** (los fallos de alto no salen probando anchos)
-- [ ] Los iconos decorativos llevan `aria-hidden`; los botones de solo icono, `aria-label`
-- [ ] Contraste ≥ 4,5:1 en texto normal y ≥ 3:1 en texto grande y gráficos, si he tocado colores
-- [ ] Se ve bien en móvil, en pantalla de ordenador y en pantalla grande
+- [ ] Usable with the keyboard alone, and the focus is always visible
+- [ ] Checked at **200% zoom**
+- [ ] Checked on **mobile in landscape** (height failures do not show up by testing widths)
+- [ ] Decorative icons carry `aria-hidden`; icon-only buttons carry `aria-label`
+- [ ] Contrast at least 4.5:1 for body text and 3:1 for large text and graphics, if I touched colours
+- [ ] Looks right on mobile, on a laptop screen and on a large display
 
 ---
 
 <!--
-Recordatorio: quien escribe el código no aprueba su propia PR.
-Necesita el visto bueno de otra persona del equipo.
+Reminder: whoever writes the code does not approve their own pull request.
+
+During the hackathon GitHub no longer enforces it, so it is on us. That a machine
+does not check it does not make it optional: it makes it ours.
 -->
