@@ -44,10 +44,14 @@ const schema = z.object({
   /** SLNG, which is what Mia says. Optional for the same reason as the rest:
    *  `next build` needs no secrets, and everything else works without a voice. */
   SLNG_API_KEY: z.string().min(1).optional(),
-  /** Model identifiers come from the environment because SLNG can retire one.
-   *  The defaults are the casting decision, not configuration: see spec 0002. */
-  SLNG_TTS_MODEL: z.string().min(1).default("deepgram/aura:2"),
-  SLNG_TTS_VOICE: z.string().min(1).default("aura-2-silvia-es"),
+  /** Mia's voice is Catalina, on a model that only streams over WebSocket.
+   *  Declared here so the casting is not lost; it speaks once the call exists. */
+  SLNG_TTS_MODEL: z.string().min(1).default("cartesia/sonic:3.5"),
+  SLNG_TTS_VOICE: z.string().min(1).default("162e0f37-8504-474c-bb33-c606c01890dc"),
+  /** The stand-in for a whole clip over HTTP, which is what speaks today.
+   *  Identifiers come from the environment because SLNG can retire one. */
+  SLNG_TTS_CLIP_MODEL: z.string().min(1).default("deepgram/aura:2"),
+  SLNG_TTS_CLIP_VOICE: z.string().min(1).default("aura-2-silvia-es"),
   /** Where a family's audio travels. The EU by default; `eu-central` does not exist. */
   SLNG_REGION: z.string().min(1).default("eu-west"),
 
@@ -182,12 +186,12 @@ export type MiaVoice = {
   base: string;
 };
 
-/** Only the key can be missing: model and voice have defaults. */
+/** The clip pair, which is what can speak today. Only the key can be missing. */
 export function requireMiaVoice(): MiaVoice {
   const {
     SLNG_API_KEY: apiKey,
-    SLNG_TTS_MODEL: model,
-    SLNG_TTS_VOICE: voice,
+    SLNG_TTS_CLIP_MODEL: model,
+    SLNG_TTS_CLIP_VOICE: voice,
     SLNG_REGION: region,
   } = env;
 

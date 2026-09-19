@@ -71,7 +71,7 @@ Bringing her over is not a copy. The prototype's tokens, class names and identif
 
 **Playing the clip in the browser and tying it to `speaking`.** That is the call screen's job, and it is where rule 2 is enforced: the clip plays only when someone gives her the floor, which is also the gesture the browser needs to unlock audio.
 
-**The in-call streaming voice.** The prototype's casting picked `cartesia/sonic:3.5` with a Cartesia voice for the phase where audio streams as it is generated, and that model is WebSocket only. The decision is recorded in the notes below and comes back with the call.
+**Making Catalina speak.** Her model is WebSocket only, and that route belongs to the call. Her pair of variables is declared and documented here so the casting travels with the code; wiring it is the call screen's work.
 
 **Dark theme for Mia.** Deliberately none: she is a character, not a surface, and a logo does not invert with the hour.
 
@@ -90,6 +90,7 @@ Bringing her over is not a copy. The prototype's tokens, class names and identif
 | The label's colour is reinforcement, the word is the information | Colour alone for "has the floor" | "Pide la palabra" and "Hablando" already say it. Someone who cannot tell the teal apart reads the same thing |
 | The brand tomato is `--color-alert-strong`, reused, not a second value | A `--mia-brand` with its own hex | Same colour, one place to change it. It always sits on the helmet: on the purple body it measures 1.02:1 and disappears |
 | Synthesis takes a model and a voice from the environment, with defaults | Only the key, model fixed in code | The model identifier is what SLNG can retire without warning, and that rule is already in `CLAUDE.md`. The defaults are not secrets: they are the casting decision, and a decision belongs where the next person will look |
+| Two pairs of variables: Catalina as `SLNG_TTS_*`, Silvia as `SLNG_TTS_CLIP_*` | Only the pair that speaks today | Catalina is the voice the team chose, and dropping her variables because her route is not built yet would lose that decision. The unqualified name goes to the chosen voice; the stand-in carries the qualifier |
 | Audio never touches disk on the server, and no log line carries the text | Caching clips by text | This synthesises what a family is told about its own house. The product needs the bytes for as long as it takes to play them and not a second more |
 | A command-line check instead of a route | An `/api/mia/voice?text=` for testing | A synthesis route that takes free text is an open relay to a paid API on a public URL. The command needs the key and runs where the key is |
 
@@ -125,10 +126,12 @@ function synthesise(text: string): Promise<ArrayBuffer>;  // WAV, 24 kHz
 **Environment**, in `.env.example`:
 
 ```bash
-SLNG_API_KEY=                        # per project, shown once
-SLNG_TTS_MODEL=deepgram/aura:2       # HTTP route. The default is the casting
-SLNG_TTS_VOICE=aura-2-silvia-es      # the voice inside the model
-SLNG_REGION=eu-west                  # where the audio travels. There is no eu-central
+SLNG_API_KEY=                                          # per project, shown once
+SLNG_TTS_MODEL=cartesia/sonic:3.5                      # Catalina: the chosen voice, WebSocket only
+SLNG_TTS_VOICE=162e0f37-8504-474c-bb33-c606c01890dc
+SLNG_TTS_CLIP_MODEL=deepgram/aura:2                    # Silvia: the stand-in for a clip over HTTP
+SLNG_TTS_CLIP_VOICE=aura-2-silvia-es
+SLNG_REGION=eu-west                                    # where the audio travels. There is no eu-central
 ```
 
 **Command**: `npm run mia:say -- "<text>" <file.wav>`.
@@ -157,7 +160,7 @@ npm run dev
 
 **The prototype's component is the source of truth for the drawing**, coordinates included. What changed here is names, tokens, and where the reasoning lives.
 
-**The casting, so it is not repeated.** Three of Mia's sentences, four voices in a row, on 2026-09-18 against `eu-west`. Two filters before pressing play: no voice named after anyone in the household, and none described as "warm", "cheerful" or "upbeat", which is the register that turns Mia into a sales assistant. The streaming pick was `cartesia/sonic:3.5`, the fastest Spanish model served from an EU region at 109 ms, and it is WebSocket only. For a clip over HTTP the pick was `deepgram/aura:2` with `aura-2-silvia-es`, chosen by pace: the same sentence in 2.5 seconds where another voice took 3.6. A model that was considered and dropped: `fish`, which speaks Spanish but is served from no European region.
+**The casting, so it is not repeated.** Three of Mia's sentences, four voices in a row, on 2026-09-18 against `eu-west`. Two filters before pressing play: no voice named after anyone in the household, and none described as "warm", "cheerful" or "upbeat", which is the register that turns Mia into a sales assistant. **Mia is Catalina, "Neighborly Guide"**, from Cartesia Sonic 3: the three other finalists were the ones the catalogue calls professional, and they sounded like a switchboard. The everyday one won, and that says something about everything Mia will say from now on. Her model, `cartesia/sonic:3.5`, is the fastest Spanish one served from an EU region at 109 ms, and it is WebSocket only. Her identifier comes from the Sonic 3 catalogue and the model is Sonic 3.5, which publishes no list: unverified until the first real call. For a clip over HTTP the stand-in is `deepgram/aura:2` with `aura-2-silvia-es`, chosen by pace: the same sentence in 2.5 seconds where another voice took 3.6. Silvia was heard and approved on 2026-09-19 saying one of Mia's lines inside a real call. A model considered and dropped: `fish`, which speaks Spanish but is served from no European region.
 
 **Three things the SLNG synthesis route does that the documentation does not make obvious**, all checked in the prototype: the `model` field in the body is the voice, not the model, which goes in the URL; `encoding`, `sample_rate` and `container` are listed as optional and the Aura route rejects them with a 400; and the WAV header declares two gigabytes, which is the unknown-size marker of a streamed response, not a truncated file.
 
