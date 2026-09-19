@@ -1,14 +1,15 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { motion } from "motion/react";
 import { useReducedMotionSafe } from "@/lib/motion";
 
-/** The orb's three moments: waiting, actively picking up speech, and — new
- *  since the batch transcription turned out to take 15 to 45 seconds instead
- *  of a couple — working on what was said. Each has its own decoration
- *  around the sphere: nothing while idle, pulsing rings while listening,
- *  three dots orbiting while processing. Never more than one at once. */
-export type OrbState = "idle" | "listening" | "processing";
+/** The orb's four moments: waiting, actively picking up speech, working on
+ *  what was said, and — once the transcript comes back structured — done.
+ *  Each has its own decoration around the sphere: nothing while idle,
+ *  pulsing rings while listening, three dots orbiting while processing, a
+ *  checkmark badge once it's sorted. Never more than one at once. */
+export type OrbState = "idle" | "listening" | "processing" | "success";
 
 // Roughly even spacing around the circle — top, lower-right, lower-left —
 // placed as CSS offsets rather than trigonometry so they scale with the
@@ -35,6 +36,7 @@ export function ListeningOrb({ state }: { state: OrbState }) {
   const prefersReducedMotion = useReducedMotionSafe();
   const isListening = state === "listening";
   const isProcessing = state === "processing";
+  const isSuccess = state === "success";
 
   return (
     <div className="relative flex h-48 w-48 items-center justify-center sm:h-56 sm:w-56">
@@ -114,6 +116,24 @@ export function ListeningOrb({ state }: { state: OrbState }) {
             : { duration: 2.8, repeat: Infinity, ease: "easeInOut" }
         }
       />
+
+      {/* The checkmark sits on its own flat badge rather than directly on
+          the gradient: --color-surface-immersive under --color-accent-immersive
+          is the pair already measured at 11.86:1 elsewhere in this file, so
+          reusing it here needs no new contrast figure. Landing the icon
+          straight on the gradient would put it over --color-accent-strong
+          at the sphere's rim, measured elsewhere at 2.73:1 against this
+          surface — too close to failing to risk. */}
+      {isSuccess && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-immersive sm:h-16 sm:w-16">
+            <Check className="h-7 w-7 text-accent-immersive sm:h-8 sm:w-8" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

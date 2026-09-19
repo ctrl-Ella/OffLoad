@@ -22,7 +22,7 @@ export default function RootLayout({
             with `id="contenido"`. */}
         <a
           href="#contenido"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-[var(--color-fondo)] focus:px-4 focus:py-2 focus:font-medium focus:text-[var(--color-texto)]"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-bg focus:px-4 focus:py-2 focus:font-medium focus:text-ink"
         >
           Saltar al contenido principal
         </a>

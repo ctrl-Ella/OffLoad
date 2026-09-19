@@ -3,6 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ListeningScreen, type ListeningStatus } from "@/components/ListeningScreen";
+import { ReviewPlan, type PlanItem } from "@/components/ReviewPlan";
+
+/** The voice flow's three screens, end to end: `ListeningStatus` covers the
+ *  first two (and the ways they can fail); `"reviewing"` is the third,
+ *  rendered once `/api/structure-plan` has turned the transcript into a
+ *  list of events, tasks and conflicts. */
+type PageStatus = ListeningStatus | "reviewing";
 
 const BAR_COUNT = 27;
 
@@ -37,12 +44,28 @@ const RECORDING_FAILED_MESSAGE = "I couldn't record that. Try again.";
 const EMPTY_TRANSCRIPT_MESSAGE = "I didn't hear anything. Try again.";
 const TRANSCRIPTION_FAILED_MESSAGE =
   "I couldn't transcribe what you said. Try again.";
+const STRUCTURE_FAILED_MESSAGE = "I couldn't put that together. Try again.";
 
 function extensionForMimeType(mimeType: string): string {
   if (mimeType.includes("ogg")) return "ogg";
   if (mimeType.includes("mp4")) return "mp4";
   if (mimeType.includes("wav")) return "wav";
   return "webm";
+}
+
+async function structurePlan(transcript: string): Promise<PlanItem[]> {
+  const response = await fetch("/api/structure-plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transcript }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`/api/structure-plan responded with status ${response.status}`);
+  }
+
+  const data: { items: PlanItem[] } = await response.json();
+  return data.items;
 }
 
 /**
@@ -54,10 +77,11 @@ function extensionForMimeType(mimeType: string): string {
  */
 export default function OffloadPage() {
   const router = useRouter();
-  const [status, setStatus] = useState<ListeningStatus>("idle");
+  const [status, setStatus] = useState<PageStatus>("idle");
   const [levels, setLevels] = useState<number[]>(IDLE_LEVELS);
   const [transcript, setTranscript] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [items, setItems] = useState<PlanItem[]>([]);
 
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -210,7 +234,19 @@ export default function OffloadPage() {
         }
 
         setTranscript(text);
-        setStatus("idle");
+
+        // Status stays "transcribing" — same processing screen, same
+        // "Sorting it out" copy — through this second step: from where
+        // whoever's watching stands, turning the transcript into a
+        // structured plan is still Mia sorting it out, not a new wait.
+        try {
+          const nextItems = await structurePlan(text);
+          setItems(nextItems);
+          setStatus("reviewing");
+        } catch {
+          setStatus("error");
+          setErrorMessage(STRUCTURE_FAILED_MESSAGE);
+        }
       } catch {
         setStatus("error");
         setErrorMessage(TRANSCRIPTION_FAILED_MESSAGE);
@@ -219,6 +255,20 @@ export default function OffloadPage() {
 
     recorder.stop();
   }, [stopLevelMeter, releaseMicrophone]);
+
+  if (status === "reviewing") {
+    return (
+      <ReviewPlan
+        items={items}
+        onBack={() => router.back()}
+        // "Plan" isn't built yet, same as the rest of BottomNav's tabs
+        // (see its own comment): the link is ready, and until that screen
+        // exists this resolves as a 404, which beats a button that does
+        // nothing.
+        onReview={() => router.push("/plan")}
+      />
+    );
+  }
 
   return (
     <ListeningScreen
