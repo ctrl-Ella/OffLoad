@@ -12,7 +12,7 @@ It applies to a local session and to a cloud session alike. If you are reading t
 
 A family app that shares out the mental load. Mia, the agent, finds the problems before anyone sees them, resolves on her own whatever changes nobody's plans, and only asks for a yes or a no when it matters. What it gives back, measured, is time.
 
-The interface is mobile first and the main input is voice.
+The interface is mobile first and the main input is voice. Screens and code are in English; Mia's voice stays in Spanish from Spain, because the support circle — starting with grandma Rosa — speaks Spanish.
 
 ## The people
 

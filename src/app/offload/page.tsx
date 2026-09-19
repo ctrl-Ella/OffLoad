@@ -1,79 +1,284 @@
 "use client";
 
-import { useState } from "react";
-import { CalendarDays, Check, ChevronLeft, Clock3, House, SquareCheck, TriangleAlert } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ListeningScreen, type ListeningStatus } from "@/components/ListeningScreen";
+import { ReviewPlan, type PlanItem } from "@/components/ReviewPlan";
 
-const items = [
-  { title: "Product meeting", detail: "Thu 18:00 – 19:00", type: "Event" },
-  { title: "Leo's football", detail: "Thu 18:30 pick-up", type: "Event" },
-  { title: "Order groceries", detail: "Before Thursday", type: "Task" },
-  { title: "Send report to Laura", detail: "Due Friday", type: "Task" },
-  { title: "Two places at 18:30", detail: "Meeting and pick-up overlap", type: "Conflict" },
-];
-const tabs = [
-  { name: "Week", icon: House },
-  { name: "Offload", icon: null },
-  { name: "Plan", icon: CalendarDays },
-  { name: "Time", icon: Clock3 },
-];
+/** The voice flow's three screens, end to end: `ListeningStatus` covers the
+ *  first two (and the ways they can fail); `"reviewing"` is the third,
+ *  rendered once `/api/structure-plan` has turned the transcript into a
+ *  list of events, tasks and conflicts. */
+type PageStatus = ListeningStatus | "reviewing";
 
-export default function Inicio() {
-  const [activeTab, setActiveTab] = useState("Offload");
-  const [reviewing, setReviewing] = useState(false);
-  const isOverview = activeTab === "Offload";
-  const visibleItems = activeTab === "Time" ? items.filter((item) => item.type !== "Task") : items;
-  function navigate(tab: string) { setActiveTab(tab); setReviewing(false); }
+const BAR_COUNT = 27;
+
+// Fixed initial state, not random: if the first level were computed with
+// Math.random() here, the HTML the server generates and the one the
+// browser mounts on hydration would come out with different values, and
+// React would flag it as a hydration error. The level becomes dynamic only
+// once recording starts, inside the browser alone.
+const IDLE_LEVELS = Array.from({ length: BAR_COUNT }, () => 0.12);
+
+// How often the waveform reads a fresh set of levels off the analyser.
+// Matches the cadence the earlier simulation used, so the bars move at the
+// same pace they always have — only the numbers behind them are real now.
+const LEVELS_INTERVAL_MS = 120;
+
+// Speech rarely pushes a time-domain sample anywhere near its 128-value
+// ceiling. This divisor is a visual calibration, not a measurement: it maps
+// a normal speaking volume to bars that read as "moving" without every
+// syllable pinning them at full height.
+const LEVEL_SCALE = 40;
+
+// Mia's copy for every way a listening turn can fail to produce a
+// transcript. Each one names what happened and, in the same sentence, what
+// to do now — the same shape the project's other error text uses (see the
+// voz-de-mia skill). The interface is in English; what Mia actually hears
+// and says through SLNG stays in Spanish, because the support network —
+// starting with grandmother Rosa — speaks Spanish. This text never reaches
+// SLNG, so it follows the interface's language.
+const PERMISSION_DENIED_MESSAGE =
+  "I don't have permission to use the microphone. Turn it on in settings and try again.";
+const RECORDING_FAILED_MESSAGE = "I couldn't record that. Try again.";
+const EMPTY_TRANSCRIPT_MESSAGE = "I didn't hear anything. Try again.";
+const TRANSCRIPTION_FAILED_MESSAGE =
+  "I couldn't transcribe what you said. Try again.";
+const STRUCTURE_FAILED_MESSAGE = "I couldn't put that together. Try again.";
+
+function extensionForMimeType(mimeType: string): string {
+  if (mimeType.includes("ogg")) return "ogg";
+  if (mimeType.includes("mp4")) return "mp4";
+  if (mimeType.includes("wav")) return "wav";
+  return "webm";
+}
+
+async function structurePlan(transcript: string): Promise<PlanItem[]> {
+  const response = await fetch("/api/structure-plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transcript }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`/api/structure-plan responded with status ${response.status}`);
+  }
+
+  const data: { items: PlanItem[] } = await response.json();
+  return data.items;
+}
+
+/**
+ * Real page: records through `getUserMedia`/`MediaRecorder`, reads audio
+ * levels off the same stream with the Web Audio API, and sends the
+ * recording to `/api/transcribe` — the route that holds the SLNG key this
+ * page never sees. `ListeningScreen` knows nothing about any of this; it
+ * only receives `status`, `transcript`, `errorMessage` and `levels`.
+ */
+export default function OffloadPage() {
+  const router = useRouter();
+  const [status, setStatus] = useState<PageStatus>("idle");
+  const [levels, setLevels] = useState<number[]>(IDLE_LEVELS);
+  const [transcript, setTranscript] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [items, setItems] = useState<PlanItem[]>([]);
+
+  const streamRef = useRef<MediaStream | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const levelsIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
+
+  const stopLevelMeter = useCallback(() => {
+    if (levelsIntervalRef.current !== null) {
+      clearInterval(levelsIntervalRef.current);
+      levelsIntervalRef.current = null;
+    }
+    audioContextRef.current?.close().catch(() => {});
+    audioContextRef.current = null;
+    analyserRef.current = null;
+    setLevels(IDLE_LEVELS);
+  }, []);
+
+  const releaseMicrophone = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  }, []);
+
+  // Belt-and-braces: if whoever is on this screen navigates away mid
+  // recording, the microphone still gets released instead of staying open
+  // in the background.
+  useEffect(() => {
+    return () => {
+      stopLevelMeter();
+      releaseMicrophone();
+    };
+  }, [stopLevelMeter, releaseMicrophone]);
+
+  const startLevelMeter = useCallback((stream: MediaStream) => {
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    const audioContext = new AudioContextClass();
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    // Only reads the stream; never connects to `audioContext.destination`,
+    // so it can't cause the room to hear itself back.
+    source.connect(analyser);
+
+    audioContextRef.current = audioContext;
+    analyserRef.current = analyser;
+
+    const buffer = new Uint8Array(analyser.fftSize);
+    const chunkSize = Math.floor(buffer.length / BAR_COUNT);
+
+    levelsIntervalRef.current = setInterval(() => {
+      analyser.getByteTimeDomainData(buffer);
+
+      const nextLevels = Array.from({ length: BAR_COUNT }, (_, bar) => {
+        const start = bar * chunkSize;
+        let sum = 0;
+        for (let i = start; i < start + chunkSize; i += 1) {
+          sum += Math.abs(buffer[i] - 128);
+        }
+        const average = sum / chunkSize;
+        return Math.min(1, average / LEVEL_SCALE);
+      });
+
+      setLevels(nextLevels);
+    }, LEVELS_INTERVAL_MS);
+  }, []);
+
+  const handleStart = useCallback(async () => {
+    setErrorMessage("");
+    setTranscript("");
+
+    let stream: MediaStream;
+    try {
+      // Echo cancellation, noise suppression and auto gain are tuned for
+      // voice calls, not dictation: on some hardware — especially Linux
+      // audio stacks — they can suppress speech itself as if it were noise.
+      // Off gives SLNG the cleanest signal to recognize.
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
+      });
+    } catch {
+      setStatus("error");
+      setErrorMessage(PERMISSION_DENIED_MESSAGE);
+      return;
+    }
+
+    try {
+      streamRef.current = stream;
+      chunksRef.current = [];
+
+      const recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+      recorderRef.current = recorder;
+      recorder.start();
+
+      startLevelMeter(stream);
+      setStatus("listening");
+    } catch {
+      releaseMicrophone();
+      setStatus("error");
+      setErrorMessage(RECORDING_FAILED_MESSAGE);
+    }
+  }, [startLevelMeter, releaseMicrophone]);
+
+  const handleStop = useCallback(() => {
+    const recorder = recorderRef.current;
+    if (!recorder) return;
+
+    stopLevelMeter();
+    setStatus("transcribing");
+
+    recorder.onstop = async () => {
+      const mimeType = recorder.mimeType || "audio/webm";
+      const blob = new Blob(chunksRef.current, { type: mimeType });
+      releaseMicrophone();
+
+      try {
+        const formData = new FormData();
+        formData.append("audio", blob, `recording.${extensionForMimeType(mimeType)}`);
+
+        const response = await fetch("/api/transcribe", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          setStatus("error");
+          setErrorMessage(TRANSCRIPTION_FAILED_MESSAGE);
+          return;
+        }
+
+        const data: { transcript?: string } = await response.json();
+        const text = (data.transcript ?? "").trim();
+
+        if (!text) {
+          setStatus("error");
+          setErrorMessage(EMPTY_TRANSCRIPT_MESSAGE);
+          return;
+        }
+
+        setTranscript(text);
+
+        // Status stays "transcribing" — same processing screen, same
+        // "Sorting it out" copy — through this second step: from where
+        // whoever's watching stands, turning the transcript into a
+        // structured plan is still Mia sorting it out, not a new wait.
+        try {
+          const nextItems = await structurePlan(text);
+          setItems(nextItems);
+          setStatus("reviewing");
+        } catch {
+          setStatus("error");
+          setErrorMessage(STRUCTURE_FAILED_MESSAGE);
+        }
+      } catch {
+        setStatus("error");
+        setErrorMessage(TRANSCRIPTION_FAILED_MESSAGE);
+      }
+    };
+
+    recorder.stop();
+  }, [stopLevelMeter, releaseMicrophone]);
+
+  if (status === "reviewing") {
+    return (
+      <ReviewPlan
+        items={items}
+        onBack={() => router.back()}
+        // "Plan" isn't built yet, same as the rest of BottomNav's tabs
+        // (see its own comment): the link is ready, and until that screen
+        // exists this resolves as a 404, which beats a button that does
+        // nothing.
+        onReview={() => router.push("/plan")}
+      />
+    );
+  }
 
   return (
-    <main className="offload-app" lang="en">
-      <div className="screen-content">
-        <header className="screen-toolbar">
-          <button className="back-button" aria-label={isOverview ? "Go to week" : "Back to offload"} onClick={() => navigate(isOverview ? "Week" : "Offload")}>
-            <ChevronLeft size={25} strokeWidth={1.8} aria-hidden="true" />
-          </button>
-          {!isOverview && <span className="toolbar-label">{reviewing ? "Review your plan" : activeTab}</span>}
-        </header>
-        <section className="summary" aria-labelledby="screen-title">
-          <div className="success-orb" aria-hidden="true">
-            {isOverview ? <Check size={34} strokeWidth={2.8} /> : <CalendarDays size={32} strokeWidth={1.8} />}
-          </div>
-          <h1 id="screen-title">{isOverview ? "I've got it." : activeTab === "Time" ? "Make room." : activeTab === "Week" ? "Your week." : "Here's the plan."}</h1>
-          <p>{isOverview ? "5 things, sorted." : activeTab === "Time" ? "One overlap to work through." : "Everything in one place."}</p>
-        </section>
-        <section className="organized-items" aria-label="Your organized items">
-          <ul className="item-list">
-            {visibleItems.map((item) => {
-              const Icon = item.type === "Event" ? CalendarDays : item.type === "Task" ? SquareCheck : TriangleAlert;
-              return (
-                <li key={item.title} className={`item-card${item.type === "Conflict" ? " conflict-card" : ""}`}>
-                  <span className="item-icon"><Icon size={23} strokeWidth={2} aria-hidden="true" /></span>
-                  <div className="item-copy"><h2>{item.title}</h2><p>{item.detail}</p></div>
-                  <span className="item-type">{item.type}</span>
-                </li>
-              );
-            })}
-          </ul>
-          {(reviewing || activeTab === "Time") && (
-            <aside className="review-note" aria-label="Schedule conflict">
-              <h2>A little breathing room.</h2>
-              <p>Your product meeting ends at 19:00, but Leo needs picking up at 18:30. Arrange another pick-up or move the meeting before confirming your plan.</p>
-            </aside>
-          )}
-        </section>
-        <div className="primary-action">
-          <button className="review-button" onClick={() => { if (reviewing) navigate("Offload"); else { setActiveTab("Plan"); setReviewing(true); } }}>
-            {reviewing ? "Back to overview" : "Review the plan"}
-          </button>
-        </div>
-      </div>
-      <nav className="bottom-navigation" aria-label="Main navigation">
-        {tabs.map(({ name, icon: Icon }) => (
-          <button key={name} className={`nav-item${activeTab === name ? " active" : ""}`} aria-current={activeTab === name ? "page" : undefined} onClick={() => navigate(name)}>
-            <span className="nav-icon">{Icon ? <Icon size={25} strokeWidth={1.8} aria-hidden="true" /> : <span className="nav-orb" />}</span>
-            <span>{name}</span>
-          </button>
-        ))}
-      </nav>
-    </main>
+    <ListeningScreen
+      status={status}
+      transcript={transcript}
+      errorMessage={errorMessage}
+      levels={levels}
+      onStart={handleStart}
+      onStop={handleStop}
+      onBack={() => router.back()}
+    />
   );
 }
