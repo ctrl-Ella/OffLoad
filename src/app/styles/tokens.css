@@ -1,0 +1,11 @@
+:root {
+  --color-text: #14141a;
+  --color-background: #f7f5f0;
+  --color-white: #fff;
+  --color-accent: #72e6d0;
+  --color-accent-strong: #14695c;
+  --color-alert: #ff654f;
+  --color-text-muted: #5b5b60;
+  --color-border: #e6e2d9;
+  --radius-card: 24px;
+}
