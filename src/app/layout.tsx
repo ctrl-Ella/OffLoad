@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OFFLOAD",
+  title: "Offload · Menos carga mental, más tiempo para vivir",
   description:
-    "Una aplicación familiar que reparte la carga mental. Mia encuentra los " +
-    "problemas antes de que nadie los vea y solo pide un sí o un no cuando hace falta.",
+    "Coordina los planes familiares, resuelve imprevistos y recupera tiempo para ti con Offload y Mia.",
 };
 
 // `lang="es"` no es decorativo: sin él, un lector de pantalla pronuncia el
