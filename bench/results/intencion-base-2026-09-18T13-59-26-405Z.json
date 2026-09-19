@@ -1,0 +1,98 @@
+[
+  {
+    "modelo": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+    "modalidad": "base",
+    "casos": 30,
+    "aciertos": 26,
+    "ttft": [
+      785,
+      785,
+      786,
+      485,
+      524,
+      578,
+      392,
+      405,
+      458,
+      322,
+      469,
+      451,
+      400,
+      397,
+      373,
+      491,
+      484,
+      526,
+      250,
+      313,
+      289,
+      375,
+      380,
+      541,
+      465,
+      334,
+      399,
+      376,
+      271,
+      432
+    ],
+    "ms": [
+      977,
+      997,
+      1002,
+      631,
+      663,
+      688,
+      515,
+      543,
+      594,
+      580,
+      580,
+      596,
+      547,
+      510,
+      472,
+      576,
+      622,
+      631,
+      398,
+      445,
+      408,
+      637,
+      832,
+      985,
+      591,
+      621,
+      509,
+      513,
+      546,
+      543
+    ],
+    "tokensIn": 6044,
+    "tokensOut": 300,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "i03",
+        "esperado": "nota",
+        "obtenido": "recordatorio"
+      },
+      {
+        "id": "i14",
+        "esperado": "nota",
+        "obtenido": "recordatorio"
+      },
+      {
+        "id": "i21",
+        "esperado": "nota",
+        "obtenido": "recordatorio"
+      },
+      {
+        "id": "i28",
+        "esperado": "nota",
+        "obtenido": "recordatorio"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  }
+]

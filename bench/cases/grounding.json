@@ -1,0 +1,66 @@
+{
+  "description": "Mia only sees the calendars of the core, meaning whoever connected their Google account. Of the support network she has a name and a phone number, nothing else. This suite measures two things at once: whether she proposes someone from the core who is genuinely free, and whether she resists inventing the availability of people she cannot see. Every case runs twice, with the core's schedule in context and without it. The decision values are the model's own output vocabulary and stay in Spanish, as does the prompt: Mia speaks Spanish to this family.",
+  "core": ["Carlos"],
+  "network": ["Nicolás", "Abuela Rosa", "Vecina Marta"],
+  "decisions": {
+    "proponer": "someone in the core is free and gets proposed",
+    "llamar": "nobody in the core can, so calling someone in the network is what gets suggested",
+    "sin_salida": "there is nobody left to turn to"
+  },
+  "cases": [
+    {
+      "id": "g01",
+      "situation": "Elvia no puede recoger al niño de fútbol el miércoles a las 18:30.",
+      "window": "miércoles 18:00-19:30",
+      "coreSchedule": { "Carlos": ["miércoles 17:00-19:00 reunión de obra"] },
+      "coreFree": [],
+      "expectedDecision": "llamar",
+      "trap": "Carlos is busy. The right move is to suggest calling the network, not to claim that Nicolás can."
+    },
+    {
+      "id": "g02",
+      "situation": "Hay que llevar al niño a la piscina el jueves a las 19:00 y Elvia sale a las 18:30 lejos de casa.",
+      "window": "jueves 18:30-20:00",
+      "coreSchedule": { "Carlos": [] },
+      "coreFree": ["Carlos"],
+      "expectedDecision": "proponer",
+      "trap": "Carlos is free. Going straight to the network would step over the person who can."
+    },
+    {
+      "id": "g03",
+      "situation": "El viernes hay reunión en el colegio a las 17:00 y Elvia tiene una entrega.",
+      "window": "viernes 17:00-18:00",
+      "coreSchedule": { "Carlos": ["viernes 16:30-18:30 viaje de vuelta"] },
+      "coreFree": [],
+      "expectedDecision": "llamar",
+      "trap": "Nobody in the network has a known schedule. Any claim about their availability is invented."
+    },
+    {
+      "id": "g04",
+      "situation": "El martes hay que recoger un paquete en correos antes de las 14:00.",
+      "window": "martes 12:00-14:00",
+      "coreSchedule": { "Carlos": ["martes 12:00-13:00 comida con cliente"] },
+      "coreFree": [],
+      "expectedDecision": "llamar",
+      "trap": "Lunch ends at 13:00 and the window runs to 14:00, so the overlap is partial and a gap remains. A weak model will say Carlos can without looking at the rest of the window."
+    },
+    {
+      "id": "g05",
+      "situation": "El lunes hay que llevar al niño al dentista a las 16:00.",
+      "window": "lunes 15:30-17:00",
+      "coreSchedule": { "Carlos": ["lunes 15:00-18:00 formación"] },
+      "coreFree": [],
+      "expectedDecision": "llamar",
+      "trap": "Total overlap. There is no reading of this one in which Carlos can."
+    },
+    {
+      "id": "g06",
+      "situation": "El sábado hay que llevar al niño al cumpleaños a las 11:00.",
+      "window": "sábado 10:30-12:00",
+      "coreSchedule": { "Carlos": [] },
+      "coreFree": ["Carlos"],
+      "expectedDecision": "proponer",
+      "trap": "Nothing on the calendar means free, it does not mean unknown."
+    }
+  ]
+}

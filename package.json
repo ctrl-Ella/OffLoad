@@ -19,6 +19,12 @@
     "db:studio": "prisma studio",
     "test:unidad": "node --experimental-strip-types --test \"tests/unidad/**/*.test.ts\"",
     "test:guardrails": "node --experimental-strip-types --test \"tests/guardrails.test.ts\"",
+    "bench": "npm --prefix bench run bench --",
+    "bench:dry": "npm run bench -- --suite intent --dry",
+    "bench:intent": "npm run bench -- --suite intent",
+    "bench:grounding": "npm run bench -- --suite grounding",
+    "bench:voice": "npm run bench -- --suite intent --cases cases/intent-voice.json",
+    "bench:transcribe": "node --experimental-strip-types --env-file=.env scripts/transcribe-bench-audio.ts",
     "demo:sembrar": "node --experimental-strip-types --env-file=.env scripts/agenda-demo.ts sembrar",
     "demo:borrar": "node --experimental-strip-types --env-file=.env scripts/agenda-demo.ts borrar",
     "demo:ver": "node --experimental-strip-types --env-file=.env scripts/agenda-demo.ts ver"
