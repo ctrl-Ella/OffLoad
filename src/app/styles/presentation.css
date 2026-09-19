@@ -1,4 +1,4 @@
-.presentation-page { background: var(--color-background); color: var(--color-text); }
+.presentation-page { --presentation-surface: #f6f6f6; --presentation-border: #e8e8e8; background: var(--color-white); color: var(--color-text); }
 .presentation-page h1, .presentation-page h2, .presentation-page h3 { font-family: 'Bricolage Grotesque', Figtree, sans-serif; }
 .presentation-page a { text-decoration: none; }
 .presentation-header { width: min(1240px, calc(100% - 64px)); min-height: 84px; margin: auto; display: flex; align-items: center; gap: 56px; }
@@ -23,34 +23,34 @@
 .presentation-button-outline { border: 1px solid #d9d6ce; color: var(--color-text); }
 .presentation-reassurance { display: flex; align-items: center; gap: 8px; margin-top: 24px; color: var(--color-text-muted); font-size: 12px; }
 .presentation-reassurance svg { flex: none; color: var(--color-accent-strong); }
-.presentation-hero-art { position: relative; min-height: 520px; display: grid; place-items: center; overflow: hidden; border-radius: 38px; background: radial-gradient(circle at 50% 44%, #e8fbf4 0, #e7f3e9 48%, #e9ede6 100%); isolation: isolate; }
-.presentation-orbit { position: absolute; width: 390px; aspect-ratio: 1; border: 1px solid #93c4b99c; border-radius: 50%; }
-.presentation-orbit-two { width: 550px; border-color: #b2d1c888; }
+.presentation-hero-art { position: relative; min-height: 520px; display: grid; place-items: center; overflow: hidden; border-radius: 38px; background: radial-gradient(circle at 50% 44%, #fff 0, var(--presentation-surface) 72%, #f0f0f0 100%); isolation: isolate; }
+.presentation-orbit { position: absolute; width: 390px; aspect-ratio: 1; border: 1px solid #d9d9d9; border-radius: 50%; }
+.presentation-orbit-two { width: 550px; border-color: #e5e5e5; }
 .presentation-mascot { position: relative; z-index: 1; width: min(72%, 360px); filter: drop-shadow(0 18px 18px #2c514122); }
 .presentation-mascot img { display: block; width: 100%; height: auto; }
 .presentation-mascot-still { display: none !important; }
-.presentation-note { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 12px 15px; border: 1px solid #e1e8df; border-radius: 14px; background: #ffffffed; box-shadow: 0 12px 26px #203d2a13; color: var(--color-text); font-size: 12px; font-weight: 800; }
+.presentation-note { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 12px 15px; border: 1px solid var(--presentation-border); border-radius: 14px; background: #ffffffed; box-shadow: 0 12px 26px #203d2a13; color: var(--color-text); font-size: 12px; font-weight: 800; }
 .presentation-note svg { color: var(--color-accent-strong); }
 .presentation-note-top { top: 14%; left: 6%; transform: rotate(-6deg); }
 .presentation-note-bottom { right: 5%; bottom: 13%; transform: rotate(5deg); }
-.presentation-intro { display: grid; grid-template-columns: 1.3fr .7fr; align-items: end; gap: 50px; padding: 65px max(32px, calc((100vw - 1240px)/2)) 76px; background: #eaf0e8; }
+.presentation-intro { display: grid; grid-template-columns: 1.3fr .7fr; align-items: end; gap: 50px; padding: 65px max(32px, calc((100vw - 1240px)/2)) 76px; background: var(--color-white); border-top: 1px solid var(--presentation-border); border-bottom: 1px solid var(--presentation-border); }
 .presentation-intro h2 { margin: 14px 0 0; font-size: clamp(33px, 3.8vw, 53px); line-height: 1.1; letter-spacing: -.04em; }
-.presentation-intro > p { max-width: 390px; color: #52615a; font-size: 15px; line-height: 1.65; }
+.presentation-intro > p { max-width: 390px; color: var(--color-text-muted); font-size: 15px; line-height: 1.65; }
 .presentation-calendar-section { width: min(1240px, calc(100% - 64px)); margin: auto; padding: 90px 0 105px; scroll-margin-top: 30px; }
 .presentation-calendar-heading { display: flex; align-items: end; justify-content: space-between; gap: 25px; margin-bottom: 28px; }
 .presentation-calendar-heading h2 { margin: 12px 0; font-size: clamp(34px, 3.5vw, 50px); letter-spacing: -.045em; }
 .presentation-calendar-heading p { color: var(--color-text-muted); font-size: 15px; }
-.presentation-demo-badge { flex: none; padding: 9px 13px; border-radius: 999px; background: #e5f7ef; color: var(--color-accent-strong); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.presentation-demo-badge { flex: none; padding: 9px 13px; border-radius: 999px; background: var(--presentation-surface); color: var(--color-accent-strong); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
 .presentation-calendar-card { overflow: hidden; border: 1px solid var(--color-border); border-radius: 26px; background: white; box-shadow: 0 20px 55px #22352a0a; }
 .presentation-calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 25px 31px; }
 .presentation-calendar-title { display: flex; align-items: center; gap: 12px; }
-.presentation-calendar-title > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: #dff7f0; color: var(--color-accent-strong); }
+.presentation-calendar-title > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: var(--presentation-surface); color: var(--color-accent-strong); }
 .presentation-calendar-title strong, .presentation-calendar-title small { display: block; }
 .presentation-calendar-title strong { font: 800 19px 'Bricolage Grotesque', sans-serif; }
 .presentation-calendar-title small { margin-top: 2px; color: var(--color-text-muted); font-size: 12px; text-transform: capitalize; }
 .presentation-calendar-navigation { display: flex; align-items: center; gap: 5px; }
 .presentation-calendar-navigation button { min-width: 36px; min-height: 36px; display: grid; place-items: center; padding: 0 9px; border: 1px solid var(--color-border); border-radius: 9px; font-size: 12px; font-weight: 700; }
-.presentation-calendar-navigation button:hover, .presentation-week button:hover { background: #eef8f3; }
+.presentation-calendar-navigation button:hover, .presentation-week button:hover { background: var(--presentation-surface); }
 .presentation-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; padding: 0 31px 23px; }
 .presentation-week button { min-height: 73px; display: grid; justify-items: center; align-content: center; gap: 3px; border: 1px solid #ecebe7; border-radius: 13px; }
 .presentation-week button span { color: var(--color-text-muted); font-size: 11px; text-transform: capitalize; }
@@ -59,7 +59,7 @@
 .presentation-week button.is-selected { border-color: var(--color-text); background: var(--color-text); color: white; }
 .presentation-week button.is-selected span { color: #e0eee9; }
 .presentation-week button.is-selected i { background: var(--color-accent); }
-.presentation-agenda-content { display: grid; grid-template-columns: 1.3fr .7fr; gap: 24px; padding: 28px 31px 31px; border-top: 1px solid var(--color-border); background: #fdfcf9; }
+.presentation-agenda-content { display: grid; grid-template-columns: 1.3fr .7fr; gap: 24px; padding: 28px 31px 31px; border-top: 1px solid var(--color-border); background: var(--color-white); }
 .presentation-agenda-list h3 { margin: 0 0 22px; font-size: 22px; text-transform: capitalize; }
 .presentation-events { display: grid; gap: 13px; }
 .presentation-event { display: grid; grid-template-columns: 50px 1fr; align-items: start; gap: 13px; }
@@ -67,19 +67,19 @@
 .presentation-event-body { display: grid; gap: 3px; padding: 14px 18px; border-left: 3px solid; border-radius: 9px; }
 .presentation-event-body strong { font-size: 14px; }
 .presentation-event-body span { color: #5f6462; font-size: 12px; }
-.presentation-event-mint { border-color: #2ca98e; background: #e9f7ef; }
-.presentation-event-peach { border-color: #e98767; background: #fff0e8; }
-.presentation-event-lilac { border-color: #8b79bb; background: #f0edfb; }
+.presentation-event-mint { border-color: #2ca98e; background: var(--presentation-surface); }
+.presentation-event-peach { border-color: #e98767; background: var(--presentation-surface); }
+.presentation-event-lilac { border-color: #8b79bb; background: var(--presentation-surface); }
 .presentation-calendar-disclaimer { margin-top: 22px; color: var(--color-text-muted); font-size: 11px; }
 .presentation-calendar-insight { align-self: stretch; padding: 25px; border-radius: 19px; background: var(--color-text); color: white; }
 .presentation-calendar-insight > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: var(--color-accent); color: var(--color-text); }
 .presentation-calendar-insight h3 { margin: 20px 0 10px; font-size: 25px; line-height: 1.15; }
 .presentation-calendar-insight p { color: #c5c7c5; font-size: 13px; line-height: 1.6; }
 .presentation-calendar-insight > div { display: flex; align-items: center; gap: 8px; margin-top: 24px; color: var(--color-accent); font-size: 12px; font-weight: 700; }
-.presentation-ending { width: min(1240px, calc(100% - 64px)); display: flex; align-items: center; gap: 23px; margin: 0 auto 85px; padding: 35px; border-radius: 24px; background: #dcefe4; }
+.presentation-ending { width: min(1240px, calc(100% - 64px)); display: flex; align-items: center; gap: 23px; margin: 0 auto 85px; padding: 35px; border-radius: 24px; background: var(--presentation-surface); border: 1px solid var(--presentation-border); }
 .presentation-ending-icon { width: 56px; height: 56px; flex: none; display: grid; place-items: center; border-radius: 17px; background: white; color: var(--color-accent-strong); }
 .presentation-ending h2 { margin-bottom: 5px; font-size: 26px; }
-.presentation-ending p { color: #4d6459; font-size: 13px; }
+.presentation-ending p { color: var(--color-text-muted); font-size: 13px; }
 .presentation-ending a { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; white-space: nowrap; color: var(--color-accent-strong); font-size: 12px; font-weight: 800; }
 .presentation-footer { display: flex; align-items: center; justify-content: space-between; padding: 26px max(32px, calc((100vw - 1240px)/2)); border-top: 1px solid var(--color-border); }
 .presentation-footer > span { font: 800 24px 'Bricolage Grotesque', sans-serif; letter-spacing: -1px; }
