@@ -31,6 +31,7 @@
                                       whose outline carries meaning */
 
   --radius-card: 24px;
+  --radius-control: 10px; /* 24px on a text input reads as a pill */
 }
 
 /* Without an entry here Tailwind 4 generates no utility, and the token can
@@ -49,6 +50,7 @@
   --color-border-strong: var(--color-border-strong);
 
   --radius-card: var(--radius-card);
+  --radius-control: var(--radius-control);
 
   --font-display: 'Bricolage Grotesque', Figtree, system-ui, sans-serif;
   --font-sans: Figtree, system-ui, -apple-system, sans-serif;
