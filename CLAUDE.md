@@ -98,6 +98,7 @@ These are covered by tests and they block the merge.
 - **Tier by load:** `-fast` inside the video call, `base` everywhere else, Batch API for the weekly summary.
 - **Quota headers.** Read `Retry-After`, and switch from `-fast` to base on sustained failures.
 - **Everything is in English.** Prose, code, identifiers, commit messages, issues, pull requests, product copy — and **file and folder names too**. `docs/guides/accessibility.md`, not `docs/guias/accesibilidad.md`. A path is read far more often than it is typed, and half-translated trees are the ones people misfile things into.
+- **Comments earn their place.** One line, only where the code cannot speak for itself: a decision taken, a trap, a constraint imposed from outside. Never a restatement of what the line already says, and never a comment propping up a name that should have been clearer. The long reasoning belongs in the spec or the decision record, where someone looking for it will go — above a function it gets read once and maintained never. This applies from here on: older files keep their comments until they are touched for another reason.
 
 ---
 
