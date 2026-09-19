@@ -20,7 +20,7 @@
   /* The same two, for when they have to be the text or a border that means
      something. A fill cannot do that job, and reaching for the fill anyway is
      the mistake these two exist to prevent. */
-  --color-accent-strong: #14695c; /*  6.01:1 · teal as text, icon or border */
+  --color-accent-strong: #1acdb2; /* Local presentation accent */
   --color-alert-strong: #b8391a;  /*  5.30:1 · the brand tomato */
 
   /* ── borders

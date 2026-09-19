@@ -15,7 +15,7 @@ export default function HomePage() {
 
   return (
     <div className="presentation-page">
-      <AppNavigation current="home" />
+      <AppNavigation />
 
       <main id="main-content">
         <section className="presentation-hero" aria-labelledby="presentation-title">
@@ -23,7 +23,7 @@ export default function HomePage() {
             <span className="presentation-eyebrow"><span /> TU DÍA, MÁS LIGERO</span>
             <TypingHeadline />
             <div className="presentation-actions">
-              <Link className="presentation-button presentation-button-primary" href="/brain-drop"><Mic2 size={18} aria-hidden="true" /> Soltar una nota de voz</Link>
+              <Link className="presentation-button presentation-button-primary" href="/offload"><Mic2 size={18} aria-hidden="true" /> Soltar una nota de voz</Link>
               <a className="presentation-button presentation-button-outline" href="#agenda">Ver calendario <ArrowRight size={18} aria-hidden="true" /></a>
             </div>
           </div>

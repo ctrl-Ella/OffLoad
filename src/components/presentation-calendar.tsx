@@ -60,7 +60,7 @@ export function PresentationCalendar({ today: todayString }: { today: string }) 
         </div>
         <div className="presentation-agenda-content">
           <div className="presentation-agenda-list"><h3>{fullDateFormatter.format(selected)}</h3><div className="presentation-events">{events.map(event => <div className="presentation-event" key={`${event.time}-${event.title}`}><time>{event.time}</time><div className={`presentation-event-body presentation-event-${event.tone}`}><strong>{event.title}</strong><span>{event.detail}</span></div></div>)}</div><p className="presentation-calendar-disclaimer">Ejemplo ilustrativo · La sincronización con calendarios está en desarrollo.</p></div>
-          <aside className="presentation-calendar-insight"><span><Mic2 size={22} aria-hidden="true" /></span><h3>¿Algo más que recordar?</h3><p>Suéltalo en una nota de voz.</p><Link href="/brain-drop"><Mic2 size={17} aria-hidden="true" /> Ir a Brain Drop</Link></aside>
+          <aside className="presentation-calendar-insight"><span><Mic2 size={22} aria-hidden="true" /></span><h3>¿Algo más que recordar?</h3><p>Suéltalo en una nota de voz.</p><Link href="/offload"><Mic2 size={17} aria-hidden="true" /> Ir a Offload</Link></aside>
         </div>
       </div>
     </section>
