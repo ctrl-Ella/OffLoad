@@ -1,0 +1,55 @@
+/* Contrast measured against --color-background. The bar is WCAG 2.1 AA: 4.5:1
+   for normal text, 3:1 for large text and graphical elements.
+   Change a colour and you measure it again — the figure is the promise. */
+
+:root {
+  /* ── surfaces */
+  --color-background: #f7f5f0;
+  --color-white: #fff;
+
+  /* ── ink · onyx black, the brand's */
+  --color-text: #111820;       /* 16.40:1 · passes at any size */
+  --color-text-muted: #5b5b60; /*  6.20:1 · passes as text */
+
+  /* ── brand
+     Both are FILLS, and that is what they are for. On top of either one the
+     ink is --color-text, which is why they need no contrast of their own. */
+  --color-accent: #72e6d0;     /*  1.38:1 · fill. Onyx on it: 11.86:1 */
+  --color-alert: #ff654f;      /*  2.67:1 · fill. Onyx on it:  6.15:1 */
+
+  /* The same two, for when they have to be the text or a border that means
+     something. A fill cannot do that job, and reaching for the fill anyway is
+     the mistake these two exist to prevent. */
+  --color-accent-strong: #14695c; /*  6.01:1 · teal as text, icon or border */
+  --color-alert-strong: #b8391a;  /*  5.30:1 · the brand tomato */
+
+  /* ── borders
+     Two, because a border does two jobs. Decoration needs no contrast; the
+     edge of an input tells you where to type and needs 3:1. */
+  --color-border: #e6e2d9;        /*  1.19:1 · decorative separator only */
+  --color-border-strong: #8a8378; /*  3.44:1 · inputs, controls, anything
+                                      whose outline carries meaning */
+
+  --radius-card: 24px;
+}
+
+/* Without an entry here Tailwind 4 generates no utility, and the token can
+   only be reached through var() — which is how loose hex values creep back in. */
+@theme inline {
+  --color-bg: var(--color-background);
+  --color-ink: var(--color-text);
+  --color-ink-muted: var(--color-text-muted);
+
+  --color-accent: var(--color-accent);
+  --color-accent-strong: var(--color-accent-strong);
+  --color-alert: var(--color-alert);
+  --color-alert-strong: var(--color-alert-strong);
+
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+
+  --radius-card: var(--radius-card);
+
+  --font-display: 'Bricolage Grotesque', Figtree, system-ui, sans-serif;
+  --font-sans: Figtree, system-ui, -apple-system, sans-serif;
+}
