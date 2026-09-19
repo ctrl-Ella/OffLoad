@@ -1,0 +1,263 @@
+@media (max-width: 850px) {
+
+  .header-inner,
+  .home-main,
+  .summary-container {
+    width: min(100% - 36px, 700px);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-top: 40px;
+  }
+
+  .hero-visual {
+    height: 420px;
+  }
+
+  .benefits {
+    padding-bottom: 50px;
+  }
+
+  .today-grid,
+  .summary-grid {
+    gap: 14px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-card {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 650px) {
+  .site-header {
+    position: static;
+  }
+
+  .header-inner {
+    height: 65px;
+  }
+
+  .wordmark {
+    font-size: 23px;
+  }
+
+  .brand-mascot {
+    width: 31px;
+    height: 35px;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .header-cta {
+    margin-left: auto;
+    padding: 9px 12px;
+    font-size: 10px;
+  }
+
+  .home-main {
+    padding-bottom: 70px;
+  }
+
+  .hero {
+    padding: 32px 0 35px;
+  }
+
+  .hero h1 {
+    font-size: clamp(43px, 11vw, 58px);
+    letter-spacing: -2.4px;
+  }
+
+  .hero-copy>p {
+    font-size: 14px;
+  }
+
+  .hero-actions {
+    gap: 8px;
+  }
+
+  .hero-actions .button {
+    width: 100%;
+  }
+
+  .hero-trust {
+    gap: 9px 15px;
+    margin-top: 22px;
+  }
+
+  .hero-visual {
+    height: 370px;
+    border-radius: 25px;
+  }
+
+  .hero-mascot {
+    width: 240px;
+  }
+
+  .orbit-one {
+    width: 250px;
+    height: 250px;
+  }
+
+  .orbit-two {
+    width: 340px;
+    height: 340px;
+  }
+
+  .floating-tag {
+    font-size: 9px;
+    padding: 8px;
+  }
+
+  .benefits {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .benefit {
+    min-height: 0;
+    padding: 17px;
+  }
+
+  .benefit h2 {
+    margin-top: 10px;
+    font-size: 17px;
+  }
+
+  .section-intro {
+    display: block;
+  }
+
+  .section-intro h2 {
+    font-size: 30px;
+  }
+
+  .demo-label {
+    display: inline-block;
+    margin-top: 13px;
+  }
+
+  .today-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .agenda-card,
+  .decision-card {
+    padding: 20px;
+  }
+
+  .decision-card h3 {
+    font-size: 26px;
+  }
+
+  .wellbeing-strip {
+    display: block;
+    padding: 25px;
+    margin-bottom: 20px;
+  }
+
+  .wellbeing-strip .button {
+    margin-top: 18px;
+  }
+
+  .site-footer {
+    padding: 20px 18px 92px;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 12;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    height: calc(68px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-background);
+  }
+
+  .mobile-nav button {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 4px;
+    border: 0;
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .mobile-nav [aria-current="page"] {
+    color: var(--color-accent-strong);
+  }
+
+  .summary-container {
+    padding: 26px 0 110px;
+  }
+
+  .summary-story h1 {
+    font-size: 42px;
+  }
+
+  .time-figure {
+    font-size: 82px;
+  }
+
+  .activity-card {
+    padding: 25px;
+  }
+
+  .activity-card h2 {
+    font-size: 31px;
+  }
+
+  .call-page {
+    display: block;
+    padding: 0;
+  }
+
+  .call-shell {
+    width: 100%;
+    min-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    padding: 13px;
+  }
+
+  .video-grid {
+    min-height: 48dvh;
+    grid-template-rows: repeat(2, minmax(130px, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-visual {
+    height: 320px;
+  }
+
+  .hero-mascot {
+    width: 210px;
+  }
+
+  .tag-bottom {
+    right: 4%;
+  }
+
+  .call-proposal {
+    align-items: flex-start;
+  }
+
+  .call-proposal button {
+    padding: 7px;
+  }
+}

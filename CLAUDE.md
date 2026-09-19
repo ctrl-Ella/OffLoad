@@ -97,6 +97,7 @@ These are covered by tests and they block the merge.
 - **In Mastra, model names carry the `nebius/` prefix.** In the Token Factory API they do not.
 - **Tier by load:** `-fast` inside the video call, `base` everywhere else, Batch API for the weekly summary.
 - **Quota headers.** Read `Retry-After`, and switch from `-fast` to base on sustained failures.
+- **Reuse before adding, and colour changes in one file.** Every colour is a token in `src/app/styles/tokens.css` with its measured contrast beside it — no loose hex in a component, and nothing from Tailwind's default palette, which is measured against nothing of ours. Before writing a rule or a component, look for the one that already does it: a second stylesheet saying almost the same thing is how a design system stops being one. The bar is WCAG 2.1 AA, which is what the law asks of us, and a token is a promise about contrast — change a colour and you measure it again.
 - **Everything is in English.** Prose, code, identifiers, commit messages, issues, pull requests, product copy — and **file and folder names too**. `docs/guides/accessibility.md`, not `docs/guias/accesibilidad.md`. A path is read far more often than it is typed, and half-translated trees are the ones people misfile things into.
 
 ---
