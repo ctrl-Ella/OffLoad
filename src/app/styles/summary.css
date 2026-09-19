@@ -1,0 +1,218 @@
+.summary-page {
+  min-height: calc(100vh - 76px);
+  background: #17171c;
+  color: var(--color-white);
+}
+
+.summary-container {
+  width: min(1120px, calc(100% - 56px));
+  margin: auto;
+  padding: 45px 0 100px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: none;
+  color: #b3b1b0;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 54px;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.summary-story .eyebrow {
+  color: var(--color-accent);
+}
+
+.summary-story .eyebrow-line {
+  background: var(--color-accent);
+}
+
+.summary-check {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  margin: 28px 0 18px;
+  background: var(--color-accent);
+  color: #173d35;
+}
+
+.summary-story h1 {
+  max-width: 600px;
+  font-size: clamp(40px, 5vw, 64px);
+  letter-spacing: -2.5px;
+}
+
+.summary-story>p {
+  max-width: 590px;
+  margin-top: 14px;
+  color: #b3b0b1;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.time-figure {
+  margin-top: 20px;
+  color: var(--color-accent);
+  font: 800 clamp(72px, 8vw, 120px)/1 'Bricolage Grotesque';
+  letter-spacing: -6px;
+}
+
+.time-figure>span {
+  font-size: .72em;
+}
+
+.time-figure small {
+  color: #d6eee7;
+  font-size: .31em;
+  letter-spacing: -1px;
+  margin-left: 5px;
+}
+
+.summary-story .time-caption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.summary-facts {
+  margin-top: 28px;
+  padding: 21px;
+  color: var(--color-text);
+}
+
+.summary-facts h2 {
+  margin-bottom: 15px;
+  font-size: 21px;
+}
+
+.summary-facts>div {
+  display: flex;
+  gap: 11px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.fact-icon {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  flex: none;
+  border-radius: 9px;
+  background: #e0f7ed;
+  color: var(--color-accent-strong);
+}
+
+.summary-facts strong,
+.summary-facts small {
+  display: block;
+}
+
+.summary-facts strong {
+  font-size: 12px;
+}
+
+.summary-facts small {
+  margin-top: 3px;
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.activity-card {
+  border-radius: 30px;
+  padding: 33px;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.activity-heart {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 45px;
+  margin-bottom: 22px;
+  border-radius: 13px;
+  background: var(--color-accent);
+  color: #1e7666;
+}
+
+.activity-card h2 {
+  max-width: 340px;
+  margin: 9px 0 12px;
+  font-size: 36px;
+  letter-spacing: -1.5px;
+}
+
+.activity-card>p {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.activity-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  padding: 12px;
+  margin: 29px 0 13px;
+  background: var(--color-white);
+}
+
+.activity-option>span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #fff0e7;
+  color: #b15c40;
+}
+
+.activity-option strong,
+.activity-option small {
+  display: block;
+}
+
+.activity-option strong {
+  font-size: 12px;
+}
+
+.activity-option small {
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.activity-card .button {
+  width: 100%;
+}
+
+.plain-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  background: none;
+  color: var(--color-accent-strong);
+  padding: 16px;
+  font-size: 11px;
+  font-weight: 800;
+}
