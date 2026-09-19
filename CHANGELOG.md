@@ -1,21 +1,28 @@
-# Registro de cambios
+# Changelog
 
-Qué ha cambiado en OFFLOAD, en orden inverso: lo último, arriba.
+What changed in OFFLOAD, newest first.
 
-Cada pull request añade aquí una línea antes de pedir revisión. Está en la lista de comprobación de la plantilla, y el motivo es que un registro escrito al final del proyecto se escribe de memoria, y la memoria a las tres de la madrugada inventa.
+Every pull request adds a line here before asking for review. It is on the template's checklist, and the reason is that a log written at the end of a project is written from memory — and memory at three in the morning invents things.
 
-El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/), y los tipos de cambio son los mismos que los de los commits.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the change types match the ones we use for commits.
 
 ---
 
-## Sin publicar
+## Unreleased
 
-### Añadido
+### Added
 
-- README del repositorio, con distintivos de estado de la integración continua, las issues y las pull requests abiertas.
-- Esqueleto de la aplicación: configuración de TypeScript, Next.js, Tailwind y ESLint, esquema de Prisma y una página provisional. Con esto el proyecto ya se puede construir y desplegar.
-- Andamiaje del proyecto: instrucciones para las sesiones de Claude Code, agentes por carril, flujo de trabajo, plantillas de issue y de pull request, etiquetas e integración continua.
+- Initial database migration: seven tables and the `Circulo` enum, generated with `migrate diff --from-empty` so the SQL could be reviewed before it was applied.
+- Production image and Railway deployment guide: a four-stage `Dockerfile` with an unprivileged user, `.dockerignore`, Next's `standalone` output and the `/api/health` route.
+- Repository README, with status badges for continuous integration, open issues and open pull requests.
+- Application skeleton: TypeScript, Next.js, Tailwind and ESLint configuration, the Prisma schema and a placeholder page. With this the project builds and deploys.
+- Project scaffolding: instructions for Claude Code sessions, one agent per lane, the working process, issue and pull request templates, labels and continuous integration.
 
-### Corregido
+### Changed
 
-- La integración continua fallaba al generar el cliente de Prisma. `prisma.config.ts` resuelve `DATABASE_URL` al cargarse, así que la variable de relleno pasa a estar a nivel de job y no solo en el paso de construir.
+- The whole project moves to English: rules, documentation, code comments, templates, labels, agent instructions and product copy.
+- Required pull request approvals drop to zero on `main` and `dev` for the duration of the hackathon. A pull request and green CI are still enforced. Another person reviewing stays the team's agreement, now with no machine checking it.
+
+### Fixed
+
+- Continuous integration was failing when generating the Prisma client. `prisma.config.ts` resolves `DATABASE_URL` as it loads, so the placeholder value moves to the job level instead of only the build step.

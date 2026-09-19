@@ -36,7 +36,7 @@ el acierto baja, mira primero `i09`, `i26` e `i30`, que son difíciles a propós
 **3 · Leer a Mia.** Cincuenta salidas seguidas, leídas por una persona. Ningún eval detecta lo
 que encuentra alguien leyendo. Por orden: disponibilidad inventada, anuncios prematuros, tono
 demasiado servicial, frases largas, español que suena a traducción. Los criterios están en la
-skill `voz-de-mia`.
+skill `mia-voice`.
 
 **4 · El ensayo.** Tres pasadas el domingo, cronometradas, con el montaje real y no con el
 portátil de quien la construyó.

@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Imagen de producción mínima: el stage `runner` del Dockerfile copia
+  // .next/standalone y arranca `node server.js`, sin node_modules completo.
+  // Sin esto, esa carpeta no se genera y la imagen no arranca.
+  output: "standalone",
+
   // En desarrollo, Next bloquea sus propios recursos —la conexión de recarga
   // en caliente, las fuentes— cuando la petición llega desde un dominio
   // distinto al que arrancó el servidor. Por el túnel público eso deja la

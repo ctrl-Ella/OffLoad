@@ -1,0 +1,8 @@
+Esta carpeta existe aunque esté vacía, y no es un descuido.
+
+Next.js sirve desde aquí los archivos estáticos —iconos, imágenes, el
+manifiesto— y el `Dockerfile` la copia a la imagen de producción. Sin la
+carpeta, el build falla en la última etapa con "/app/public: not found",
+después de haber compilado bien, que es donde menos se busca el fallo.
+
+En cuanto haya un archivo estático de verdad, este se puede borrar.

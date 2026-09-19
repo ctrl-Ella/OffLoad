@@ -82,7 +82,7 @@ npx prisma generate
 npm run dev
 ```
 
-Las credenciales que hay que dar de alta, en qué orden y con qué trampas, están en `docs/guias/`. El `.env` no se sube nunca: lo que se versiona es `.env.example`, con los nombres de las variables y sin un solo valor.
+Las credenciales que hay que dar de alta, en qué orden y con qué trampas, están en `docs/guides/`. El `.env` no se sube nunca: lo que se versiona es `.env.example`, con los nombres de las variables y sin un solo valor.
 
 ## Cómo trabajamos
 
@@ -92,13 +92,13 @@ Las credenciales que hay que dar de alta, en qué orden y con qué trampas, est�
 |---|---|
 | [`docs/workflow/`](docs/workflow/) | Ramas y pull requests, commits, issues y etiquetas, spec driven development |
 | [`docs/specs/`](docs/specs/) | Una spec por tarea, más la plantilla |
-| [`docs/decisiones/`](docs/decisiones/) | Las decisiones de arquitectura, con sus alternativas descartadas |
-| [`docs/guias/`](docs/guias/) | Accesibilidad y automatizaciones |
+| [`docs/decisions/`](docs/decisions/) | Las decisiones de arquitectura, con sus alternativas descartadas |
+| [`docs/guides/`](docs/guides/) | Accesibilidad y automatizaciones |
 | [`CLAUDE.md`](CLAUDE.md) | El contexto con el que trabajan las sesiones de Claude Code |
 | [`CHANGELOG.md`](CHANGELOG.md) | Qué ha cambiado, una línea por pull request |
 
 ## Accesibilidad
 
-El listón es **EN 301 549, que remite a WCAG 2.1 nivel AA**, y es una decisión de alcance razonada en [`docs/guias/accesibilidad.md`](docs/guias/accesibilidad.md).
+El listón es **EN 301 549, que remite a WCAG 2.1 nivel AA**, y es una decisión de alcance razonada en [`docs/guides/accessibility.md`](docs/guides/accessibility.md).
 
 Lo que no depende de ese nivel se cumple igual: foco siempre visible, teclado completo, etiquetas reales, `prefers-reduced-motion`, móvil en horizontal y zoom al 200 %. Cada token de color lleva anotado su contraste medido, porque un token es una promesa y sin medirla se rompe en silencio.
