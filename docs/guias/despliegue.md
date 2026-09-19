@@ -80,6 +80,16 @@ railway tcp-proxy list --service Postgres                        # tiene que que
 
 La CLI cambió de forma aquí: en la 5.49.2, `railway tcp-proxy --port 5432` responde `error: unexpected argument '--port' found`. Ahora `tcp-proxy` es un grupo con `create`, `list`, `status` y `delete`.
 
+**Y el JSON de `create` trae los datos anidados, no en la raíz:**
+
+```json
+{ "applicationPort": 5432, "staged": false, "committed": true, "proxy": { "id": "…", "domain": "…", "proxyPort": 12345 } }
+```
+
+Leer `domain` o `proxyPort` del primer nivel devuelve vacío. Y ese fallo tiene una consecuencia que no se ve venir: **cuando descubres que no has podido leer el identificador, el proxy ya está creado.** Un script que aborte ahí por prudencia deja la base de datos abierta precisamente por intentar ser prudente.
+
+Así que el borrado no puede depender de haber leído bien la respuesta. Si el `id` no se extrae del JSON, se saca de `tcp-proxy list`, que lo da en texto plano, y se borra igual. *(Pagado el 2026-09-19: la base de datos estuvo expuesta unos minutos.)*
+
 Meter la migración en el arranque del contenedor es lo correcto cuando hay varias instancias y un despliegue por hora. Con una instancia y un fin de semana, cuesta más de lo que resuelve.
 
 ### 5 · La clave privada de Vonage viaja como variable
