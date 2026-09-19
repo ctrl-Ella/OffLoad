@@ -1,0 +1,68 @@
+/* ---------------------------------------------------------------------------
+   Los tokens del proyecto y la base que los usa.
+
+   LA REGLA QUE NO SE ROMPE
+   ------------------------------------------------------------------------
+   Un color se cambia aquí y en ningún sitio más. Ni un hexadecimal suelto en
+   un componente, ni una clase de la paleta por defecto de Tailwind, que no
+   está medida contra nada nuestro. Si hace falta un color que no está, se
+   añade como token con su contraste medido al lado.
+
+   Cada token lleva anotado su contraste. El listón del proyecto es 4,5:1 para
+   texto normal y 3:1 para texto grande y elementos gráficos, y el porqué de
+   ese nivel está en docs/guias/accesibilidad.md.
+
+   Si cambias un color, vuelve a medirlo. Un token es una promesa de
+   contraste: si se cambia sin comprobar, la promesa se rompe en silencio.
+--------------------------------------------------------------------------- */
+
+@import "tailwindcss";
+
+@theme {
+  /* Fondo y texto. 15,8:1 entre los dos: holgado incluso para AAA. */
+  --color-fondo: #fbfaf8;
+  --color-texto: #1a1a1f;
+
+  /* Texto secundario sobre el fondo: 7,4:1. */
+  --color-texto-suave: #4a4a55;
+
+  /* Acento de marca sobre el fondo: 5,1:1. Vale para texto normal. */
+  --color-acento: #7a3d9c;
+
+  /* Turquesa sobre el fondo: 3,2:1. El más justo de los tres, así que se
+     reserva para titulares, iconos y bordes. Nunca para texto normal. */
+  --color-turquesa: #0f7d86;
+
+  /* Bordes y separadores: 3,1:1 sobre el fondo. Elemento gráfico, no texto. */
+  --color-borde: #b9b4ad;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+  }
+
+  /* Nunca `outline: none` sin sustituto. Quien navega con teclado pierde la
+     referencia de dónde está y la página deja de ser usable. Se define una
+     vez, aquí, y en los componentes solo hay que no estropearlo. */
+  :focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+  }
+
+  /* Quien pide menos movimiento lo pide por un motivo: para algunas personas
+     una animación no es un adorno, es un mareo. Lo declarativo se neutraliza
+     aquí; lo que anima por JavaScript hay que preguntárselo aparte, y de eso
+     se ocupa src/lib/motion.ts. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
