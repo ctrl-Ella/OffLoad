@@ -84,6 +84,14 @@ npm run dev
 
 Las credenciales que hay que dar de alta, en qué orden y con qué trampas, están en `docs/guias/`. El `.env` no se sube nunca: lo que se versiona es `.env.example`, con los nombres de las variables y sin un solo valor.
 
+## Recorrido web actual
+
+La portada presenta a Mia con un GIF de parpadeo suave, un ejemplo de agenda familiar y el camino hacia una llamada de coordinación. Hay tres vistas: inicio, llamada y resumen del tiempo potencial para el bienestar personal. La pantalla de notas de voz se ha retirado del frontend actual.
+
+La sala de vídeo usa `/api/video/room` y los SDK de Vonage. La persona que abre la sala recibe un enlace temporal para invitar a otras personas; cada participante recibe su propio token. Configura `VONAGE_APPLICATION_ID`, `VONAGE_PRIVATE_KEY_PATH` y `VONAGE_API_SECRET` en `.env`. La ruta de la clave debe apuntar al archivo privado de esa aplicación. La cámara y el micrófono requieren `localhost` o HTTPS.
+
+Google Calendar y la orquestación del agente quedan para una siguiente fase. Por ahora, la agenda y los minutos de bienestar se muestran como ejemplos, y ningún cambio se escribe en un calendario.
+
 ## Cómo trabajamos
 
 `main` es producción y `dev` es donde se integra. Cada rama sale de `dev` con el número de su issue en el nombre, y vuelve por pull request. Ninguna tarea empieza por el código: primero se escribe qué se va a hacer y cómo se sabrá que está hecho.
