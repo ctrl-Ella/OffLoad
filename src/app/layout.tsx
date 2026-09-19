@@ -19,9 +19,9 @@ export default function RootLayout({
             receives focus; then it jumps in front of any screen (light or
             dark) with its own opaque box, so it doesn't depend on what
             background is behind it. Each screen marks its main content
-            with `id="contenido"`. */}
+            with `id="content"`. */}
         <a
-          href="#contenido"
+          href="#content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-bg focus:px-4 focus:py-2 focus:font-medium focus:text-ink"
         >
           Saltar al contenido principal

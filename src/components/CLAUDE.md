@@ -1,9 +1,9 @@
 # src/components
 
 This folder governs itself: before writing a new component, check here and check the design
-system's living page at `http://localhost:3000/sistema` (the colours, measured; the three
-typefaces; every state of every component, side by side). It doesn't exist yet — it gets built by
-whoever needs to show those states together for the first screen that requires it.
+system's living page at `http://localhost:3000/system` (`src/app/system/page.tsx`: every state of
+every component, side by side). It started with Mia's five states; a new component adds its own
+states there in the same change, because a component that is not on that page is one nobody finds.
 
 ## What lives here
 

@@ -41,6 +41,20 @@ const schema = z.object({
    */
   VERIFICATION_PEPPER: z.string().min(32).optional(),
 
+  /** SLNG, which is what Mia says. Optional for the same reason as the rest:
+   *  `next build` needs no secrets, and everything else works without a voice. */
+  SLNG_API_KEY: z.string().min(1).optional(),
+  /** Mia's voice is Catalina, on a model that only streams over WebSocket.
+   *  Declared here so the casting is not lost; it speaks once the call exists. */
+  SLNG_TTS_MODEL: z.string().min(1).default("cartesia/sonic:3.5"),
+  SLNG_TTS_VOICE: z.string().min(1).default("162e0f37-8504-474c-bb33-c606c01890dc"),
+  /** The stand-in for a whole clip over HTTP, which is what speaks today.
+   *  Identifiers come from the environment because SLNG can retire one. */
+  SLNG_TTS_CLIP_MODEL: z.string().min(1).default("deepgram/aura:2"),
+  SLNG_TTS_CLIP_VOICE: z.string().min(1).default("aura-2-silvia-es"),
+  /** Where a family's audio travels. The EU by default; `eu-central` does not exist. */
+  SLNG_REGION: z.string().min(1).default("eu-west"),
+
   TEST_PHONE_ELVIA: z.string().min(1).optional(),
   TEST_PHONE_CARLOS: z.string().min(1).optional(),
   TEST_EMAIL_ELVIA: z.string().min(1).optional(),
@@ -161,6 +175,34 @@ export function requireVerifyCredentials(): VerifyCredentials {
   }
 
   return { applicationId, privateKeyPath, publicUrl, pepper };
+}
+
+export type MiaVoice = {
+  apiKey: string;
+  model: string;
+  /** The voice inside the model. On the SLNG route the `model` field is this. */
+  voice: string;
+  /** The regional host, already built: the call never goes to `api.slng.ai` bare. */
+  base: string;
+};
+
+/** The clip pair, which is what can speak today. Only the key can be missing. */
+export function requireMiaVoice(): MiaVoice {
+  const {
+    SLNG_API_KEY: apiKey,
+    SLNG_TTS_CLIP_MODEL: model,
+    SLNG_TTS_CLIP_VOICE: voice,
+    SLNG_REGION: region,
+  } = env;
+
+  if (!apiKey) {
+    throw new Error(
+      "Mia's voice needs SLNG_API_KEY and it is not in .env. It is generated per " +
+        "project at app.slng.ai and shown once.",
+    );
+  }
+
+  return { apiKey, model, voice, base: `https://${region}.api.slng.ai` };
 }
 
 export type GoogleCredentials = {
