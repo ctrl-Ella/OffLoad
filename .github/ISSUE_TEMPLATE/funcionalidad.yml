@@ -1,18 +1,18 @@
-name: Funcionalidad
-description: Algo nuevo que el producto tiene que hacer
+name: Feature
+description: Something new the product has to do
 title: "[area] "
-labels: ["tipo:feature"]
+labels: ["type:feature"]
 body:
   - type: markdown
     attributes:
       value: |
-        Sustituye `[area]` del título por el área que corresponda:
+        Replace `[area]` in the title with the right one:
         `[frontend]` `[backend]` `[qa]` `[devops]` `[ia]` `[video]` `[docs]`
 
   - type: dropdown
     id: area
     attributes:
-      label: Área
+      label: Area
       options:
         - frontend
         - backend
@@ -25,21 +25,21 @@ body:
       required: true
 
   - type: textarea
-    id: problema
+    id: problem
     attributes:
-      label: Qué problema resuelve
-      description: Qué pasa hoy que no debería pasar. Sin hablar todavía de la solución.
-      placeholder: Ahora mismo no hay forma de que dos personas se vean, y...
+      label: What problem it solves
+      description: What happens today that should not. No solutions yet.
+      placeholder: Right now there is no way for two people to see each other, and...
     validations:
       required: true
 
   - type: textarea
-    id: criterios
+    id: acceptance
     attributes:
-      label: Criterios de aceptación
+      label: Acceptance criteria
       description: |
-        Cómo sabremos que está hecho. Que los pueda comprobar otra persona:
-        "es rápido" no vale, "aparece en menos de 3 segundos" sí.
+        How we will know it is done. Someone else has to be able to check them:
+        "it's fast" does not count, "it appears in under 3 seconds" does.
       value: |
         - [ ]
         - [ ]
@@ -51,26 +51,26 @@ body:
     id: spec
     attributes:
       label: Spec
-      description: Ruta de la spec en docs/specs/ (créala antes si no existe)
-      placeholder: docs/specs/0003-sala-de-video.md
+      description: Path to the spec in docs/specs/ (write it first if it does not exist)
+      placeholder: docs/specs/0003-video-room.md
     validations:
       required: true
 
   - type: dropdown
-    id: prioridad
+    id: priority
     attributes:
-      label: Prioridad
+      label: Priority
       options:
-        - alta
-        - media
-        - baja
+        - high
+        - medium
+        - low
     validations:
       required: true
 
   - type: textarea
-    id: notas
+    id: notes
     attributes:
-      label: Notas
-      description: Enlaces, capturas, dependencias con otras issues
+      label: Notes
+      description: Links, screenshots, dependencies on other issues
     validations:
       required: false

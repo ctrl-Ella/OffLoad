@@ -1,12 +1,12 @@
-name: Tarea técnica
-description: Trabajo interno sin cara visible - configuración, dependencias, CI, documentación
+name: Technical task
+description: Internal work with no visible face - configuration, dependencies, CI, documentation
 title: "[area] "
-labels: ["tipo:tarea"]
+labels: ["type:task"]
 body:
   - type: dropdown
     id: area
     attributes:
-      label: Área
+      label: Area
       options:
         - devops
         - backend
@@ -19,26 +19,26 @@ body:
       required: true
 
   - type: textarea
-    id: que-hay-que-hacer
+    id: what-needs-doing
     attributes:
-      label: Qué hay que hacer
+      label: What needs doing
     validations:
       required: true
 
   - type: textarea
-    id: por-que
+    id: why
     attributes:
-      label: Por qué
+      label: Why
       description: |
-        Qué mejora o qué problema evita. Una tarea técnica sin porqué acaba
-        siendo trabajo que nadie echa de menos si no se hace.
+        What it improves, or what problem it avoids. A technical task with no reason
+        behind it ends up being work nobody misses if it never happens.
     validations:
       required: true
 
   - type: textarea
-    id: hecho
+    id: done
     attributes:
-      label: Cuándo está hecha
+      label: Definition of done
       value: |
         - [ ]
         - [ ]
@@ -46,12 +46,12 @@ body:
       required: true
 
   - type: dropdown
-    id: prioridad
+    id: priority
     attributes:
-      label: Prioridad
+      label: Priority
       options:
-        - alta
-        - media
-        - baja
+        - high
+        - medium
+        - low
     validations:
       required: true

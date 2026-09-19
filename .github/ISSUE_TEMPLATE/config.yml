@@ -1,14 +1,14 @@
-# Obliga a usar una de las tres plantillas: sin esto, GitHub deja abrir issues
-# en blanco y acabamos con "no va el login" sin más datos.
+# Forces one of the three templates: without this, GitHub allows blank issues
+# and we end up with "login doesn't work" and nothing else to go on.
 blank_issues_enabled: false
 
 contact_links:
-  - name: Cómo trabajamos
+  - name: How we work
     url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/workflow/ramas-y-pull-requests.md
-    about: Ramas, pull requests y revisiones.
-  - name: Antes de escribir código
+    about: Branches, pull requests and reviews.
+  - name: Before writing any code
     url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/workflow/spec-driven-development.md
-    about: Cada tarea lleva su spec. Aquí está el circuito completo.
-  - name: Accesibilidad
+    about: Every task carries a spec. The full circuit is here.
+  - name: Accessibility
     url: https://github.com/ctrl-Ella/OffLoad/blob/main/docs/guias/accesibilidad.md
-    about: El estándar del proyecto y cómo se comprueba cada pantalla.
+    about: The project's bar, and how each screen is checked against it.

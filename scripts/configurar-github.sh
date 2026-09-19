@@ -1,188 +1,189 @@
 #!/usr/bin/env bash
 #
-# Configura el repositorio en GitHub: etiquetas, ramas y reglas de protección.
+# Configures the repository on GitHub: labels, branches and protection rules.
 #
-# CUÁNDO EJECUTARLO
-#   Una sola vez, sobre el repositorio ya creado.
-#   Es idempotente: si lo lanzas dos veces no rompe nada.
+# WHEN TO RUN IT
+#   Once, against a repository that already exists.
+#   It is idempotent: running it twice breaks nothing.
 #
-# QUÉ NECESITAS ANTES
-#   - gh instalado y con sesión iniciada:  gh auth login
-#   - el repositorio ya creado y como remoto `origin`
+# WHAT YOU NEED FIRST
+#   - gh installed and signed in:  gh auth login
+#   - the repository already created and set as the `origin` remote
 #
-# QUÉ HACE
-#   1. Configura git para que los acentos no se rompan (UTF-8)
-#   2. Crea las etiquetas de .github/labels.yml
-#   3. Crea la rama dev
-#   4. Aplica las reglas de protección de .github/rulesets/
-#   5. Activa el borrado automático de ramas al mergear
+# WHAT IT DOES
+#   1. Configures git so accented characters survive (UTF-8)
+#   2. Creates the labels from .github/labels.yml
+#   3. Creates the dev branch
+#   4. Applies the protection rules from .github/rulesets/
+#   5. Turns on automatic branch deletion on merge
 #
-# QUÉ NO HACE
-#   - Crear el repositorio ni la organización
-#   - Crear el tablero (Project): se crea a mano y el auto-añadir se activa
-#     desde su pantalla de Workflows. Ver docs/workflow/issues-y-labels.md
+# WHAT IT DOES NOT DO
+#   - Create the repository or the organisation
+#   - Create the project board: that is done by hand, and auto-add is switched
+#     on from its own Workflows screen. See docs/workflow/issues-y-labels.md
 
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Comprobaciones previas: fallar pronto y con un mensaje que se entienda
+# Preflight checks: fail early, with a message that makes sense
 # ---------------------------------------------------------------------------
 
 if ! command -v gh >/dev/null 2>&1; then
-  echo "ERROR: falta la herramienta 'gh' (GitHub CLI)."
-  echo "       Instálala desde https://cli.github.com y vuelve a intentarlo."
+  echo "ERROR: 'gh' (GitHub CLI) is missing."
+  echo "       Install it from https://cli.github.com and try again."
   exit 1
 fi
 
 if ! gh auth status >/dev/null 2>&1; then
-  echo "ERROR: 'gh' no tiene sesión iniciada."
-  echo "       Ejecuta:  gh auth login"
+  echo "ERROR: 'gh' is not signed in."
+  echo "       Run:  gh auth login"
   exit 1
 fi
 
 if ! git remote get-url origin >/dev/null 2>&1; then
-  echo "ERROR: este repositorio no tiene remoto 'origin'."
-  echo "       Crea el repositorio en la organización y añádelo:"
+  echo "ERROR: this repository has no 'origin' remote."
+  echo "       Create it and add the remote:"
   echo "       git remote add origin https://github.com/ctrl-Ella/OffLoad.git"
   exit 1
 fi
 
 REPO="$(gh repo view --json nameWithOwner --jq .nameWithOwner)"
-echo "Repositorio: $REPO"
+echo "Repository: $REPO"
 echo
 
 # ---------------------------------------------------------------------------
-# 1. UTF-8 en git
+# 1. UTF-8 in git
 # ---------------------------------------------------------------------------
-# Sin esto, en Windows los acentos acaban en el historial como \303\261 y los
-# nombres de archivo con tilde se ven igual de mal.
+# Without this, on Windows accented characters land in the history as \303\261
+# and filenames carrying them look just as broken.
 
-echo "== Configurando git para UTF-8 =="
+echo "== Configuring git for UTF-8 =="
 git config core.quotepath false
 git config i18n.commitEncoding utf-8
 git config i18n.logOutputEncoding utf-8
-echo "   hecho"
+echo "   done"
 echo
 
 # ---------------------------------------------------------------------------
-# 2. Etiquetas
+# 2. Labels
 # ---------------------------------------------------------------------------
 
-echo "== Creando etiquetas =="
+echo "== Creating labels =="
 
-# Se leen de .github/labels.yml sin depender de un parser YAML: el formato es
-# fijo y conocido (lo escribimos nosotras), así que basta con leer los campos.
-nombre=""
-color=""
-descripcion=""
+# Read from .github/labels.yml without depending on a YAML parser: the format is
+# fixed and known, because we write it, so reading the fields is enough.
+label_name=""
+label_color=""
+label_description=""
 
-crear_etiqueta() {
-  [ -z "$nombre" ] && return 0
-  if gh label create "$nombre" --color "$color" --description "$descripcion" --force >/dev/null 2>&1; then
-    echo "   $nombre"
+create_label() {
+  [ -z "$label_name" ] && return 0
+  if gh label create "$label_name" --color "$label_color" --description "$label_description" --force >/dev/null 2>&1; then
+    echo "   $label_name"
   else
-    echo "   AVISO: no se pudo crear '$nombre'"
+    echo "   WARNING: could not create '$label_name'"
   fi
 }
 
-while IFS= read -r linea; do
-  case "$linea" in
-    "- nombre: "*)
-      crear_etiqueta
-      nombre="$(echo "$linea" | sed 's/^- nombre: *//; s/^"//; s/"$//')"
-      color=""
-      descripcion=""
+while IFS= read -r line; do
+  case "$line" in
+    "- name: "*)
+      create_label
+      label_name="$(echo "$line" | sed 's/^- name: *//; s/^"//; s/"$//')"
+      label_color=""
+      label_description=""
       ;;
     *"color: "*)
-      color="$(echo "$linea" | sed 's/^ *color: *//; s/^"//; s/"$//')"
+      label_color="$(echo "$line" | sed 's/^ *color: *//; s/^"//; s/"$//')"
       ;;
-    *"descripcion: "*)
-      descripcion="$(echo "$linea" | sed 's/^ *descripcion: *//; s/^"//; s/"$//')"
+    *"description: "*)
+      label_description="$(echo "$line" | sed 's/^ *description: *//; s/^"//; s/"$//')"
       ;;
   esac
 done < .github/labels.yml
-crear_etiqueta
+create_label
 
 echo
 
 # ---------------------------------------------------------------------------
-# 3. Rama dev
+# 3. The dev branch
 # ---------------------------------------------------------------------------
 
-echo "== Creando la rama dev =="
+echo "== Creating the dev branch =="
 if git show-ref --verify --quiet refs/heads/dev; then
-  echo "   ya existe en local"
+  echo "   already exists locally"
 else
   git branch dev
-  echo "   creada en local"
+  echo "   created locally"
 fi
 
 if git ls-remote --exit-code --heads origin dev >/dev/null 2>&1; then
-  echo "   ya existe en remoto"
+  echo "   already exists on the remote"
 else
   git push -u origin dev
-  echo "   subida a remoto"
+  echo "   pushed to the remote"
 fi
 echo
 
 # ---------------------------------------------------------------------------
-# 4. Reglas de protección
+# 4. Protection rules
 # ---------------------------------------------------------------------------
-# Solo funcionan en repositorios públicos con plan gratuito. Si el repo es
-# privado, la API responde con un error de permisos: se avisa y se sigue.
+# These only work on public repositories under the free plan. If the repo is
+# private, the API answers with a permissions error: warn and carry on.
 
-echo "== Aplicando reglas de protección =="
-for archivo in .github/rulesets/*.json; do
-  nombre_regla="$(basename "$archivo" .json)"
+echo "== Applying protection rules =="
+for file in .github/rulesets/*.json; do
+  rule_name="$(basename "$file" .json)"
   if gh api "repos/$REPO/rulesets" \
        --method POST \
-       --input "$archivo" >/dev/null 2>&1; then
-    echo "   $nombre_regla aplicada"
+       --input "$file" >/dev/null 2>&1; then
+    echo "   $rule_name applied"
   else
-    echo "   AVISO: no se pudo aplicar '$nombre_regla'."
-    echo "          Suele significar que el repositorio es privado (las reglas"
-    echo "          solo funcionan en públicos con plan gratuito) o que la regla"
-    echo "          ya existe. Compruébalo en Settings > Rules."
+    echo "   WARNING: could not apply '$rule_name'."
+    echo "            Usually this means the repository is private (the rules only"
+    echo "            work on public ones under the free plan), or the rule already"
+    echo "            exists. Check under Settings > Rules."
   fi
 done
 echo
 
 # ---------------------------------------------------------------------------
-# 5. Ajustes del repositorio
+# 5. Repository settings
 # ---------------------------------------------------------------------------
 
-echo "== Ajustes del repositorio =="
+echo "== Repository settings =="
 if gh api "repos/$REPO" --method PATCH \
      -F delete_branch_on_merge=true \
      -F allow_squash_merge=true \
      -F allow_merge_commit=true \
      -F allow_rebase_merge=false >/dev/null 2>&1; then
-  echo "   borrado automático de ramas al mergear: activado"
+  echo "   automatic branch deletion on merge: on"
 else
-  echo "   AVISO: no se pudieron cambiar los ajustes (¿permisos de administración?)"
+  echo "   WARNING: could not change the settings (admin permissions?)"
 fi
 echo
 
 # ---------------------------------------------------------------------------
-# Lo que queda a mano
+# What is left to do by hand
 # ---------------------------------------------------------------------------
 
-cat <<'FIN'
-== Listo ==
+cat <<'END'
+== Done ==
 
-Queda por hacer a mano (GitHub no lo permite por API con plan gratuito):
+Left to do by hand, because GitHub does not allow it over the API on the free plan:
 
-  1. Crear el tablero (Project) en la organización.
-     Después: Workflows > Auto-add to project, con el filtro  is:issue is:open
-     Así las issues entran solas al crearse.
+  1. Create the project board.
+     Then: Workflows > Auto-add to project, filtering on  is:issue is:open
+     That way issues land on the board as they are created.
 
-  2. Comprobar que el escaneo de secretos está activo:
+  2. Check that secret scanning is on:
      Settings > Code security > Secret scanning > Push protection
 
-  3. Rellenar .github/CODEOWNERS con los usuarios reales del equipo.
+  3. Fill in .github/CODEOWNERS with the team's real usernames.
 
-  4. Revisar las URLs de .github/ISSUE_TEMPLATE/config.yml: llevan un nombre
-     de organización de ejemplo.
+One thing to know about automatic branch deletion: it also deletes the head
+branch of a pull request, and on a dev-to-main release that branch is `dev`.
+It is safe while `dev` is protected, because the rules forbid deleting it.
 
-Detalles en docs/workflow/issues-y-labels.md
-FIN
+Details in docs/workflow/issues-y-labels.md
+END
