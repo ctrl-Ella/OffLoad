@@ -102,13 +102,13 @@ export function VerificationReturn() {
   return (
     <div aria-live="polite" className="flex flex-col gap-4">
       {outcome.state === "checking" && showChecking ? (
-        <Notice title="Confirmando tu línea">
+        <Notice tone="good" title="Confirmando tu línea">
           <p>Un segundo.</p>
         </Notice>
       ) : null}
 
       {outcome.state === "in" ? (
-        <Notice title={`Hola, ${outcome.name}`}>
+        <Notice tone="good" title={`Hola, ${outcome.name}`}>
           <p>Ya estás dentro.</p>
         </Notice>
       ) : null}

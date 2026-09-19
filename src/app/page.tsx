@@ -130,7 +130,7 @@ function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
 
       {/* The day's timeline goes here. Until it exists, the screen says only
           what it can prove: that it knows who you are. */}
-      <Notice title="Ya estás dentro">
+      <Notice tone="good" title="Ya estás dentro">
         <p className="mt-1">
           Tu día todavía no está aquí: esto de momento solo sabe quién eres.
         </p>

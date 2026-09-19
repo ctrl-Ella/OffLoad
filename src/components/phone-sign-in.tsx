@@ -209,7 +209,7 @@ export function PhoneSignIn({ alternative }: Props) {
     return (
       <div aria-live="polite">
         {phase.name ? (
-          <Notice title={`Hola, ${phase.name}`}>
+          <Notice tone="good" title={`Hola, ${phase.name}`}>
             <p>Ya estás dentro. No hace falta que vuelvas a entrar.</p>
           </Notice>
         ) : (
@@ -233,7 +233,7 @@ export function PhoneSignIn({ alternative }: Props) {
 
     return (
       <div className="flex flex-col gap-5">
-        <Notice title="Te he mandado un código">
+        <Notice tone="good" title="Te he mandado un código">
           <p>
             Tu operador no ha podido confirmar la línea por su cuenta, así que va
             por SMS. Escribe el código que acabas de recibir.
@@ -300,7 +300,7 @@ export function PhoneSignIn({ alternative }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <Notice tone="alert" title="Apaga el wifi antes de empezar">
+      <Notice title="Apaga el wifi antes de empezar">
         <p>
           La comprobación va por la red de tu operador. Con el wifi encendido no
           sale por ahí y hay que teclear un código.
