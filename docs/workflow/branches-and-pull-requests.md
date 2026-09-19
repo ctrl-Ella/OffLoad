@@ -101,6 +101,31 @@ Si algo no se entiende, la pregunta correcta es "¿por qué así?", no "esto est
 Cuando `dev` está estable y sin conflictos, se abre una PR de `dev` a `main`. Eso es una
 *release*: lo que hay en `main` es lo que se enseña y se entrega.
 
+### A `main` solo entra `dev`, y ahora hay una máquina comprobándolo
+
+Ninguna rama de trabajo abre una pull request contra `main`. Ni una corrección de una línea, ni
+un cambio que «solo toca estilos», ni algo urgente: todo entra por `dev` y llega a `main` en la
+siguiente release.
+
+**El motivo está comprobado en este repositorio.** Las pull requests #12 y #13 fueron directas a
+`main` en una misma tarde. Dejaron allí un reparto de hojas de estilo —`src/app/styles/`, 350
+líneas— que `dev` no tiene, sobre un `globals.css` que `dev` también había tocado. A partir de
+ahí, la siguiente release deja de ser un avance limpio y pasa a ser un conflicto que hay que
+resolver a mano, y mientras tanto quien sale de `dev` trabaja sin unos estilos que ya están
+publicados.
+
+La protección de ramas no puede expresar esto: gobierna los push, no hacia dónde apunta una pull
+request. Por eso es una comprobación,
+[`check-pr-target.yml`](../../.github/workflows/check-pr-target.yml), y va en los checks
+obligatorios del ruleset de `main` — si no, avisa pero no bloquea.
+
+Si una pull request está mal dirigida, se redirige sin perder nada, ni los commits ni la
+conversación:
+
+```bash
+gh pr edit <número> --base dev
+```
+
 ---
 
 ## Lo que GitHub hace cumplir

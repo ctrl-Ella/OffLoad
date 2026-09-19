@@ -1,111 +1,11 @@
-/* ---------------------------------------------------------------------------
-   Los tokens del proyecto y la base que los usa.
+/* The root sheet: it chains, it defines nothing.
+   Tailwind goes first because `@theme` is read from there, tokens next
+   because the base uses them. */
 
-   LA REGLA QUE NO SE ROMPE
-   ------------------------------------------------------------------------
-   Un color se cambia aquí y en ningún sitio más. Ni un hexadecimal suelto en
-   un componente, ni una clase de la paleta por defecto de Tailwind, que no
-   está medida contra nada nuestro. Si hace falta un color que no está, se
-   añade como token con su contraste medido al lado.
-
-   Cada token lleva anotado su contraste. El listón del proyecto es 4,5:1 para
-   texto normal y 3:1 para texto grande y elementos gráficos, y el porqué de
-   ese nivel está en docs/guides/accessibility.md.
-
-   Si cambias un color, vuelve a medirlo. Un token es una promesa de
-   contraste: si se cambia sin comprobar, la promesa se rompe en silencio.
---------------------------------------------------------------------------- */
-
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-@theme {
-  /* Fondo y texto. 15,8:1 entre los dos: holgado incluso para AAA. */
-  --color-fondo: #fbfaf8;
-  --color-texto: #1a1a1f;
-
-  /* Texto secundario sobre el fondo: 7,4:1. */
-  --color-texto-suave: #4a4a55;
-
-  /* Acento de marca sobre el fondo: 5,1:1. Vale para texto normal. */
-  --color-acento: #7a3d9c;
-
-  /* Turquesa sobre el fondo: 3,2:1. El más justo de los tres, así que se
-     reserva para titulares, iconos y bordes. Nunca para texto normal. */
-  --color-turquesa: #0f7d86;
-
-  /* Bordes y separadores: 3,1:1 sobre el fondo. Elemento gráfico, no texto. */
-  --color-borde: #b9b4ad;
-
-  /* -------------------------------------------------------------------
-     Paleta inmersiva: solo para la pantalla de escucha por voz.
-
-     No es un tema oscuro global. El recorrido del día, la tarjeta de
-     propuesta y el tiempo recuperado siguen sobre el fondo claro de arriba,
-     con las mismas cifras ya medidas — construirlos no entraba en esta
-     tarea, así que no hay motivo para dar por buena una app entera en
-     oscuro sin haber medido cada pantalla. Esta paleta se usa una vez, en
-     la pantalla donde Mia escucha: una superficie casi negra a pantalla
-     completa deja que la persona hable sin que la pantalla compita por
-     atención, y no deslumbra si se usa de noche.
-
-     Mismo listón que arriba (4,5:1 texto normal, 3:1 gráficos), mismo
-     método de medida (luminancia relativa WCAG, la fórmula de WebAIM).
-  ------------------------------------------------------------------- */
-  --color-fondo-inmersivo: #0b0d0d;
-
-  /* Texto principal sobre el fondo inmersivo: 18,1:1. */
-  --color-texto-inmersivo: #f5f7f7;
-
-  /* Texto secundario —la transcripción en vivo, las etiquetas de las
-     pestañas inactivas— sobre el fondo inmersivo: 8,8:1. */
-  --color-texto-suave-inmersivo: #a9afb1;
-
-  /* Turquesa sobre fondo inmersivo: 10,4:1. El turquesa claro de arriba se
-     queda en 4,0:1 aquí: pasa para gráficos pero no para texto. Sobre un
-     fondo casi negro aguanta un turquesa más vivo, con margen de sobra
-     también para texto, así que es el que pinta la esfera, la onda de
-     audio y la pestaña activa del menú. */
-  --color-turquesa-inmersivo: #3fd1c7;
-
-  /* Superficie de un elemento gráfico —el círculo del botón de volver, la
-     línea divisoria antes del menú— sobre fondo inmersivo: 3,2:1. Es el
-     mínimo del proyecto para gráficos: no baja de aquí. */
-  --color-superficie-inmersiva: #5a6364;
-
-  /* Aviso sobre fondo inmersivo: 8,5:1. Para cuando el reconocimiento de voz
-     no ha podido completarse —sin permiso de micrófono, sin transcripción—.
-     El texto ya dice qué ha pasado; este tono solo lo distingue a simple
-     vista de la transcripción normal, nunca es el único portador del
-     mensaje. */
-  --color-aviso-inmersivo: #ff8a80;
-}
-
-@layer base {
-  body {
-    background-color: var(--color-fondo);
-    color: var(--color-texto);
-  }
-
-  /* Nunca `outline: none` sin sustituto. Quien navega con teclado pierde la
-     referencia de dónde está y la página deja de ser usable. Se define una
-     vez, aquí, y en los componentes solo hay que no estropearlo. */
-  :focus-visible {
-    outline: 3px solid var(--color-acento);
-    outline-offset: 2px;
-  }
-
-  /* Quien pide menos movimiento lo pide por un motivo: para algunas personas
-     una animación no es un adorno, es un mareo. Lo declarativo se neutraliza
-     aquí; lo que anima por JavaScript hay que preguntárselo aparte, y de eso
-     se ocupa src/lib/motion.ts. */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-}
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/responsive.css";
+@import "./styles/accessibility.css";
