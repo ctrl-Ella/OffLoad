@@ -3,6 +3,13 @@ import { ArrowRight, Heart, ShieldCheck, Sparkles } from "lucide-react";
 import { PresentationCalendar } from "@/components/presentation-calendar";
 
 export default function HomePage() {
+  const today = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+
   return (
     <div className="presentation-page">
       <header className="presentation-header">
@@ -49,7 +56,7 @@ export default function HomePage() {
           <p>Una agenda clara para ver el día de todos. Cuando surge un conflicto, Mia prepara opciones y pregunta antes de cambiar el plan de otra persona.</p>
         </section>
 
-        <PresentationCalendar />
+        <PresentationCalendar today={today} />
 
         <section className="presentation-ending" aria-label="Bienestar personal">
           <span className="presentation-ending-icon"><Heart size={24} aria-hidden="true" /></span>

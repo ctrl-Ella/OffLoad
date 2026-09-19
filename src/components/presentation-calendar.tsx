@@ -34,8 +34,9 @@ function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
-export function PresentationCalendar() {
-  const [today] = useState(() => new Date());
+export function PresentationCalendar({ today: todayString }: { today: string }) {
+  const [year, month, day] = todayString.split("-").map(Number);
+  const today = new Date(year, month - 1, day);
   const [weekOffset, setWeekOffset] = useState(0);
   const [selectedDay, setSelectedDay] = useState(today.getDay());
   const days = Array.from({ length: 7 }, (_, index) => addDays(startOfWeek(today), weekOffset * 7 + index));
