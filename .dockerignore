@@ -1,0 +1,27 @@
+.git
+.gitignore
+.gitattributes
+node_modules
+.next
+out
+build
+coverage
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+# La clave privada de Vonage es un fichero que se descarga a la carpeta del
+# proyecto. En el despliegue viaja como variable de entorno, nunca dentro de la
+# imagen: una clave horneada en una capa se queda ahí aunque se borre después.
+*.key
+*.pem
+private.key
+npm-debug.log*
+.claude
+.claudeignore
+.mcp.json
+# material interno del equipo: nunca entra en una imagen
+docs-internos
+*.md
+!README.md
+.mastra

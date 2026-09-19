@@ -12,6 +12,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/), y 
 
 ### Añadido
 
+- Imagen de producción y guía de despliegue en Railway: `Dockerfile` de cuatro etapas con usuario sin privilegios, `.dockerignore`, salida `standalone` de Next y la ruta `/api/health`.
 - README del repositorio, con distintivos de estado de la integración continua, las issues y las pull requests abiertas.
 - Esqueleto de la aplicación: configuración de TypeScript, Next.js, Tailwind y ESLint, esquema de Prisma y una página provisional. Con esto el proyecto ya se puede construir y desplegar.
 - Andamiaje del proyecto: instrucciones para las sesiones de Claude Code, agentes por carril, flujo de trabajo, plantillas de issue y de pull request, etiquetas e integración continua.
