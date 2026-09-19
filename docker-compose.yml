@@ -9,8 +9,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      # 5434: el 5432 lo tiene el PostgreSQL de la máquina y el 5433 el de
-      # ctrl4ella-hackaton. Solo a localhost, nunca a la red.
+      # 5434: 5432 is the machine's own PostgreSQL and 5433 is already taken by
+      # another project on the same laptop. Bound to localhost, never the network.
       - "127.0.0.1:5434:5432"
     volumes:
       # Postgres 18+ quiere el volumen en /var/lib/postgresql, no en .../data:
