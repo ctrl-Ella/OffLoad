@@ -1,0 +1,76 @@
+name: Funcionalidad
+description: Algo nuevo que el producto tiene que hacer
+title: "[area] "
+labels: ["tipo:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Sustituye `[area]` del título por el área que corresponda:
+        `[frontend]` `[backend]` `[qa]` `[devops]` `[ia]` `[video]` `[docs]`
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - frontend
+        - backend
+        - ia
+        - video
+        - devops
+        - qa
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qué problema resuelve
+      description: Qué pasa hoy que no debería pasar. Sin hablar todavía de la solución.
+      placeholder: Ahora mismo no hay forma de que dos personas se vean, y...
+    validations:
+      required: true
+
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Criterios de aceptación
+      description: |
+        Cómo sabremos que está hecho. Que los pueda comprobar otra persona:
+        "es rápido" no vale, "aparece en menos de 3 segundos" sí.
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      description: Ruta de la spec en docs/specs/ (créala antes si no existe)
+      placeholder: docs/specs/0003-sala-de-video.md
+    validations:
+      required: true
+
+  - type: dropdown
+    id: prioridad
+    attributes:
+      label: Prioridad
+      options:
+        - alta
+        - media
+        - baja
+    validations:
+      required: true
+
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas
+      description: Enlaces, capturas, dependencias con otras issues
+    validations:
+      required: false

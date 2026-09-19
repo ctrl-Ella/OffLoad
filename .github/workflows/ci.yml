@@ -1,0 +1,59 @@
+# Comprobaciones automáticas en cada pull request.
+#
+# Es lo mismo que ejecutas en local antes de subir. Está aquí porque "en mi
+# máquina funciona" deja de ser una discusión cuando hay una máquina neutral
+# que lo dice.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+# Si llegan varios push seguidos a la misma rama, cancela los anteriores:
+# no tiene sentido gastar minutos comprobando un commit ya superado.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # `npm ci` y no `npm install`: instala exactamente lo del package-lock,
+      # sin actualizar nada por su cuenta. Es la diferencia entre comprobar
+      # tu código y comprobar tu código con dependencias distintas.
+      - name: Instalar dependencias
+        run: npm ci
+
+      # El cliente de Prisma es código generado: sin esto, los tipos de la
+      # base de datos no existen y el typecheck falla sin motivo real.
+      - name: Generar cliente de Prisma
+        run: npx prisma generate
+
+      - name: Comprobar tipos
+        run: npm run typecheck
+
+      - name: Comprobar estilo
+        run: npm run lint
+
+      - name: Construir
+        env:
+          # Valores de relleno: el build no debe necesitar secretos ni una
+          # base de datos real. Si algún día los necesitara, sería un error
+          # de diseño, no algo que tapar con variables de verdad.
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+        run: npm run build

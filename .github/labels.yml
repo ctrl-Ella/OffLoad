@@ -1,0 +1,79 @@
+# Etiquetas del proyecto. Fuente única: se aplican con scripts/configurar-github.sh
+#
+# Se crean una vez y se reutilizan siempre. Si cada una crea las suyas sobre la
+# marcha, en dos días hay "bug", "Bug", "bugs" y "error", y ningún filtro sirve.
+#
+# Para añadir una: edítala aquí y vuelve a ejecutar el script.
+
+# --- Área: quién lo coge -----------------------------------------------------
+- nombre: "area:frontend"
+  color: "1f6feb"
+  descripcion: "Interfaz, componentes, estilos"
+
+- nombre: "area:backend"
+  color: "0969da"
+  descripcion: "Route handlers, base de datos, lógica de servidor"
+
+- nombre: "area:ia"
+  color: "8250df"
+  descripcion: "Agente, Mastra, Nebius, prompts"
+
+- nombre: "area:video"
+  color: "bf3989"
+  descripcion: "Vonage Video API, salas, señal"
+
+- nombre: "area:devops"
+  color: "6e7781"
+  descripcion: "Docker, CI, despliegue, configuración"
+
+- nombre: "area:qa"
+  color: "bf8700"
+  descripcion: "Pruebas, verificación, accesibilidad"
+
+- nombre: "area:docs"
+  color: "0e8a16"
+  descripcion: "Documentación y specs"
+
+# --- Tipo: qué clase de trabajo es -------------------------------------------
+- nombre: "tipo:feature"
+  color: "a2eeef"
+  descripcion: "Funcionalidad nueva"
+
+- nombre: "tipo:bug"
+  color: "d73a4a"
+  descripcion: "Algo que existe y no funciona"
+
+- nombre: "tipo:tarea"
+  color: "d4c5f9"
+  descripcion: "Trabajo técnico sin cara visible"
+
+- nombre: "tipo:spec"
+  color: "c5def5"
+  descripcion: "Escribir o revisar una spec"
+
+# --- Prioridad: qué va antes -------------------------------------------------
+- nombre: "prio:alta"
+  color: "b60205"
+  descripcion: "Bloquea a alguien o a la entrega"
+
+- nombre: "prio:media"
+  color: "fbca04"
+  descripcion: "Importante, no urgente"
+
+- nombre: "prio:baja"
+  color: "c2e0c6"
+  descripcion: "Si da tiempo"
+
+# --- Estado: por qué no avanza -----------------------------------------------
+- nombre: "estado:bloqueada"
+  color: "000000"
+  descripcion: "Esperando algo externo. Di en un comentario qué esperas"
+
+- nombre: "estado:en-revision"
+  color: "fef2c0"
+  descripcion: "Con pull request abierta, esperando revisión"
+
+# --- Otras -------------------------------------------------------------------
+- nombre: "buena-primera-tarea"
+  color: "7057ff"
+  descripcion: "Acotada y con contexto suficiente para empezar por aquí"

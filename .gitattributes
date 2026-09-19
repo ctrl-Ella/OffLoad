@@ -1,0 +1,32 @@
+# Normalizacion de finales de linea y codificacion.
+#
+# Sin esto, cuando alguien trabaja en Windows y otra persona en Mac o Linux,
+# git marca archivos enteros como modificados aunque solo haya cambiado el
+# caracter invisible de fin de linea. Las revisiones se vuelven ilegibles:
+# 300 lineas cambiadas para un arreglo de una palabra.
+
+# Por defecto: git normaliza a LF al guardar, y cada quien ve lo suyo al sacar.
+* text=auto eol=lf
+
+# Los scripts de Windows necesitan CRLF o PowerShell puede quejarse.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binarios: que git no los toque nunca.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.mp4 binary
+*.webm binary
+
+# Archivos generados: se marcan para que GitHub los colapse en las revisiones
+# y no cuenten como codigo escrito por el equipo.
+package-lock.json linguist-generated=true
+src/generated/** linguist-generated=true

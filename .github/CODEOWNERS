@@ -1,0 +1,35 @@
+# Quién revisa qué.
+#
+# GitHub pide revisión automáticamente a quien figure aquí cuando una PR toca
+# esos archivos. Evita el "¿quién mira esto?" en el grupo a las dos de la
+# madrugada.
+#
+# PENDIENTE: sustituir los marcadores por los usuarios reales de GitHub del
+# equipo. Mientras estén los marcadores, GitHub
+# ignora las líneas (el usuario no existe) y no pide revisión a nadie.
+#
+# Formato: ruta   @usuario [@otra-usuaria]
+# Gana la ÚLTIMA línea que coincide, no la primera.
+
+# Por defecto, cualquiera del equipo puede revisar
+# *                          @organizacion/equipo
+
+# Frontend e interfaz
+# /src/app/                  @usuaria-frontend
+# /src/components/           @usuaria-frontend
+
+# Backend y datos
+# /src/app/api/              @usuaria-backend
+# /prisma/                   @usuaria-backend
+# /src/lib/db.ts             @usuaria-backend
+
+# Agente e IA
+# /src/mastra/               @usuaria-ia
+
+# Infraestructura: aquí un error afecta a las cuatro
+# /Dockerfile                @usuaria-devops
+# /docker-compose.yml        @usuaria-devops
+# /.github/                  @usuaria-devops
+
+# Documentación y specs: las revisa quien no las escribió
+# /docs/                     @organizacion/equipo

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mastra": {
+      "command": "npx",
+      "args": ["-y", "@mastra/mcp-docs-server"]
+    },
+    "vonage-docs": {
+      "type": "http",
+      "url": "https://documentation-mcp.vonage.dev/mcp"
+    }
+  }
+}
