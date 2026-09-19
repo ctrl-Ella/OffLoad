@@ -150,7 +150,7 @@ npm run dev
 ```
 
 1. In Google Cloud Console: register `<PUBLIC_URL>/api/auth/google/callback` as an authorised redirect URI, add both addresses as test users, and check the consent screen asks for all four permissions.
-2. Seed two people in the `CORE` circle: Elvia with `aprender2426@gmail.com` and `TEST_PHONE_ELVIA`, Carlos with `carlosmartinezgutierrez55@gmail.com` and `TEST_PHONE_CARLOS`.
+2. Seed the two people in the `CORE` circle with `npm run db:seed`. It reads their numbers and addresses from `TEST_PHONE_*` and `TEST_EMAIL_*`, which live in the environment and not in a committed file: the repository is public, and an address written into one is an address published.
 3. Open `/` on a phone over mobile data, type Elvia's number, and check she gets in without typing a code.
 4. Open `/` on a laptop, try the same number: silent verification cannot complete, and the screen has to say so and offer Google.
 5. Sign in with Google as Elvia. In `npm run db:studio`, check there is a row in `google_accounts` with a non-empty `refresh_token`.
