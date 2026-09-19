@@ -32,6 +32,26 @@
 
   --radius-card: 24px;
   --radius-control: 10px; /* 24px on a text input reads as a pill */
+
+  /* ── Mia
+     None of these change with a theme: she is a character, not a surface.
+     They stay out of @theme on purpose — the SVG reads them with var(), and
+     a utility class would invite them onto text and backgrounds they were
+     never measured for. Contrasts below are measured, not estimated. */
+  --mia-sky: #1e1b4b;          /* the halo that lifts her off the page */
+  --mia-visor-light: #4a3f8f;  /* the glass where the light hits it */
+  --mia-visor-dark: #171436;   /* and its shaded side */
+  --mia-helmet: #f2f4ff;       /* 14.59:1 on the sky · 7.99:1 on the visor */
+  --mia-helmet-shade: #c9cfe8;
+  --mia-body-light: #5b54c9;
+  --mia-body-dark: #34307e;
+  --mia-eye: #3fdcc8;          /* 5.12:1 on the light visor · 10.32:1 on the dark */
+  /* The brand tomato, the one thing that ties her to OFFLOAD. Always inside
+     the helmet: on the purple body it measures 1.02:1 and vanishes. */
+  --mia-brand: var(--color-alert-strong); /* 5.27:1 on the helmet */
+  --mia-brand-light: #d9673f;  /* 3.21:1 on the helmet · gradient highlight only */
+  --mia-flame-core: #c9fff4;   /* decorative: the bright heart of the flame */
+  --mia-shine: var(--color-white);
 }
 
 /* Without an entry here Tailwind 4 generates no utility, and the token can

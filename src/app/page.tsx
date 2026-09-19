@@ -4,6 +4,8 @@ import { currentPerson, type SignedInPerson } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
 import { GoogleSignIn } from "@/components/google-sign-in";
+import { MiaFigure } from "@/components/mia";
+import { MIA_SKY } from "@/components/mia-states";
 import { PhoneSignIn } from "@/components/phone-sign-in";
 
 /**
@@ -59,30 +61,55 @@ const GOOGLE_OUTCOMES: Record<string, string> = {
   failed: "No he podido terminar con Google. Vuelve a intentarlo en un momento.",
 };
 
+/**
+ * Two compositions, not one. On a phone it is a column — Mia, the headline,
+ * the two ways in — and on a desktop the text sits on one side and Mia on the
+ * other: stretching the phone column to 1440px left the headline in four
+ * short lines with half a metre of empty background above it.
+ */
 function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
   const message = googleOutcome ? GOOGLE_OUTCOMES[googleOutcome] : undefined;
 
   return (
     <main
       id="content"
-      className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 pt-11 pb-7 lg:max-w-4xl lg:px-10"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 pt-11 pb-7 lg:max-w-6xl lg:px-10 lg:pt-8 lg:pb-10"
     >
       <p className="font-display text-xl font-bold tracking-tight text-ink">OFFLOAD</p>
 
-      <div className="mt-12 flex min-h-0 flex-1 flex-col gap-8">
-        <h1 className="font-display text-[2.125rem] leading-[1.1] text-ink lg:text-5xl">
-          Organizar a una familia es un trabajo.{" "}
-          <span className="text-accent-strong">Que lo haga Mia.</span>
-        </h1>
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:items-center lg:gap-16">
+        {/* The figure alone, with no state label: nothing is running here yet.
+            The height is declared rather than left to `flex-1`: scaled by the
+            column's width, in phone landscape she pushed the headline and the
+            buttons off the screen. */}
+        <div className="relative my-4 flex h-[34vh] max-h-80 shrink-0 items-center justify-center lg:order-2 lg:my-0 lg:h-[26rem] lg:max-h-none lg:basis-96">
+          {/* Overflows top and bottom only: she fills the box's height, so the
+              sky needs room outside it to fade. Sideways overflow would bring
+              a horizontal scrollbar. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 -inset-y-14"
+            style={{ background: MIA_SKY }}
+          />
 
-        {message ? (
-          <Notice tone="alert">
-            <p>{message}</p>
-          </Notice>
-        ) : null}
+          <MiaFigure state="quiet" className="relative h-full w-full" />
+        </div>
 
-        <div className="lg:max-w-md">
-          <PhoneSignIn alternative={<GoogleSignIn />} />
+        <div className="flex flex-col gap-8 lg:order-1 lg:flex-1">
+          <h1 className="font-display text-[2.125rem] leading-[1.1] text-ink lg:text-5xl">
+            Organizar a una familia es un trabajo.{" "}
+            <span className="text-accent-strong">Que lo haga Mia.</span>
+          </h1>
+
+          {message ? (
+            <Notice tone="alert">
+              <p>{message}</p>
+            </Notice>
+          ) : null}
+
+          <div className="lg:max-w-md">
+            <PhoneSignIn alternative={<GoogleSignIn />} />
+          </div>
         </div>
       </div>
     </main>
