@@ -14,7 +14,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><a className="skip-link" href="#main-content">Saltar al contenido principal</a>{children}</body>
     </html>
   );
 }

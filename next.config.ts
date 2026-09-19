@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   // distinto al que arrancó el servidor. Por el túnel público eso deja la
   // página pintada pero sin hidratar: los botones no hacen nada. Solo afecta
   // a `next dev`.
-  allowedDevOrigins: ["*.ngrok-free.app", "*.trycloudflare.com"],
+  allowedDevOrigins: ["127.0.0.1", "*.ngrok-free.app", "*.trycloudflare.com"],
 
   // Mastra y Prisma cargan binarios y módulos nativos en tiempo de ejecución.
   // Si el bundler del servidor intenta empaquetarlos, fallan al resolverse.

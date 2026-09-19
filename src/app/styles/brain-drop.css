@@ -1,0 +1,62 @@
+.brain-drop-page { min-height: 100dvh; background: var(--color-text); color: var(--color-white); }
+.brain-drop-page .presentation-brand { color: var(--color-white); }
+.brain-drop-page .presentation-header-link { background: var(--color-accent); color: var(--color-text) !important; }
+.brain-drop-page .presentation-mobile-nav { border-color: color-mix(in srgb, var(--color-white) 18%, var(--color-text)); background: var(--color-text); }
+.brain-drop-page .presentation-mobile-nav a { color: var(--color-background); }
+.brain-drop-page .presentation-mobile-nav a[aria-current="page"] { color: var(--color-accent); }
+.brain-drop-main { width: min(1120px, calc(100% - 64px)); margin: 0 auto; padding: 70px 0 110px; }
+.brain-drop-heading { max-width: 720px; margin-bottom: 45px; }
+.brain-drop-heading h1 { margin: 12px 0 14px; font-size: clamp(54px, 7vw, 90px); letter-spacing: -.06em; }
+.brain-drop-heading p { color: var(--color-background); font-size: 18px; }
+.brain-drop-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; align-items: start; gap: 24px; }
+.brain-drop-record-card { display: flex; flex-direction: column; align-items: center; padding: 55px 30px 42px; border: 1px solid color-mix(in srgb, var(--color-white) 18%, var(--color-text)); border-radius: var(--radius-card); background: color-mix(in srgb, var(--color-white) 5%, var(--color-text)); text-align: center; }
+.brain-drop-mic { width: 112px; height: 112px; display: grid; place-items: center; margin-bottom: 25px; border: 9px solid color-mix(in srgb, var(--color-accent) 23%, var(--color-text)); border-radius: 50%; background: var(--color-accent); color: var(--color-text); }
+.brain-drop-mic.is-recording { border-color: color-mix(in srgb, var(--color-alert) 35%, var(--color-text)); background: var(--color-alert); color: var(--color-text); animation: brain-drop-pulse 1.5s ease-in-out infinite; }
+.brain-drop-state { color: var(--color-accent); font-size: 10px; font-weight: 800; letter-spacing: .13em; }
+.brain-drop-record-card h2 { margin: 9px 0; font-size: clamp(26px, 3vw, 36px); letter-spacing: -.04em; }
+.brain-drop-record-card > p { color: var(--color-background); font-size: 14px; }
+.brain-drop-timer { margin: 32px 0 19px; font: 700 35px/1 'Bricolage Grotesque', sans-serif; font-variant-numeric: tabular-nums; }
+.brain-drop-record-button { min-width: min(192px, 100%); min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 20px; border-radius: 999px; background: var(--color-accent); color: var(--color-text); font-size: 13px; font-weight: 800; }
+.brain-drop-record-button.is-stop { background: var(--color-alert); color: var(--color-text); }
+.brain-drop-record-card > small { margin-top: 19px; color: var(--color-background); font-size: 11px; }
+.brain-drop-error { margin: 16px 0 0; padding: 13px 16px; border: 1px solid var(--color-alert); border-radius: 12px; background: var(--color-text); color: var(--color-white); font-size: 13px; }
+.brain-drop-notes { margin-top: 40px; }
+.brain-drop-notes-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.brain-drop-notes-heading h2 { font-size: 25px; }
+.brain-drop-notes-heading > span { min-width: 27px; min-height: 27px; display: grid; place-items: center; border-radius: 50%; background: var(--color-accent); color: var(--color-text); font-size: 12px; font-weight: 800; }
+.brain-drop-empty { padding: 25px; border: 1px dashed color-mix(in srgb, var(--color-white) 25%, var(--color-text)); border-radius: 15px; color: var(--color-background); font-size: 13px; }
+.brain-drop-notes ul { display: grid; gap: 12px; padding: 0; list-style: none; }
+.brain-drop-notes li { padding: 18px; border: 1px solid color-mix(in srgb, var(--color-white) 18%, var(--color-text)); border-radius: 16px; }
+.brain-drop-notes li > div:first-child { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.brain-drop-notes li strong { font-size: 13px; }
+.brain-drop-notes li span { color: var(--color-background); font-size: 12px; }
+.brain-drop-notes audio { width: 100%; }
+.brain-drop-note-actions { display: flex; justify-content: flex-end; gap: 17px; margin-top: 9px; }
+.brain-drop-note-actions a, .brain-drop-note-actions button { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; }
+.brain-drop-note-actions button { color: var(--color-alert); }
+.brain-drop-privacy { margin-top: 18px; color: var(--color-background); font-size: 11px; line-height: 1.5; }
+.brain-drop-aside { position: sticky; top: 25px; display: grid; justify-items: center; padding: 35px 20px 25px; border-radius: var(--radius-card); background: color-mix(in srgb, var(--color-white) 5%, var(--color-text)); text-align: center; }
+.brain-drop-aside img { width: min(100%, 230px); height: auto; }
+.brain-drop-mascot-still { display: none !important; }
+.brain-drop-aside p { margin-top: 12px; font: 800 22px 'Bricolage Grotesque', sans-serif; }
+@keyframes brain-drop-pulse { 50% { box-shadow: 0 0 0 13px color-mix(in srgb, var(--color-alert) 12%, transparent); } }
+
+@media (max-width: 800px) {
+  .brain-drop-grid { grid-template-columns: 1fr; }
+  .brain-drop-aside { display: none; }
+}
+
+@media (max-width: 620px) {
+  .brain-drop-main { width: min(100% - 40px, 700px); padding: 48px 0 65px; }
+  .brain-drop-heading { margin-bottom: 27px; }
+  .brain-drop-heading h1 { font-size: 56px; }
+  .brain-drop-heading p { font-size: 15px; }
+  .brain-drop-record-card { padding: 38px 18px 33px; }
+  .brain-drop-mic { width: 98px; height: 98px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brain-drop-mic.is-recording { animation: none; }
+  .brain-drop-mascot-animated { display: none !important; }
+  .brain-drop-mascot-still { display: block !important; }
+}
