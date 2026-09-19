@@ -27,7 +27,7 @@ Un subagente, `accesibilidad`, repasa página a página contra este listón.
 
 ## Color
 
-Los tokens están en `src/app/globals.css` y **cada uno lleva
+Los tokens están en [`src/app/globals.css`](../../src/app/globals.css) y **cada uno lleva
 anotado su contraste medido**. El listón es **4,5:1 para texto normal y 3:1 para texto grande y
 elementos gráficos**.
 
@@ -86,10 +86,10 @@ Si algo falla ahí, no está terminado.
 
 Todo lo que se mueve respeta `prefers-reduced-motion`. Hay dos capas, porque una sola no basta:
 
-- **CSS**: `globals.css` neutraliza transiciones y animaciones
+- **CSS**: [`globals.css`](../../src/app/globals.css) neutraliza transiciones y animaciones
   declarativas.
 - **JavaScript**: Motion anima sin pasar por CSS, así que hay que preguntárselo con
-  `useReducedMotion`. Está resuelto en `src/lib/motion.ts`: usa ese
+  `useReducedMotion`. Está resuelto en [`src/lib/motion.ts`](../../src/lib/motion.ts): usa ese
   helper y no tendrás que pensarlo.
 
 Cuando el sistema pide menos movimiento, el contenido **sigue apareciendo**: se quita el
