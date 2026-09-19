@@ -4,17 +4,16 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "OFFLOAD",
   description:
-    "Una aplicación familiar que reparte la carga mental. Mia encuentra los " +
-    "problemas antes de que nadie los vea y solo pide un sí o un no cuando hace falta.",
+    "A family app that shares the mental load. Mia spots problems before " +
+    "anyone else does and only asks for a yes or no when needed.",
 };
 
-// `lang="es"` no es decorativo: sin él, un lector de pantalla pronuncia el
-// castellano con fonética inglesa y la página deja de entenderse.
+// Declare the interface language so screen readers use English pronunciation.
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="en">
       <body className="antialiased">{children}</body>
     </html>
   );
