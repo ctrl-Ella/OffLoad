@@ -30,6 +30,39 @@
   --color-border-strong: #8a8378; /*  3.44:1 · inputs, controls, anything
                                       whose outline carries meaning */
 
+  /* ── immersive
+     The one deliberately dark corner of the product: the voice screen, full
+     screen and full attention, no chrome from the rest of the app around it.
+     Contrast below is measured against --color-surface-immersive, not
+     --color-background like everything above — a different base, so it gets
+     its own figures instead of borrowing the ones already written down.
+
+     The surface and its ink are the brand's own onyx-and-cream pair, inverted
+     rather than reinvented: --color-surface-immersive is --color-text worn as
+     a background, --color-ink-immersive is --color-background worn as text,
+     so the 16.40:1 already measured above holds here too. The brand teal
+     carries over as well — on this surface it reads as light-on-dark, which
+     is exactly the role --color-accent-strong plays on the cream background,
+     so here it is --color-accent doing that job (11.86:1, the same pair as
+     its own fill comment, just read the other way). --color-accent-strong
+     itself does not survive the trip: dark teal on near-black measures
+     2.73:1, so it stays out of this section entirely. The muted ink is the
+     one colour with no equivalent to invert — --color-text-muted measures
+     2.65:1 here and fails outright — so it alone is new. */
+  --color-surface-immersive: var(--color-text);       /* the base; see above */
+  --color-ink-immersive: var(--color-background);     /* 16.40:1 · passes at any size */
+  --color-ink-muted-immersive: #9aa3a1;               /*  6.92:1 · passes as text */
+  --color-accent-immersive: var(--color-accent);      /* 11.86:1 · text, icon or
+                                                           border. As a fill
+                                                           (the orb, the mic
+                                                           button) it needs no
+                                                           contrast of its own,
+                                                           same as --color-accent
+                                                           everywhere else. */
+  --color-border-immersive: #1e2929;                  /*  1.19:1 · decorative
+                                                           separator only, same
+                                                           figure as --color-border */
+
   --radius-card: 24px;
   --radius-control: 10px; /* 24px on a text input reads as a pill */
 }
@@ -48,6 +81,12 @@
 
   --color-border: var(--color-border);
   --color-border-strong: var(--color-border-strong);
+
+  --color-surface-immersive: var(--color-surface-immersive);
+  --color-ink-immersive: var(--color-ink-immersive);
+  --color-ink-muted-immersive: var(--color-ink-muted-immersive);
+  --color-accent-immersive: var(--color-accent-immersive);
+  --color-border-immersive: var(--color-border-immersive);
 
   --radius-card: var(--radius-card);
   --radius-control: var(--radius-control);

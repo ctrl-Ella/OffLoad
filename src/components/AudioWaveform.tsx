@@ -43,7 +43,7 @@ export function AudioWaveform({
           <motion.span
             key={index}
             aria-hidden="true"
-            className="w-[3px] shrink-0 rounded-full bg-[var(--color-turquesa-inmersivo)]"
+            className="w-[3px] shrink-0 rounded-full bg-accent-immersive"
             initial={false}
             animate={{
               height,

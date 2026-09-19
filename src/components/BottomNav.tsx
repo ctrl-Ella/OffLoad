@@ -25,7 +25,7 @@ const TABS: Tab[] = [
 /**
  * The four-section menu, always visible at the bottom of the screen.
  *
- * Colored for the listening screen's immersive palette, the only one that
+ * Coloured for the listening screen's immersive palette, the only one that
  * exists today. Once the day's journey, the proposal card and the recovered
  * time are built on the light background, this bar needs a light variant —
  * not guessed here without seeing it side by side.
@@ -44,12 +44,9 @@ export function BottomNav() {
               <Link
                 href={href}
                 aria-current={isActive ? "page" : undefined}
-                className="flex flex-col items-center gap-1 rounded-lg px-2 py-3 text-xs font-medium"
-                style={{
-                  color: isActive
-                    ? "var(--color-turquesa-inmersivo)"
-                    : "var(--color-texto-suave-inmersivo)",
-                }}
+                className={`flex flex-col items-center gap-1 rounded-lg px-2 py-3 text-xs font-medium ${
+                  isActive ? "text-accent-immersive" : "text-ink-muted-immersive"
+                }`}
               >
                 <Icon className="h-6 w-6" aria-hidden="true" />
                 {label}

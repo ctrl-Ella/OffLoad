@@ -1,39 +1,49 @@
 # src/components
 
-Esta carpeta manda sobre sí misma: antes de escribir un componente nuevo, se mira aquí y en
-`http://localhost:3000/sistema` (la página viva del sistema de diseño, con los colores medidos,
-las tres tipografías y todos los estados de cada componente a la vez). Todavía no existe: la crea
-quien construya la primera pantalla que necesite enseñar esos estados juntos.
+This folder governs itself: before writing a new component, check here and check the design
+system's living page at `http://localhost:3000/sistema` (the colours, measured; the three
+typefaces; every state of every component, side by side). It doesn't exist yet — it gets built by
+whoever needs to show those states together for the first screen that requires it.
 
-## Qué vive aquí
+## What lives here
 
-Piezas de interfaz reutilizables entre las tres pantallas del carril `interfaz` (el recorrido del
-día, la tarjeta de propuesta, el tiempo recuperado), más la franja de traza y la entrada por voz.
-Una pantalla completa vive en `src/app/<ruta>/page.tsx` y compone los componentes de aquí; no al
-revés.
+Interface pieces reused across the three screens of the `interface` lane (the day's journey, the
+proposal card, the recovered time), plus the trace strip and the voice entry. A full screen lives
+in `src/app/<route>/page.tsx` and composes the components here — never the other way round.
 
-## Reglas del carril, aplicadas a esta carpeta
+The voice entry (`ListeningScreen` and what it composes) is the one deliberate exception to the
+light palette below: full screen, full attention, no chrome from the rest of the app around it. It
+draws on its own `*-immersive` tokens in `tokens.css` instead of the ones every other screen uses,
+and its own visible text stays English rather than Spanish — both confirmed decisions, not gaps to
+close by making it match the rest of the folder.
 
-- **Nada de datos inventados.** Un componente recibe lo que le pasan por props. Si el dato real
-  puede faltar, el componente sabe pintar ese hueco — vacío, o con su estado de carga— sin
-  simular un valor como si fuera real. La página que compone el componente es la única que decide
-  si usa datos reales o un valor de ejemplo para desarrollo, y si lo hace, lo dice en un
-  comentario.
-- **Ni un hexadecimal suelto.** Todo color sale de un token de `src/app/globals.css`. Si hace
-  falta un color que no está, se añade el token allí, con su contraste medido al lado — nunca
-  inline en el componente.
-- **Cliente solo si hace falta.** `"use client"` únicamente cuando el componente usa estado,
-  efectos, o un hook de Motion o de navegación. Lo puramente visual y estático no lo necesita.
-- **Foco visible, siempre.** El estilo de foco global de `globals.css` no se pisa. Un botón de
-  solo icono lleva `aria-label` describiendo la acción, y ese `aria-label` cambia si el estado del
-  botón cambia.
-- **Animación con `useReducedMotionSafe`, no con el `useReducedMotion` de Motion a secas.**
-  Cualquier animación por JavaScript (Motion) se pregunta antes de moverse, y se pregunta con el
-  hook de `src/lib/motion.ts`: el de Motion lee `matchMedia` de forma síncrona en el primer render
-  del cliente y, en una máquina con menos movimiento activado, rompe la hidratación. La entrada
-  usa `useAparicion`; un bucle continuo (un pulso, una espera) se pregunta aparte con
-  `useReducedMotionSafe` y, si se pide menos movimiento, sigue indicando su estado sin
-  desplazamiento — con opacidad o quieto, nunca invisible.
-- **Se prueba en móvil horizontal y al 200% de zoom**, no solo en el ancho de un móvil en
-  vertical. Nada de alturas fijas que puedan recortar contenido: si algo no cabe, la página hace
-  scroll, no desaparece.
+## The lane's rules, applied to this folder
+
+- **No invented data.** A component receives what it's passed as props. If the real value can be
+  missing, the component knows how to paint that gap — empty, or in its loading state — without
+  simulating a value as if it were real. The page composing the component is the only one that
+  decides whether it uses real data or a placeholder for development, and if it does, it says so
+  in a comment.
+- **Not a loose hex value.** Every colour comes from a token in `src/app/styles/tokens.css`
+  (`src/app/globals.css` is just the import chain that pulls it in — it defines nothing itself).
+  If a colour is missing, the token gets added there, with its measured contrast next to it —
+  never inline in the component.
+- **Client only when it needs to be.** `"use client"` only when the component uses state, effects,
+  or a Motion or navigation hook. Anything purely visual and static doesn't need it.
+- **Focus always visible.** The global focus style from `base.css` stays as it is almost
+  everywhere. Its one sanctioned override lives in that same file, scoped to
+  `[data-theme="immersive"]`, because the ring's default colour measures 2.73:1 on the voice
+  screen's dark surface — a second override anywhere else needs the same kind of measured reason,
+  not just a colour that looked better. An icon-only button carries a `label` describing the
+  action (`Button` from `ui/button.tsx` turns this into a compile error if it's missing), and that
+  label changes if the button's state does.
+- **Animation through `useReducedMotionSafe`, never Motion's own `useReducedMotion`.** Any
+  JavaScript animation (Motion) asks before it moves, and it asks through the hook in
+  `src/lib/motion.ts`: Motion's own hook reads `matchMedia` synchronously on the client's first
+  render and, on a machine with reduced motion on, breaks hydration. An entrance uses
+  `useAparicion`; a continuous loop (a pulse, a wait) asks `useReducedMotionSafe` separately and,
+  when less motion is requested, keeps showing its state without moving — through opacity, or
+  staying still, never invisible.
+- **Tested in mobile landscape and at 200% zoom**, not only at mobile portrait width. No fixed
+  heights that could clip content: if something doesn't fit, the page scrolls, it doesn't
+  disappear.

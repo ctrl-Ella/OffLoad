@@ -3,19 +3,38 @@
 import { motion } from "motion/react";
 import { useReducedMotionSafe } from "@/lib/motion";
 
+/** The orb's three moments: waiting, actively picking up speech, and — new
+ *  since the batch transcription turned out to take 15 to 45 seconds instead
+ *  of a couple — working on what was said. Each has its own decoration
+ *  around the sphere: nothing while idle, pulsing rings while listening,
+ *  three dots orbiting while processing. Never more than one at once. */
+export type OrbState = "idle" | "listening" | "processing";
+
+// Roughly even spacing around the circle — top, lower-right, lower-left —
+// placed as CSS offsets rather than trigonometry so they scale with the
+// container at both breakpoints without any JavaScript measuring it.
+const DOT_POSITIONS = [
+  "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2",
+  "top-[75%] right-0 translate-x-1/2 -translate-y-1/2",
+  "top-[75%] left-0 -translate-x-1/2 -translate-y-1/2",
+];
+
 /**
  * The central orb on the listening screen: the indicator that Mia is
- * active and waiting for what's said.
+ * active and waiting for what's said, or working on it.
  *
- * The pulse is a looping animation, not an entrance one, so it doesn't use
- * `useAparicion` (meant for appearing once). It asks `useReducedMotionSafe`
- * — not Motion's plain `useReducedMotion`, which on a machine with reduced
- * motion enabled already differs on the client's first render and breaks
- * hydration — and with reduced motion the orb stays still: only the rings
- * change opacity, without moving or scaling.
+ * The pulse and the orbit are looping animations, not entrance ones, so
+ * neither uses `useAparicion` (meant for appearing once). Both ask
+ * `useReducedMotionSafe` — not Motion's plain `useReducedMotion`, which on a
+ * machine with reduced motion enabled already differs on the client's first
+ * render and breaks hydration — and with reduced motion neither the rings
+ * nor the dots move: the rings hold a fixed opacity, the dots sit still at
+ * their three positions instead of orbiting.
  */
-export function ListeningOrb({ isActive }: { isActive: boolean }) {
+export function ListeningOrb({ state }: { state: OrbState }) {
   const prefersReducedMotion = useReducedMotionSafe();
+  const isListening = state === "listening";
+  const isProcessing = state === "processing";
 
   return (
     <div className="relative flex h-48 w-48 items-center justify-center sm:h-56 sm:w-56">
@@ -23,10 +42,10 @@ export function ListeningOrb({ isActive }: { isActive: boolean }) {
         <motion.span
           key={ring}
           aria-hidden="true"
-          className="absolute inset-0 rounded-full border border-[var(--color-turquesa-inmersivo)]"
+          className="absolute inset-0 rounded-full border border-accent-immersive"
           initial={false}
           animate={
-            !isActive
+            !isListening
               ? { opacity: 0, scale: 1 }
               : prefersReducedMotion
                 ? { opacity: 0.25, scale: 1 }
@@ -50,14 +69,42 @@ export function ListeningOrb({ isActive }: { isActive: boolean }) {
 
       <motion.div
         aria-hidden="true"
+        className="absolute inset-0"
+        initial={false}
+        animate={
+          !isProcessing
+            ? { opacity: 0 }
+            : prefersReducedMotion
+              ? { opacity: 1, rotate: 0 }
+              : { opacity: 1, rotate: 360 }
+        }
+        transition={
+          !isProcessing || prefersReducedMotion
+            ? { duration: 0 }
+            : { duration: 2.4, repeat: Infinity, ease: "linear" }
+        }
+      >
+        {DOT_POSITIONS.map((position) => (
+          <span
+            key={position}
+            className={`absolute h-2.5 w-2.5 rounded-full bg-accent-immersive ${position}`}
+          />
+        ))}
+      </motion.div>
+
+      <motion.div
+        aria-hidden="true"
         className="h-32 w-32 rounded-full sm:h-36 sm:w-36"
         style={{
+          // No hue invented for the bubble effect: the light centre and the
+          // dark rim are the same two tokens the rest of the screen already
+          // uses for the teal brand colour.
           background:
-            "radial-gradient(circle at 32% 28%, #8ff2ea 0%, var(--color-turquesa-inmersivo) 45%, #0a4a47 100%)",
+            "radial-gradient(circle at 32% 28%, var(--color-accent-immersive) 0%, var(--color-accent-strong) 100%)",
         }}
         initial={false}
         animate={
-          !isActive || prefersReducedMotion
+          !isListening || prefersReducedMotion
             ? { scale: 1, opacity: 1 }
             : { scale: [1, 1.05, 1] }
         }

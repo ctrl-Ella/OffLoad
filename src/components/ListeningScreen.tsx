@@ -1,9 +1,11 @@
 "use client";
 
-import { ArrowLeft, Loader2, Mic, Square } from "lucide-react";
+import { ArrowLeft, Mic, Square } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ListeningOrb } from "@/components/ListeningOrb";
 import { AudioWaveform } from "@/components/AudioWaveform";
+import { Button } from "@/components/ui/button";
+import { Notice } from "@/components/ui/notice";
 
 /**
  * The four moments of a listening turn. `"error"` covers every way the turn
@@ -13,19 +15,31 @@ import { AudioWaveform } from "@/components/AudioWaveform";
  */
 export type ListeningStatus = "idle" | "listening" | "transcribing" | "error";
 
+// This screen's visible text stays English on purpose. It's the one
+// deliberately immersive, full-screen surface in a product that's Spanish
+// everywhere else — confirmed with the person using it, not a gap to close.
 const TITLE: Record<ListeningStatus, string> = {
   idle: "Tap to start",
   listening: "Listening",
-  transcribing: "Transcribing…",
+  transcribing: "Sorting it out",
   error: "Tap to start",
 };
 
+// Read under the button, which processing hides entirely — see the footer
+// below — so this entry is never rendered, kept only so the record stays
+// total over `ListeningStatus` instead of carving out an exception type.
 const CAPTION: Record<ListeningStatus, string> = {
   idle: "Tap to talk.",
   listening: "Tap when you're done.",
-  transcribing: "One moment.",
+  transcribing: "",
   error: "Tap to talk.",
 };
+
+// Stands in for the transcript while processing. SLNG's batch API takes 15
+// to 45 seconds — long enough that a bare "Transcribing…" reads as stuck.
+// Naming what's actually happening gives the wait a shape.
+const PROCESSING_SUBTITLE =
+  "Finding the dates, the people and what needs doing.";
 
 const ARIA_LABEL: Record<ListeningStatus, string> = {
   idle: "Start talking",
@@ -69,103 +83,90 @@ export function ListeningScreen({
   const isError = status === "error";
 
   return (
-    <div className="relative flex min-h-dvh flex-col overflow-hidden bg-[var(--color-fondo-inmersivo)] text-[var(--color-texto-inmersivo)]">
+    <div
+      data-theme="immersive"
+      className="relative flex min-h-dvh flex-col overflow-hidden bg-surface-immersive text-ink-immersive"
+    >
       {/* Ambient glow, decorative. On a phone it sits close to the orb; on a
           wide screen it fills the air around the central column instead of
           leaving two empty black strips. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/3 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-3xl"
-        style={{ background: "var(--color-turquesa-inmersivo)" }}
+        className="pointer-events-none absolute top-1/3 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-immersive opacity-20 blur-3xl"
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col px-6 pb-6 sm:max-w-lg sm:pb-10">
         <header className="pt-[max(1rem,env(safe-area-inset-top))]">
-          <button
-            type="button"
+          {/* `secondary`'s ink text and border-strong outline are calibrated
+              for the cream page everywhere else and all but disappear here;
+              `primary`'s accent fill carries its own contrast wherever it
+              sits, so it's the one variant of the two that survives the trip
+              onto this dark surface. */}
+          <Button
+            variant="primary"
             onClick={onBack}
-            aria-label="Back"
-            className="flex h-12 w-12 items-center justify-center rounded-full"
-            style={{ backgroundColor: "var(--color-superficie-inmersiva)" }}
-          >
-            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-          </button>
+            icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
+            label="Back"
+          />
         </header>
 
         <main
-          id="contenido"
+          id="content"
           className="flex flex-1 flex-col items-center justify-center gap-6 py-6 text-center"
         >
-          <ListeningOrb isActive={isListening} />
+          <ListeningOrb
+            state={isListening ? "listening" : isTranscribing ? "processing" : "idle"}
+          />
 
-          <h1 className="text-2xl font-semibold sm:text-3xl">
+          <h1 className="font-display text-2xl font-semibold sm:text-3xl">
             {TITLE[status]}
           </h1>
 
           <AudioWaveform levels={levels} isActive={isListening} />
 
-          {/* `aria-live` so the growing transcript — or the error that
-              replaces it — gets announced without anyone using a screen
-              reader having to go look for it. A `min-height` keeps the rest
-              of the screen from jumping when the first words show up. */}
-          <p
-            aria-live="polite"
-            className="min-h-[1.5em] max-w-sm text-pretty"
-            style={{
-              color: isError
-                ? "var(--color-aviso-inmersivo)"
-                : "var(--color-texto-suave-inmersivo)",
-            }}
-          >
-            {isError ? errorMessage : transcript}
-          </p>
+          {/* `aria-live` so the growing transcript — or the error, or the
+              processing subtitle, whichever replaces it — gets announced
+              without anyone using a screen reader having to go look for it.
+              A `min-height` keeps the rest of the screen from jumping when
+              the first words show up. */}
+          <div aria-live="polite" className="min-h-[1.5em] w-full max-w-sm">
+            {isError ? (
+              <Notice tone="alert">{errorMessage}</Notice>
+            ) : isTranscribing ? (
+              <p className="text-pretty text-ink-muted-immersive">
+                {PROCESSING_SUBTITLE}
+              </p>
+            ) : (
+              <p className="text-pretty text-ink-muted-immersive">{transcript}</p>
+            )}
+          </div>
         </main>
 
         <footer className="flex flex-col items-center gap-5">
-          <div className="flex flex-col items-center gap-2">
-            <button
-              type="button"
-              onClick={isListening ? onStop : onStart}
-              disabled={isTranscribing}
-              aria-label={ARIA_LABEL[status]}
-              aria-busy={isTranscribing}
-              className="flex h-16 w-16 items-center justify-center rounded-full transition-transform active:scale-95 disabled:active:scale-100"
-              style={{
-                backgroundColor: "var(--color-turquesa-inmersivo)",
-                opacity: isTranscribing ? 0.7 : 1,
-              }}
-            >
-              {isListening ? (
-                <Square
-                  className="h-6 w-6"
-                  style={{ color: "var(--color-fondo-inmersivo)" }}
-                  fill="currentColor"
-                  aria-hidden="true"
-                />
-              ) : isTranscribing ? (
-                <Loader2
-                  className="h-6 w-6 animate-spin"
-                  style={{ color: "var(--color-fondo-inmersivo)" }}
-                  aria-hidden="true"
-                />
-              ) : (
-                <Mic
-                  className="h-6 w-6"
-                  style={{ color: "var(--color-fondo-inmersivo)" }}
-                  aria-hidden="true"
-                />
-              )}
-            </button>
+          {/* Nothing to tap while processing: SLNG already has the
+              recording, and a control sitting there disabled reads as
+              broken rather than busy. Hidden outright instead. */}
+          {!isTranscribing && (
+            <div className="flex flex-col items-center gap-2">
+              <Button
+                onClick={isListening ? onStop : onStart}
+                label={ARIA_LABEL[status]}
+                className="h-16 w-16 active:scale-95"
+                style={{ borderRadius: "9999px" }}
+                icon={
+                  isListening ? (
+                    <Square className="h-6 w-6" fill="currentColor" aria-hidden="true" />
+                  ) : (
+                    <Mic className="h-6 w-6" aria-hidden="true" />
+                  )
+                }
+              />
 
-            <p className="text-xs text-[var(--color-texto-suave-inmersivo)]">
-              {CAPTION[status]}
-            </p>
-          </div>
+              <p className="text-xs text-ink-muted-immersive">{CAPTION[status]}</p>
+            </div>
+          )}
 
-          <hr
-            className="w-full border-t"
-            style={{ borderColor: "var(--color-superficie-inmersiva)" }}
-          />
+          <hr className="w-full border-t border-border-immersive" />
 
           <BottomNav />
         </footer>
