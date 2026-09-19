@@ -16,7 +16,7 @@
 .brain-drop-record-card h2 { margin: 9px 0; font-size: clamp(26px, 3vw, 36px); letter-spacing: -.04em; }
 .brain-drop-record-card > p { color: var(--color-background); font-size: 14px; }
 .brain-drop-timer { margin: 32px 0 19px; font: 700 35px/1 'Bricolage Grotesque', sans-serif; font-variant-numeric: tabular-nums; }
-.brain-drop-record-button { min-width: min(192px, 100%); min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 20px; border-radius: 999px; background: var(--color-accent); color: var(--color-text); font-size: 13px; font-weight: 800; }
+.brain-drop-record-button { min-width: min(192px, 100%); min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 20px; border-radius: 999px; background: var(--color-accent); color: var(--color-text); font-size: 16px; font-weight: 800; }
 .brain-drop-record-button.is-stop { background: var(--color-alert); color: var(--color-text); }
 .brain-drop-record-card > small { margin-top: 19px; color: var(--color-background); font-size: 11px; }
 .brain-drop-error { margin: 16px 0 0; padding: 13px 16px; border: 1px solid var(--color-alert); border-radius: 12px; background: var(--color-text); color: var(--color-white); font-size: 13px; }

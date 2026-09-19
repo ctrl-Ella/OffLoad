@@ -5,7 +5,7 @@
 .presentation-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-text); font: 800 27px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -1.5px; }
 .presentation-brand img { object-fit: contain; }
 .presentation-brand-dot { color: var(--color-alert); }
-.presentation-header-link { margin-left: auto; display: inline-flex; align-items: center; gap: 9px; padding: 12px 18px; border-radius: 999px; background: var(--color-text); color: var(--color-white) !important; font-size: 12px; font-weight: 700; }
+.presentation-header-link { margin-left: auto; display: inline-flex; align-items: center; gap: 9px; padding: 12px 18px; border-radius: 999px; background: var(--color-text); color: var(--color-white) !important; font-size: 15px; font-weight: 800; }
 .presentation-hero { width: min(1240px, calc(100% - 64px)); min-height: 606px; margin: auto; display: grid; grid-template-columns: 1.08fr .92fr; align-items: center; gap: 40px; padding: 40px 0 80px; }
 .presentation-eyebrow, .presentation-section-label { color: var(--color-accent-strong); font-size: 11px; font-weight: 800; letter-spacing: .11em; }
 .presentation-eyebrow { display: inline-flex; align-items: center; gap: 9px; }
@@ -20,7 +20,7 @@
 .presentation-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 31px; }
 .presentation-button { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 11px; padding: 0 23px; border-radius: 999px; font-size: 13px; font-weight: 800; transition: transform .2s, background .2s; }
 .presentation-button:hover { transform: translateY(-2px); }
-.presentation-button-primary { background: var(--color-text); color: var(--color-white) !important; }
+.presentation-button-primary { background: var(--color-text); color: var(--color-white) !important; font-size: 16px; }
 .presentation-button-outline { border: 1px solid var(--color-border); color: var(--color-text); }
 .presentation-hero-art { position: relative; min-height: 520px; display: grid; place-items: center; overflow: hidden; border-radius: var(--radius-card); background: radial-gradient(circle at 50% 44%, var(--color-white) 0, var(--color-background) 72%, var(--color-background) 100%); isolation: isolate; }
 .presentation-orbit { position: absolute; width: 390px; aspect-ratio: 1; border: 1px solid var(--color-border); border-radius: 50%; }
@@ -97,7 +97,7 @@
   .presentation-note-top { top: 11%; }
   .presentation-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   .presentation-mobile-nav { position: fixed; z-index: 30; inset: auto 0 0; display: grid; grid-template-columns: repeat(3, 1fr); height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--color-border); background: var(--color-white); }
-  .presentation-mobile-nav a { display: grid; justify-items: center; align-content: center; gap: 3px; color: var(--color-text-muted); font-size: 11px; font-weight: 700; }
+  .presentation-mobile-nav a { display: grid; justify-items: center; align-content: center; gap: 3px; color: var(--color-text-muted); font-size: 12px; font-weight: 700; }
   .presentation-mobile-nav a[aria-current="page"] { color: var(--color-accent-strong); }
   .presentation-calendar-heading { display: block; }
   .presentation-demo-badge { display: inline-block; margin-top: 15px; }
