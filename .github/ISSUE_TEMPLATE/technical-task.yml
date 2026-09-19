@@ -1,0 +1,57 @@
+name: Technical task
+description: Internal work with no visible face - configuration, dependencies, CI, documentation
+title: "[area] "
+labels: ["type:task"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - devops
+        - backend
+        - frontend
+        - ia
+        - video
+        - qa
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-needs-doing
+    attributes:
+      label: What needs doing
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: |
+        What it improves, or what problem it avoids. A technical task with no reason
+        behind it ends up being work nobody misses if it never happens.
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of done
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true

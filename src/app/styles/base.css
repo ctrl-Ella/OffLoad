@@ -10,7 +10,7 @@ body {
   margin: 0;
   background: var(--color-background);
   color: var(--color-text);
-  font-family: Figtree, system-ui, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -43,11 +43,20 @@ p {
 h1,
 h2,
 h3 {
-  font-family: 'Bricolage Grotesque', Figtree, sans-serif;
+  font-family: var(--font-display);
   line-height: 1.1;
 }
 
 :focus-visible {
   outline: 3px solid var(--color-accent-strong);
   outline-offset: 3px;
+}
+
+/* The ring above is tuned for the cream page: 6.01:1. On the one
+   deliberately dark screen (`data-theme="immersive"`, the voice entry) that
+   same dark teal measures 2.73:1 against the near-black surface — close
+   enough to invisible to break the "focus is always visible" rule. Swapped
+   for the immersive screen's own bright teal, which reads at 11.86:1 there. */
+[data-theme="immersive"] :focus-visible {
+  outline-color: var(--color-accent-immersive);
 }

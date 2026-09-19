@@ -72,7 +72,7 @@ git config --global i18n.commitEncoding utf-8
 git config --global i18n.logOutputEncoding utf-8
 ```
 
-Lo hace también [`scripts/configurar-github.sh`](../../scripts/configurar-github.sh).
+Lo hace también [`scripts/configure-github.sh`](../../scripts/configure-github.sh).
 
 Y el [`.gitattributes`](../../.gitattributes) del proyecto normaliza los finales de línea, para
 que nadie vea "300 líneas modificadas" solo porque escribe desde otro sistema operativo.

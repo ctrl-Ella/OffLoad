@@ -44,7 +44,7 @@ montado **antes** de empezar a encontrar cosas.
 
 ## Qué lleva una spec
 
-La plantilla está en [`docs/specs/0000-plantilla.md`](../specs/0000-plantilla.md). Se copia, se
+La plantilla está en [`docs/specs/0000-template.md`](../specs/0000-template.md). Se copia, se
 renumera y se rellena.
 
 | Sección | Qué responde |

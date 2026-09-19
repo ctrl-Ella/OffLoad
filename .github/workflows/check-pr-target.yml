@@ -1,0 +1,38 @@
+# Branch protection governs pushes, not where a pull request points, so the
+# rule needs a check. It only blocks once it is in main's required status
+# checks.
+
+name: Check pull request target
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  only-dev-into-main:
+    name: only dev into main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only dev may open a pull request into main
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          if [ "$HEAD_BRANCH" = "dev" ]; then
+            echo "dev -> main. This is a release."
+            exit 0
+          fi
+
+          echo "::error::'$HEAD_BRANCH' targets main, and only dev may do that."
+          echo ""
+          echo "Every branch comes off dev and goes back into dev. main only"
+          echo "ever receives dev, and that pull request is a release."
+          echo ""
+          echo "To redirect this one without losing the review or the commits:"
+          echo "  gh pr edit <number> --base dev"
+          echo ""
+          echo "See docs/workflow/branches-and-pull-requests.md"
+          exit 1

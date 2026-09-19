@@ -1,0 +1,87 @@
+name: Bug
+description: Something that already exists and does not work
+title: "[area] "
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        "The video is broken" cannot be fixed.
+        "Joining the room in Firefox leaves the camera black and the console says X" can.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - frontend
+        - backend
+        - ia
+        - video
+        - devops
+        - qa
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happens
+    attributes:
+      label: What happens
+      description: What you see, exactly as it is
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: What should happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce it
+      description: The exact steps. Whoever fixes this will follow them as written.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Where it happens
+      description: Browser, operating system, Docker or local
+      placeholder: |
+        Browser: Firefox 141
+        System: Windows 11
+        Running: npm run dev (not Docker)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console or terminal errors
+      description: |
+        Paste the whole error, not just the last line.
+        **Check it carries no keys or tokens before pasting: this repository is public.**
+      render: shell
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Is it blocking anyone right now?
+      options:
+        - high
+        - medium
+        - low
+    validations:
+      required: true

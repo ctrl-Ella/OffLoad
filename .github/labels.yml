@@ -1,79 +1,79 @@
-# Etiquetas del proyecto. Fuente única: se aplican con scripts/configurar-github.sh
+# Project labels. Single source of truth: applied by scripts/configure-github.sh
 #
-# Se crean una vez y se reutilizan siempre. Si cada una crea las suyas sobre la
-# marcha, en dos días hay "bug", "Bug", "bugs" y "error", y ningún filtro sirve.
+# Created once and reused always. If everyone makes their own on the fly, within
+# two days there is "bug", "Bug", "bugs" and "error", and no filter is any use.
 #
-# Para añadir una: edítala aquí y vuelve a ejecutar el script.
+# To add one: edit it here and run the script again.
 
-# --- Área: quién lo coge -----------------------------------------------------
-- nombre: "area:frontend"
+# --- Area: who picks it up ---------------------------------------------------
+- name: "area:frontend"
   color: "1f6feb"
-  descripcion: "Interfaz, componentes, estilos"
+  description: "Interface, components, styles"
 
-- nombre: "area:backend"
+- name: "area:backend"
   color: "0969da"
-  descripcion: "Route handlers, base de datos, lógica de servidor"
+  description: "Route handlers, database, server logic"
 
-- nombre: "area:ia"
+- name: "area:ia"
   color: "8250df"
-  descripcion: "Agente, Mastra, Nebius, prompts"
+  description: "Agent, Mastra, Nebius, prompts"
 
-- nombre: "area:video"
+- name: "area:video"
   color: "bf3989"
-  descripcion: "Vonage Video API, salas, señal"
+  description: "Vonage Video API, rooms, signalling"
 
-- nombre: "area:devops"
+- name: "area:devops"
   color: "6e7781"
-  descripcion: "Docker, CI, despliegue, configuración"
+  description: "Docker, CI, deployment, configuration"
 
-- nombre: "area:qa"
+- name: "area:qa"
   color: "bf8700"
-  descripcion: "Pruebas, verificación, accesibilidad"
+  description: "Testing, verification, accessibility"
 
-- nombre: "area:docs"
+- name: "area:docs"
   color: "0e8a16"
-  descripcion: "Documentación y specs"
+  description: "Documentation and specs"
 
-# --- Tipo: qué clase de trabajo es -------------------------------------------
-- nombre: "tipo:feature"
+# --- Type: what kind of work it is -------------------------------------------
+- name: "type:feature"
   color: "a2eeef"
-  descripcion: "Funcionalidad nueva"
+  description: "Something new"
 
-- nombre: "tipo:bug"
+- name: "type:bug"
   color: "d73a4a"
-  descripcion: "Algo que existe y no funciona"
+  description: "Something that exists and does not work"
 
-- nombre: "tipo:tarea"
+- name: "type:task"
   color: "d4c5f9"
-  descripcion: "Trabajo técnico sin cara visible"
+  description: "Technical work with no visible face"
 
-- nombre: "tipo:spec"
+- name: "type:spec"
   color: "c5def5"
-  descripcion: "Escribir o revisar una spec"
+  description: "Writing or reviewing a spec"
 
-# --- Prioridad: qué va antes -------------------------------------------------
-- nombre: "prio:alta"
+# --- Priority: what comes first ----------------------------------------------
+- name: "priority:high"
   color: "b60205"
-  descripcion: "Bloquea a alguien o a la entrega"
+  description: "Blocking someone, or blocking the delivery"
 
-- nombre: "prio:media"
+- name: "priority:medium"
   color: "fbca04"
-  descripcion: "Importante, no urgente"
+  description: "Important, not urgent"
 
-- nombre: "prio:baja"
+- name: "priority:low"
   color: "c2e0c6"
-  descripcion: "Si da tiempo"
+  description: "If there is time"
 
-# --- Estado: por qué no avanza -----------------------------------------------
-- nombre: "estado:bloqueada"
+# --- Status: why it is not moving --------------------------------------------
+- name: "status:blocked"
   color: "000000"
-  descripcion: "Esperando algo externo. Di en un comentario qué esperas"
+  description: "Waiting on something external. Say in a comment what you are waiting for"
 
-- nombre: "estado:en-revision"
+- name: "status:in-review"
   color: "fef2c0"
-  descripcion: "Con pull request abierta, esperando revisión"
+  description: "Pull request open, waiting for review"
 
-# --- Otras -------------------------------------------------------------------
-- nombre: "buena-primera-tarea"
+# --- Other -------------------------------------------------------------------
+- name: "good-first-task"
   color: "7057ff"
-  descripcion: "Acotada y con contexto suficiente para empezar por aquí"
+  description: "Scoped, with enough context to start here"
