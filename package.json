@@ -14,7 +14,7 @@
     "test:integracion": "node --experimental-strip-types --test tests/integracion/**/*.test.ts",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "db:sembrar": "node --experimental-strip-types --env-file=.env scripts/sembrar-nucleo.ts",
+    "db:seed": "node --experimental-strip-types --env-file=.env prisma/seed.ts",
     "db:studio": "prisma studio",
     "test:unidad": "node --experimental-strip-types --test \"tests/unidad/**/*.test.ts\"",
     "test:guardrails": "node --experimental-strip-types --test \"tests/guardrails.test.ts\"",
