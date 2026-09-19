@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Notice } from "@/components/ui/notice";
 import { forgetAttemptInBrowser, pendingAttempt } from "@/lib/browser-attempt";
 
@@ -20,7 +19,6 @@ type Outcome =
   | { state: "failed" };
 
 export function VerificationReturn() {
-  const router = useRouter();
   const [outcome, setOutcome] = useState<Outcome>({ state: "checking" });
   const [showChecking, setShowChecking] = useState(false);
 
@@ -46,7 +44,7 @@ export function VerificationReturn() {
     // phone browser reopening its last tab. The home page is the only one that
     // knows whether there is a session.
     if (!code || !requestId) {
-      router.replace("/");
+      window.location.replace("/");
       return;
     }
 
@@ -84,13 +82,18 @@ export function VerificationReturn() {
         }
 
         setOutcome({ state: "in", name: data.person.name });
+
+        // A full load, not router.replace: Next keeps the RSC payload of
+        // visited routes in the browser, and the home page is already in there
+        // as it looked before signing in. A client navigation serves that copy
+        // and paints the door again with the session cookie already set.
         // `replace` so "back" does not land here with a spent code.
-        router.replace("/");
+        window.location.replace("/");
       } catch {
         setOutcome({ state: "failed" });
       }
     })();
-  }, [router]);
+  }, []);
 
   // 400ms before saying anything: on the way out this is never seen, and a
   // real check takes over a second so it still shows.
