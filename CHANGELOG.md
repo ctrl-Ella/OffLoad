@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Initial database migration: seven tables and the `Circulo` enum, generated with `migrate diff --from-empty` so the SQL could be reviewed before it was applied.
 - Production image and Railway deployment guide: a four-stage `Dockerfile` with an unprivileged user, `.dockerignore`, Next's `standalone` output and the `/api/health` route.
 - Repository README, with status badges for continuous integration, open issues and open pull requests.
 - Application skeleton: TypeScript, Next.js, Tailwind and ESLint configuration, the Prisma schema and a placeholder page. With this the project builds and deploys.

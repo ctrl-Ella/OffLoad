@@ -216,7 +216,7 @@ Plus two skills in `.claude/skills/`: `platform-docs`, for the platforms' living
 | `docs/workflow/` | How we work: branches and PRs, commits, issues and labels, spec driven development |
 | `docs/specs/` | One spec per task, plus the template |
 | `docs/decisions/` | Architecture decisions, with their context and consequences |
-| `docs/guides/` | Guides by topic: accessibility, Make, deployment |
+| `docs/guides/` | Guides by topic: accessibility, Make and deployment |
 | `.claude/agents/` | The eight agents, one per lane |
 | `.claude/skills/` | The platforms' living documentation, and Mia's voice |
 | `.github/` | Issue and PR templates, labels, CODEOWNERS, rulesets and continuous integration |

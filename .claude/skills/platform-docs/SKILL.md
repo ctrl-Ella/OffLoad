@@ -333,6 +333,13 @@ Antes de consultar, conviene tener estas presentes, porque son las que hacen per
   de datos expuesta indefinidamente. Conviene comprobar con `tcp-proxy list` que queda en cero.
   El host y el puerto salen del `--json` del `create`, en `domain` y `proxyPort`.
   *(Comprobado el 2026-09-18.)*
+- **Pero ese JSON los trae anidados bajo `proxy`, no en la raíz:**
+  `{ "applicationPort": 5432, "staged": false, "committed": true, "proxy": { "id", "domain", "proxyPort" } }`.
+  Leerlos del primer nivel devuelve vacío, y ahí está la trampa de verdad: **cuando te enteras de
+  que no has podido leer el identificador, el proxy ya existe.** Un script que aborte en ese punto
+  por prudencia deja la base de datos abierta justamente por ser prudente. El borrado no puede
+  depender del parseo: si el `id` no sale del JSON, se saca de `tcp-proxy list`, que lo da en texto
+  plano. *(Pagado el 2026-09-19, con la base de datos expuesta unos minutos.)*
 - **Las credenciales de Postgres están en las variables del servicio `Postgres`**, no en las del
   servicio de la aplicación: `PGUSER`, `PGPASSWORD` y `PGDATABASE`. En el servicio de la aplicación
   solo está `DATABASE_URL`, que apunta a la interna.
