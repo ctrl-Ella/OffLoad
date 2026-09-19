@@ -30,6 +30,59 @@
   --color-border-strong: #8a8378; /*  3.44:1 · inputs, controls, anything
                                       whose outline carries meaning */
 
+  /* ── immersive
+     The one deliberately dark corner of the product: the voice screen, full
+     screen and full attention, no chrome from the rest of the app around it.
+     Contrast below is measured against --color-surface-immersive, not
+     --color-background like everything above — a different base, so it gets
+     its own figures instead of borrowing the ones already written down.
+
+     The surface and its ink are the brand's own onyx-and-cream pair, inverted
+     rather than reinvented: --color-surface-immersive is --color-text worn as
+     a background, --color-ink-immersive is --color-background worn as text,
+     so the 16.40:1 already measured above holds here too. The brand teal
+     carries over as well — on this surface it reads as light-on-dark, which
+     is exactly the role --color-accent-strong plays on the cream background,
+     so here it is --color-accent doing that job (11.86:1, the same pair as
+     its own fill comment, just read the other way). --color-accent-strong
+     itself does not survive the trip: dark teal on near-black measures
+     2.73:1, so it stays out of this section entirely. The muted ink is the
+     one colour with no equivalent to invert — --color-text-muted measures
+     2.65:1 here and fails outright — so it alone is new. */
+  --color-surface-immersive: var(--color-text);       /* the base; see above */
+  --color-ink-immersive: var(--color-background);     /* 16.40:1 · passes at any size */
+  --color-ink-muted-immersive: #9aa3a1;               /*  6.92:1 · passes as text */
+  --color-accent-immersive: var(--color-accent);      /* 11.86:1 · text, icon or
+                                                           border. As a fill
+                                                           (the orb, the mic
+                                                           button) it needs no
+                                                           contrast of its own,
+                                                           same as --color-accent
+                                                           everywhere else. */
+  --color-border-immersive: #1e2929;                  /*  1.19:1 · decorative
+                                                           separator only, same
+                                                           figure as --color-border */
+
+  /* Item cards on the review screen (the voice flow's third state) sit on
+     this surface too, so they get their own fills instead of a fourth
+     invented hex. --color-card-immersive is a small step up from the
+     surface — decorative, 1.16:1, same idea as --color-border-immersive —
+     with the two ink tokens measured on top of it since text sits directly
+     there: 14.09:1 for --color-ink-immersive, 5.94:1 for
+     --color-ink-muted-immersive. --color-chip-immersive is one step
+     lighter again, for the icon chip inside a card; --color-accent-immersive
+     on it measures 7.44:1. */
+  --color-card-immersive: #1c2727;   /*  1.16:1 vs surface · decorative */
+  --color-chip-immersive: #2a3f3c;   /*  accent-immersive icon on it: 7.44:1 */
+
+  /* The conflict card's warm fill. Its icon chip needs no new token: it
+     reuses --color-alert as the fill with --color-surface-immersive (onyx)
+     as the icon on top, the exact pair already measured above at 6.15:1 for
+     onyx on the alert fill. Only the card's own background is new — text
+     sits directly on it, so it gets its own figures: 13.86:1 for
+     --color-ink-immersive, 5.85:1 for --color-ink-muted-immersive. */
+  --color-alert-surface-immersive: #3a1f1a; /* 13.86:1 ink · 5.85:1 ink-muted */
+
   --radius-card: 24px;
   --radius-control: 10px; /* 24px on a text input reads as a pill */
 }
@@ -49,29 +102,18 @@
   --color-border: var(--color-border);
   --color-border-strong: var(--color-border-strong);
 
+  --color-surface-immersive: var(--color-surface-immersive);
+  --color-ink-immersive: var(--color-ink-immersive);
+  --color-ink-muted-immersive: var(--color-ink-muted-immersive);
+  --color-accent-immersive: var(--color-accent-immersive);
+  --color-border-immersive: var(--color-border-immersive);
+  --color-card-immersive: var(--color-card-immersive);
+  --color-chip-immersive: var(--color-chip-immersive);
+  --color-alert-surface-immersive: var(--color-alert-surface-immersive);
+
   --radius-card: var(--radius-card);
   --radius-control: var(--radius-control);
 
   --font-display: 'Bricolage Grotesque', Figtree, system-ui, sans-serif;
   --font-sans: Figtree, system-ui, -apple-system, sans-serif;
-}
-
-/* Dark review screen: scoped so sign-in keeps its own palette. */
-.offload-app {
-  /* WCAG contrast: text/background 17,16:1; secondary/card 6,29:1;
-     mint/card 10,21:1; button 12,11:1; secondary/alert 5,80:1.
-     The border is decorative: navigation uses icons and labels. */
-  --color-fondo: #111111;
-  --color-texto: #f5f4f0;
-  --color-texto-suave: #a3a3a0;
-  --color-acento: #71e2ce;
-  --color-turquesa: #71e2ce;
-  --color-borde: #303030;
-  --color-tarjeta: #222222;
-  --color-icono-fondo: #2e4541;
-  --color-alerta: #ff634c;
-  --color-alerta-fondo: #3d211c;
-  --color-exterior: #f7f5f0;
-  --color-orbe-luz: #b7fff0;
-  --color-orbe-sombra: #2aa692;
 }

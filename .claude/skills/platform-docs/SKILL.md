@@ -295,7 +295,36 @@ Antes de consultar, conviene tener estas presentes, porque son las que hacen per
 - **Que un modelo de dictado esté en el catálogo con español no significa que se pueda llamar por
   HTTP.** `soniox/speech-ai:rt-v5` —lo que este proyecto tenía escrito— es **solo WebSocket**, y eso
   no se ve en la ficha del catálogo: hay que abrir su `docs_url` y mirar si acaba en `-http` o en
-  `-ws`. Para un clip grabado sirve `deepgram/nova:3`, que tiene ruta HTTP, español y `eu-west`.
+  `-ws`.
+- **`deepgram/nova:3` tiene ruta HTTP y `eu-west`, pero en la práctica solo transcribe inglés.**
+  El catálogo lo lista con `"languages"` incluyendo `es`, y `language=es` en la query no da ningún
+  error — simplemente no hace nada: la transcripción vuelve `""` con `confidence: 0.0`, aunque
+  `metadata.duration` y `channels` sean correctos (el audio llegó bien, se decodificó bien, el
+  modelo no lo entendió). Comprobado con cuatro fuentes de audio en español —dos clips generados
+  con la propia TTS de SLNG, y una voz humana real grabada por el navegador con `MediaRecorder`,
+  las tres veces con `duration` y `channels` correctos y transcripción vacía— frente a un clip en
+  inglés con el mismo pipeline, que transcribió con `confidence: 0.999`. El `model_info` que
+  devuelve la respuesta lo confirma: es el checkpoint `general-nova-3`, no uno multilingüe.
+- **Los despliegues en español de Nova 3 existen en el catálogo pero no en ningún servidor.**
+  `slng/deepgram/nova:3-es` y `slng/deepgram/nova:3-multi` aparecen en
+  `GET /v1/catalog/models?service_type=stt&language=es` con `available_regions: []` y
+  `served_regions: []` — vacíos de verdad, no solo fuera de la UE. Llamarlos en cualquier región
+  (`eu-west`, `eu-north`, `us-east`, `us-central`, `us-west`, `au`, `gb`) devuelve
+  `503 {"error":"No deployments found"}`. Incluso `slng/deepgram/nova:3-en`, el que usa como
+  ejemplo la guía `docs.slng.ai/guides/models/your-first-request`, da el mismo `503` — el ejemplo
+  de esa guía además tiene el host mal escrito, `eu-west.slng.ai` en vez de
+  `eu-west.api.slng.ai`, que no resuelve. Para un clip grabado en español, hoy no hay ninguna vía
+  de Deepgram vía SLNG que funcione.
+- **El único modelo de dictado por HTTP realmente desplegado con español de verdad es
+  `slng/speechmatics/batch:15.0.0`** (`eu-north`, antes `europe-west4` en el detalle de región),
+  pero su contrato de API no está documentado en ningún sitio que responda: su `docs_url`
+  (`docs.slng.ai/api-reference/speechmatics/list-batch-jobs`) da `404`, no está indexado en
+  `docs.slng.ai/llms.txt`, y ni la documentación pública de Speechmatics ni una serie de rutas
+  probadas a mano (`/v1/stt/slng/speechmatics/batch:15.0.0`, con y sin `/jobs`, con y sin el
+  prefijo `slng/`, con y sin `/v1/stt/`) han dado más que `404`. Antes de darlo por imposible,
+  falta probar la vía del panel: `app.slng.ai` permite ver el código real de una llamada desde su
+  interfaz («View config» tras una transcripción de prueba), y esa es la siguiente vía a intentar,
+  no otra ronda de adivinar rutas. *(Las cuatro comprobaciones de este bloque, el 2026-09-19.)*
 - **El dictado es `POST <region>/v1/stt/<modelo>` con `multipart/form-data`**, campo `audio`, y el
   texto sale en `results.channels[0].alternatives[0].transcript`. `Content-Type` no se escribe a
   mano: lo pone `fetch` con la frontera del multipart, y ponerlo rompe el cuerpo sin decir por qué.
