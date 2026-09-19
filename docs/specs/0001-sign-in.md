@@ -98,9 +98,9 @@ The Postgres schema already reflects the split — `Verification`, `Session` and
 | Decision | Rejected alternative | Why |
 |---|---|---|
 | One screen holds both doors, with the phone first | A landing page with a "Get started" button in front | Signing in and arriving are the same moment here: there is no password and no account to create, so a screen in between decides nothing. This is what the internal prototype arrived at after building it the other way |
-| **Two separate sets of Vonage credentials**, one for verification and one for voice and video | A single application for everything | Silent verification already works against the practice application and moving it would mean re-doing the setup that makes it work. Voice and video run on the project's own application. Two variable pairs, `VONAGE_VERIFY_*` and `VONAGE_*`, so it is visible in the environment which credential does what instead of being remembered |
+| Verification runs on the practice Vonage application, under `VONAGE_VERIFY_*` | Moving verification onto the project's own application | Silent auth already works there, and moving it would mean redoing the setup that makes it work. Verify v2 authenticates with a signed JWT, so each application needs its own id **and its own private key file** — this is not two API keys. Separate variables because `VONAGE_APPLICATION_ID` is already taken by the video application |
 | Both doors **look up** a `Person` and refuse when they find none | Creating the `Person` on first sign-in | The repository is public and so is the URL. Automatic sign-up means anyone in the world with a Google account, or any phone line that verifies, walks into Elvia's household. The schema says it outright: "a person exists because the family added them". A verification proves the line is yours, not that you belong to this household |
-| A failed silent verification offers Google, and says what happened | Falling back to an SMS code | Silent auth needs mobile data, so it cannot complete on a laptop over wi-fi — which is the demo machine. The other door is already on the same screen and costs nothing to point at |
+| A failed silent verification offers Google, and says what happened | Falling back to an SMS code | The demo numbers start with `990`, which makes them Network Registry Playground lines: a virtual operator serves them, they receive no SMS, and Vonage rejects the whole request with a 422 if the workflow carries any channel besides `silent_auth`. Checked against the API on 2026-09-15 and recorded in the internal prototype. So the fallback is not a choice here — and the other door is already on the same screen |
 | Write the Google flow against the schema that exists, with `google-auth-library` | Auth.js (NextAuth) with its Prisma adapter | The adapter brings its own schema — `User`, `Account`, `Session` — and `Person`, `GoogleAccount` and `Session` are already written here, with decisions the adapter does not honour: an opaque token instead of a JWT, and a `Person` existing before anyone signs in. Bending the adapter to that model costs more than the flow itself. Google's library is needed anyway to refresh the token when calling Calendar |
 | `access_type=offline` **and** `prompt=consent` on every outbound request | `access_type=offline` alone | Google hands over the refresh token the first time an account authorises the application and returns it empty afterwards. Without `prompt=consent` the failure shows up as "it worked yesterday" on demo day, with a row holding an empty string and no error in sight |
 | An opaque session token from `crypto.randomUUID()`, in its own row | A signed JWT carrying the person id | This comes from the schema: signing out is deleting a row, and a JWT cannot be invalidated before it expires. For a demo where someone may want to switch person mid-run, that matters |
@@ -130,10 +130,11 @@ The Postgres schema already reflects the split — `Verification`, `Session` and
 ```bash
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-PUBLIC_URL=http://localhost:3000   # the redirect URI is derived from this
+PUBLIC_URL=                        # the redirect URI is derived from this, and
+                                   # silent auth needs it reachable from a phone
 
-VONAGE_VERIFY_API_KEY=             # silent auth only — a different application
-VONAGE_VERIFY_API_SECRET=          # from the one carrying voice and video
+VONAGE_VERIFY_APPLICATION_ID=      # the practice application, where silent
+VONAGE_VERIFY_PRIVATE_KEY_PATH=    # auth already works. A JWT, not an API key
 
 TEST_PHONE_ELVIA=                  # demo numbers, seeded against the two people
 TEST_PHONE_CARLOS=

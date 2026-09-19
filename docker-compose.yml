@@ -1,0 +1,55 @@
+name: offload
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.6-pg18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      # 5434: el 5432 lo tiene el PostgreSQL de la máquina y el 5433 el de
+      # ctrl4ella-hackaton. Solo a localhost, nunca a la red.
+      - "127.0.0.1:5434:5432"
+    volumes:
+      # Postgres 18+ quiere el volumen en /var/lib/postgresql, no en .../data:
+      # montar la ruta antigua deja el contenedor arrancando en bucle.
+      - pgdata:/var/lib/postgresql
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # Bajo perfil, así que `docker compose up -d` levanta solo la base de datos.
+  # Sirve para comprobar que la imagen de producción arranca, no para desarrollar:
+  # en Windows el bind mount de NTFS no propaga eventos y no hay recarga en
+  # caliente. Para trabajar, `npm run dev` contra la base de datos de aquí.
+  web:
+    profiles: ["image"]
+    build:
+      context: .
+      target: dev
+    restart: unless-stopped
+    # Node como PID 1 no reenvía las señales y Ctrl+C tardaría diez segundos.
+    init: true
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      # Volúmenes anónimos: los binarios de Windows no valen dentro de Linux.
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
