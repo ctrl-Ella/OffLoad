@@ -98,7 +98,8 @@ These are covered by tests and they block the merge.
 - **Tier by load:** `-fast` inside the video call, `base` everywhere else, Batch API for the weekly summary.
 - **Quota headers.** Read `Retry-After`, and switch from `-fast` to base on sustained failures.
 - **Reuse before adding, and colour changes in one file.** Every colour is a token in `src/app/styles/tokens.css` with its measured contrast beside it — no loose hex in a component, and nothing from Tailwind's default palette, which is measured against nothing of ours. Before writing a rule or a component, look for the one that already does it: a second stylesheet saying almost the same thing is how a design system stops being one. The bar is WCAG 2.1 AA, which is what the law asks of us, and a token is a promise about contrast — change a colour and you measure it again.
-- **Everything is in English.** Prose, code, identifiers, commit messages, issues, pull requests, product copy — and **file and folder names too**. `docs/guides/accessibility.md`, not `docs/guias/accesibilidad.md`. A path is read far more often than it is typed, and half-translated trees are the ones people misfile things into.
+- **Everything is in English.** Prose, code, identifiers, commit messages, issues, pull requests — and **file and folder names too**. `docs/guides/accessibility.md`, not `docs/guias/accesibilidad.md`. A path is read far more often than it is typed, and half-translated trees are the ones people misfile things into.
+- **The exception is what the family reads on screen, which is Spanish.** Buttons, notices, error messages, what Mia says. The interface is for Elvia and Carlos, not for us, and `mia-voice` governs how it is written. So a component is named `PhoneSignIn` and its button says «Entrar con mi teléfono».
 - **Comments earn their place.** One line, only where the code cannot speak for itself: a decision taken, a trap, a constraint imposed from outside. Never a restatement of what the line already says, and never a comment propping up a name that should have been clearer. The long reasoning belongs in the spec or the decision record, where someone looking for it will go — above a function it gets read once and maintained never. This applies from here on: older files keep their comments until they are touched for another reason.
 
 ---
@@ -237,3 +238,13 @@ Still unresolved, and worth closing before they get expensive.
 - **The child needs a name.** He shows up on screens, in notifications and in Mia's voice. Once it is decided, it gets written here and stops being discussed.
 - **Required approvals are set to zero** on `main` and `dev` for the duration of the hackathon. A pull request and green CI are still enforced. Another person reviewing is still the team's agreement — there is simply no machine checking it now, and turning it back on afterwards is the first thing to restore.
 - **`/api/health` does not check Postgres yet.** It reports that the process is alive and says so in those words. Once the database client exists it has to run a real query: the app can be up with the database down, and that is exactly what a health check is for.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
