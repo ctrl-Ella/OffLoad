@@ -90,12 +90,17 @@ const MATERIALISED_KEY = join(tmpdir(), "vonage-verify.key");
  * that never mentions newlines.
  */
 function materialise(key: string): string {
-  const pem = key.replace(/\\n/g, "\n");
+  // Base64 is accepted because escaped newlines do not survive every route in:
+  // Railway's CLI truncated the key at the first `\n`, storing 28 characters of
+  // 1703 and reporting success. Base64 has no newlines to lose.
+  const pem = key.includes("BEGIN")
+    ? key.replace(/\\n/g, "\n")
+    : Buffer.from(key, "base64").toString("utf8");
 
-  if (!pem.includes("\n")) {
+  if (!pem.includes("BEGIN") || !pem.includes("\n")) {
     throw new Error(
-      "VONAGE_VERIFY_PRIVATE_KEY is on a single line. The key is a multi-line PEM: " +
-        "when pasting it into the panel, newlines go escaped as \\n.",
+      "VONAGE_VERIFY_PRIVATE_KEY is not a usable PEM. Either the whole key with " +
+        "newlines escaped as \\n, or the same key base64-encoded.",
     );
   }
 
