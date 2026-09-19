@@ -1,0 +1,204 @@
+// Esquema de Prisma. Gobierna UNICAMENTE el schema `public` de Postgres.
+// Las tablas del schema `mastra` las crea y mantiene Mastra por su cuenta:
+// no se declaran aqui, y por eso la URL de conexion lleva ?schema=public.
+
+generator client {
+  // Prisma 7 sustituye `prisma-client-js` por `prisma-client`, que genera
+  // TypeScript plano en una carpeta del proyecto en vez de dentro de node_modules.
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  // package.json no declara "type": "module", asi que el cliente se genera en CJS.
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  // En Prisma 7 la URL ya no vive aqui: las migraciones la leen de
+  // prisma.config.ts y el cliente la recibe a traves del driver adapter.
+  provider = "postgresql"
+}
+
+/// PROVISIONAL: existe solo para validar el circuito completo
+/// (migracion -> cliente -> consulta -> pagina).
+/// Se sustituye por las entidades reales cuando se defina el dominio.
+model Nota {
+  id        String   @id @default(cuid())
+  texto     String
+  creadaEn  DateTime @default(now()) @map("creada_en")
+
+  @@map("notas")
+}
+
+/// Los dos círculos del producto, y la diferencia es estructural.
+///
+/// El NUCLEO conecta su Google y Mia ve su agenda entera. El APOYO solo está en
+/// la lista de contactos: Mia no ve nada suyo y nunca afirma su disponibilidad.
+/// Por eso es un enum y no un booleano con nombre de bandera: son dos cosas
+/// distintas, no un permiso encendido o apagado.
+enum Circulo {
+  NUCLEO
+  APOYO
+}
+
+/// Quién es cada cual. Es la entidad a la que cuelga todo lo demás.
+///
+/// El teléfono no se guarda en claro: `telefonoHash` lleva la huella con la sal
+/// secreta del entorno, y `telefonoCola` los últimos dígitos para poder enseñar
+/// cuál es sin revelarlo. El nombre sí, porque es lo que Mia dice en voz alta.
+///
+/// No hay alta libre: una persona existe porque la familia la ha metido, no
+/// porque alguien verifique un teléfono. Verificar demuestra que esa línea es
+/// tuya, no que formes parte de esta casa.
+model Persona {
+  id           String   @id @default(cuid())
+  nombre       String
+  circulo      Circulo
+  telefonoHash String   @unique @map("telefono_hash")
+  telefonoCola String   @map("telefono_cola")
+  /// El correo de Google, cuando lo hay. Es la segunda forma de entrar.
+  ///
+  /// Opcional a propósito: la red de apoyo no tiene cuenta, y alguien del
+  /// núcleo puede existir con solo su teléfono hasta que conecte su Google.
+  ///
+  /// A diferencia del teléfono, aquí NO se guarda una huella: el correo hay que
+  /// poder compararlo con el que devuelve Google en cada entrada, y una huella
+  /// con sal no se compara contra un dato que llega de fuera sin volver a
+  /// calcularla. Es dato personal y por eso no sale nunca en un log.
+  email        String?  @unique
+  creadaEn     DateTime @default(now()) @map("creada_en")
+
+  verificaciones Verificacion[]
+  sesiones       Sesion[]
+  cuentaGoogle   CuentaGoogle?
+  anotaciones    Anotacion[]
+
+  @@map("personas")
+}
+
+/// El permiso que una persona del núcleo le ha dado a Mia sobre su Google.
+///
+/// Vive aparte de `Persona` porque tiene otra razón para cambiar: la persona
+/// sigue siendo la misma cuando revoca el permiso, y revocarlo es borrar esta
+/// fila y nada más.
+///
+/// **Deuda técnica consciente:** el `refreshToken` se guarda en claro. Cifrarlo
+/// en reposo es lo correcto y no da tiempo este fin de semana; queda dicho aquí
+/// y no en una conversación. Con él se entra en la agenda de una persona hasta
+/// que lo revoque, así que la base de datos de producción es material sensible.
+model CuentaGoogle {
+  id           String   @id @default(cuid())
+  personaId    String   @unique @map("persona_id")
+  persona      Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  email        String
+  refreshToken String   @map("refresh_token")
+  /// Lo que la persona concedió de verdad, que no tiene por qué ser lo pedido:
+  /// en la pantalla de Google se pueden desmarcar permisos uno a uno.
+  alcance      String
+  creadaEn     DateTime @default(now()) @map("creada_en")
+  actualizadaEn DateTime @updatedAt @map("actualizada_en")
+
+  @@map("cuentas_google")
+}
+
+/// Algo que alguien le ha contado a Mia y que todavía no está en ningún sitio.
+///
+/// **Existe porque un volcado que se olvida no es un volcado.** Hasta que hubo
+/// tabla, cada frase dictada vivía dentro de su run y la siguiente la tapaba:
+/// escribías dos cosas seguidas y la primera desaparecía de la pantalla sin que
+/// se hubiera perdido nada, simplemente porque nunca se había guardado.
+///
+/// **No es lo mismo que un evento del calendario, y por eso no vive allí.** Una
+/// anotación es lo que Mia ha entendido; un evento es lo que alguien ha
+/// confirmado. La regla 1 del proyecto es justo esa frontera: en un calendario
+/// no se escribe sin un sí humano. `eventoGoogleId` se rellena cuando ese sí
+/// llega, y mientras esté vacío la interfaz dice que no está apuntado —porque no
+/// lo está—.
+model Anotacion {
+  id        String   @id @default(cuid())
+  personaId String   @map("persona_id")
+  persona   Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  /// Una de las siete etiquetas del intérprete: parada, recordatorio, nota,
+  /// delegar, mover, consulta, compra.
+  tipo      String
+  titulo    String
+  /// Cuándo empieza, si se dijo. Null para lo que no tiene hora, que es la
+  /// mayoría de lo que se suelta de carrerilla.
+  inicio    DateTime?
+  fin       DateTime?
+  /// El nombre del sitio tal y como está en la tabla de lugares, o null.
+  lugar     String?
+  /// El id del evento en Google, cuando alguien ha confirmado que se escriba.
+  /// Mientras sea null, esto no existe en ningún calendario.
+  eventoGoogleId String? @map("evento_google_id")
+  /// De qué volcado salió. Sirve para poder mirar un run entero cuando algo
+  /// sale raro, que en una demo es la mitad de la depuración.
+  runId     String?  @map("run_id")
+  creadaEn  DateTime @default(now()) @map("creada_en")
+
+  @@index([personaId])
+  @@map("anotaciones")
+}
+
+/// Una sesión abierta: el navegador trae el token, el servidor dice de quién es.
+///
+/// El token es opaco y lo genera el servidor. NO se guarda el id de persona en
+/// la cookie, ni firmado: una cookie con un identificador dentro invita a
+/// cambiarlo, y aquí toda la aplicación depende de saber quién eres. Con un
+/// token opaco, suplantar a alguien es adivinar un UUID, y cerrar la sesión es
+/// borrar una fila.
+model Sesion {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  personaId String   @map("persona_id")
+  persona   Persona  @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  creadaEn  DateTime @default(now()) @map("creada_en")
+  expiraEn  DateTime @map("expira_en")
+
+  @@index([personaId])
+  @@map("sesiones")
+}
+
+/// La sala de vídeo de la casa. Una, y siempre la misma.
+///
+/// **Es de la casa, no de un run.** El choque que lleva a la llamada sale del
+/// día de alguien, no de un run vivo —la pantalla de conflicto se recarga sin
+/// él—, así que colgar la sala de un `runId` obligaría a inventar de dónde sale
+/// ese identificador cuando alguien entra por su cuenta.
+///
+/// **Existe porque una sesión de Vonage hay que recordarla.** Si se creara una
+/// nueva en cada entrada, Elvia y Carlos acabarían en dos salas distintas
+/// viéndose cada uno solo. `clave` es única para que eso no dependa de que nadie
+/// se equivoque: hay una fila, la de `"nucleo"`, y se reutiliza.
+model Sala {
+  id        String   @id @default(cuid())
+  /// De quién es esta sala. Hoy solo hay un valor, `"nucleo"`, y es el candado
+  /// que impide que se creen dos.
+  clave     String   @unique
+  sessionId String   @map("session_id")
+  creadaEn  DateTime @default(now()) @map("creada_en")
+
+  @@map("salas")
+}
+
+/// Un teléfono que pasó por la verificación silenciosa de Vonage.
+///
+/// Es el registro de un INTENTO, no de una persona. Se conserva separado de
+/// `Persona` a propósito: un intento puede venir de un número que no es de
+/// nadie de la casa, y eso también hay que poder verlo.
+///
+/// `personaId` es opcional por lo mismo: se rellena solo cuando el teléfono
+/// verificado resulta ser el de alguien conocido.
+model Verificacion {
+  id           String   @id @default(cuid())
+  telefonoHash String   @unique @map("telefono_hash")
+  telefonoCola String   @map("telefono_cola")
+  requestId    String   @unique @map("request_id")
+  estado       String
+  /// Por qué vía se completó: dice si la silenciosa funcionó o si cayó al SMS.
+  canal        String?
+  personaId    String?  @map("persona_id")
+  persona      Persona? @relation(fields: [personaId], references: [id], onDelete: SetNull)
+  creadaEn     DateTime @default(now()) @map("creada_en")
+
+  @@index([personaId])
+  @@map("verificaciones")
+}

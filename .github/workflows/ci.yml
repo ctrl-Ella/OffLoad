@@ -25,6 +25,15 @@ jobs:
   comprobar:
     runs-on: ubuntu-latest
 
+    # Valor de relleno, y va a nivel de job a propósito: `prisma.config.ts`
+    # resuelve DATABASE_URL al cargarse, así que la necesitan tanto `generate`
+    # como el build. Nada de esto abre una conexión real.
+    #
+    # Si algún día un paso de CI necesitara una base de datos de verdad o un
+    # secreto, sería un error de diseño y no algo que tapar con valores reales.
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+
     steps:
       - uses: actions/checkout@v4
 
@@ -51,9 +60,4 @@ jobs:
         run: npm run lint
 
       - name: Construir
-        env:
-          # Valores de relleno: el build no debe necesitar secretos ni una
-          # base de datos real. Si algún día los necesitara, sería un error
-          # de diseño, no algo que tapar con variables de verdad.
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
         run: npm run build
