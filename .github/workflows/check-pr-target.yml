@@ -1,0 +1,46 @@
+# Fails a pull request into `main` that does not come from `dev`.
+#
+# WHY THIS FILE EXISTS
+# The rule was written down and nothing enforced it. Two pull requests went
+# straight into `main` in one afternoon (#12 and #13), which left `main` holding
+# a stylesheet split that `dev` does not have, on a file `dev` had also touched.
+# Releases stop being a fast-forward and start being a conflict, and whoever
+# branches off `dev` is missing work that is already live.
+#
+# Branch protection cannot express this: it governs pushes, not where a pull
+# request points. So it is a check, and it belongs in the ruleset's required
+# status checks for `main` — otherwise it reports and does not block.
+
+name: Check pull request target
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  target:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only dev may open a pull request into main
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          if [ "$HEAD_BRANCH" = "dev" ]; then
+            echo "dev -> main. This is a release."
+            exit 0
+          fi
+
+          echo "::error::'$HEAD_BRANCH' targets main, and only dev may do that."
+          echo ""
+          echo "Every branch comes off dev and goes back into dev. main only"
+          echo "ever receives dev, and that pull request is a release."
+          echo ""
+          echo "To redirect this one without losing the review or the commits:"
+          echo "  gh pr edit <number> --base dev"
+          echo ""
+          echo "See docs/workflow/branches-and-pull-requests.md"
+          exit 1
