@@ -99,7 +99,13 @@ function pair(audioDir: string, cases: IntentCase[]): Entry[] {
   if (files.length === 0) fail(`No audio files in ${path.resolve(audioDir)}`);
 
   const numbered = files.map((file) => {
-    const digits = file.match(/(\d+)(?!.*\d)/);
+    // The extension has to come off first: ".m4a" and ".3gp" both carry a
+    // digit of their own, and matched against the whole filename it reads as
+    // the "last" number in the string — every ".m4a" file in a folder came
+    // back numbered "4", the one digit the real number and the extension
+    // happened to share a position for.
+    const stem = file.slice(0, file.length - path.extname(file).length);
+    const digits = stem.match(/(\d+)(?!.*\d)/);
     return { file, number: digits ? Number(digits[1]) : null };
   });
 
