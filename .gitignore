@@ -53,7 +53,8 @@ next-env.d.ts
 
 # material interno del equipo. Este repositorio es el publico de la hackaton:
 # aqui viaja solo lo ya destilado, nunca el brief ni los zips de referencia.
-/docs-internos
+/docs-internos/*
+!/docs-internos/bench-audio/
 
 # datos locales de Docker por si alguien monta el volumen en el repo
 /docker/data
@@ -61,14 +62,13 @@ next-env.d.ts
 # el banco de pruebas es un paquete npm aparte, con sus propias dependencias
 /bench/node_modules
 
-# --- la voz de una persona no se versiona ---
-# Los audios del banco son voz humana real, o sea un dato personal. Viven en
-# /docs-internos, que ya esta ignorado; estos globs cubren el dia que alguien
-# deje un clip suelto en otra carpeta por comodidad. Al repositorio viaja la
-# transcripcion, que es texto.
+# Audios locales, salvo las grabaciones del banco que se suben como prueba.
 *.m4a
 *.wav
 *.webm
+!/docs-internos/bench-audio/*.m4a
+!/docs-internos/bench-audio/*.wav
+!/docs-internos/bench-audio/*.webm
 
 # --- credenciales en forma de archivo ---
 # La clave privada de Vonage se descarga como archivo .key y acaba, por
