@@ -1,7 +1,41 @@
 import type { Metadata } from "next";
+import { CallBanner } from "@/components/CallNotice";
+import { ConflictBreakdown } from "@/components/ConflictBreakdown";
 import { Mia } from "@/components/mia";
 import { MIA_STATE_ORDER } from "@/components/mia-states";
+import type { Conflict, Stop } from "@/lib/conflicts";
 import { MiaLive } from "./mia-live";
+
+/**
+ * Declared examples for the reference page, and only for it: the conflict
+ * screen reads real calendars, this page shows what each shape looks like.
+ */
+function exampleStop(title: string, from: string, to: string): Stop {
+  return {
+    id: title,
+    personId: "example",
+    title,
+    startsAt: new Date(`2026-09-24T${from}:00+02:00`),
+    endsAt: new Date(`2026-09-24T${to}:00+02:00`),
+    place: null,
+  };
+}
+
+const OVERLAP: Conflict = {
+  reason: "overlap",
+  previous: exampleStop("Reunión de equipo", "16:00", "17:30"),
+  next: exampleStop("Recoger al niño", "17:00", "17:30"),
+  gapMin: -30,
+  travelMin: null,
+};
+
+const NO_TIME: Conflict = {
+  reason: "no-time",
+  previous: exampleStop("Trabajo", "09:00", "17:00"),
+  next: exampleStop("Piscina", "17:05", "18:00"),
+  gapMin: 5,
+  travelMin: 42,
+};
 
 /**
  * The living reference: every state of every component, side by side. A
@@ -49,6 +83,39 @@ export default function SystemPage() {
 
         <h3 className="text-lg font-medium text-ink">Las transiciones</h3>
         <MiaLive />
+      </section>
+
+      <section aria-labelledby="conflict-heading" className="flex flex-col gap-6">
+        <h2 id="conflict-heading" className="font-display text-2xl text-ink">
+          El choque
+        </h2>
+        <p className="max-w-prose text-ink-muted">
+          Dos formas, porque son dos cosas distintas: solaparse es aritmética exacta, y no dar
+          tiempo lleva dentro una estimación de trayecto que se declara como tal.
+        </p>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="flex flex-col gap-3">
+            <h3 className="text-lg font-medium text-ink">Se solapan</h3>
+            <ConflictBreakdown conflict={OVERLAP} />
+          </div>
+          <div className="flex flex-col gap-3">
+            <h3 className="text-lg font-medium text-ink">No da tiempo</h3>
+            <ConflictBreakdown conflict={NO_TIME} />
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="call-heading" className="flex flex-col gap-6">
+        <h2 id="call-heading" className="font-display text-2xl text-ink">
+          La llamada
+        </h2>
+        <p className="max-w-prose text-ink-muted">
+          El aviso que ve quien no la ha abierto. La sala no tiene ejemplo aquí: solo sabe pintar
+          una llamada de verdad, con sus permisos de cámara y su sesión abierta.
+        </p>
+
+        <CallBanner who="Carlos" />
       </section>
     </main>
   );

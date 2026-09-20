@@ -17,7 +17,7 @@
     "db:seed": "node --experimental-strip-types --env-file=.env prisma/seed.ts",
     "mia:say": "node --experimental-strip-types --env-file=.env scripts/mia-says.ts",
     "db:studio": "prisma studio",
-    "test:unidad": "node --experimental-strip-types --test \"tests/unidad/**/*.test.ts\"",
+    "test:unit": "node --experimental-strip-types --test \"tests/unit/**/*.test.ts\"",
     "test:guardrails": "node --experimental-strip-types --test \"tests/guardrails.test.ts\"",
     "demo:seed": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts seed",
     "demo:clear": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts clear",

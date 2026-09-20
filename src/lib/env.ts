@@ -1,4 +1,4 @@
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { z } from "zod";
@@ -33,6 +33,15 @@ const schema = z.object({
 
   VONAGE_API_BASE: z.url().default("https://api-eu.vonage.com"),
   VONAGE_BRAND_NAME: z.string().min(1).default("OFFLOAD"),
+
+  /** The video application, which is a different one from Verify's. */
+  VONAGE_APPLICATION_ID: z.string().min(1).optional(),
+  VONAGE_PRIVATE_KEY_PATH: z.string().min(1).optional(),
+  /** On Railway the key travels as content, same as Verify's. */
+  VONAGE_PRIVATE_KEY: z.string().min(1).optional(),
+  /** Video has its own host. `api.opentok.com` is the previous generation and
+   *  answers 403 to an application JWT. */
+  VONAGE_VIDEO_BASE: z.url().default("https://video.api.vonage.com"),
 
   /**
    * At least 32 characters. Spanish mobile numbers are about a billion
@@ -96,6 +105,28 @@ export const env = load();
 const MATERIALISED_KEY = join(tmpdir(), "vonage-verify.key");
 
 /**
+ * The PEM inside a variable, whichever way it was pasted.
+ *
+ * Base64 is accepted because escaped newlines do not survive every route in:
+ * Railway's CLI truncated the key at the first `\n`, storing 28 characters of
+ * 1703 and reporting success. Base64 has no newlines to lose.
+ */
+function pemFromVariable(key: string, variable: string): string {
+  const pem = key.includes("BEGIN")
+    ? key.replace(/\\n/g, "\n")
+    : Buffer.from(key, "base64").toString("utf8");
+
+  if (!pem.includes("BEGIN") || !pem.includes("\n")) {
+    throw new Error(
+      `${variable} is not a usable PEM. Either the whole key with newlines ` +
+        "escaped as \\n, or the same key base64-encoded.",
+    );
+  }
+
+  return pem;
+}
+
+/**
  * Writes the key that arrives as a variable to disk and returns its path,
  * because the Vonage SDK wants a path and not a string.
  *
@@ -104,19 +135,7 @@ const MATERIALISED_KEY = join(tmpdir(), "vonage-verify.key");
  * that never mentions newlines.
  */
 function materialise(key: string): string {
-  // Base64 is accepted because escaped newlines do not survive every route in:
-  // Railway's CLI truncated the key at the first `\n`, storing 28 characters of
-  // 1703 and reporting success. Base64 has no newlines to lose.
-  const pem = key.includes("BEGIN")
-    ? key.replace(/\\n/g, "\n")
-    : Buffer.from(key, "base64").toString("utf8");
-
-  if (!pem.includes("BEGIN") || !pem.includes("\n")) {
-    throw new Error(
-      "VONAGE_VERIFY_PRIVATE_KEY is not a usable PEM. Either the whole key with " +
-        "newlines escaped as \\n, or the same key base64-encoded.",
-    );
-  }
+  const pem = pemFromVariable(key, "VONAGE_VERIFY_PRIVATE_KEY");
 
   // 0600, and written once per process: this runs on every verification.
   if (!existsSync(MATERIALISED_KEY)) {
@@ -124,6 +143,54 @@ function materialise(key: string): string {
   }
 
   return MATERIALISED_KEY;
+}
+
+export type VideoCredentials = {
+  applicationId: string;
+  /** The whole PEM, not its path: `tokenGenerate` signs with the content. */
+  privateKey: string;
+  videoBase: string;
+};
+
+/**
+ * What the video room needs, which is less than verification: no public URL
+ * and no pepper. Demanding those would leave the call off over a variable it
+ * does not use.
+ */
+export function requireVideoCredentials(): VideoCredentials {
+  const {
+    VONAGE_APPLICATION_ID: applicationId,
+    VONAGE_PRIVATE_KEY: keyAsValue,
+    VONAGE_PRIVATE_KEY_PATH: keyOnDisk,
+    VONAGE_VIDEO_BASE: videoBase,
+  } = env;
+
+  if (!applicationId || (!keyAsValue && !keyOnDisk)) {
+    const missing = [
+      !applicationId && "VONAGE_APPLICATION_ID",
+      !keyAsValue && !keyOnDisk && "VONAGE_PRIVATE_KEY_PATH or VONAGE_PRIVATE_KEY",
+    ].filter(Boolean);
+
+    throw new Error(
+      `The video call needs these variables and they are not in .env: ${missing.join(", ")}. ` +
+        "They come from the video application in the Vonage panel.",
+    );
+  }
+
+  // The value wins over the path, same as verification: the template always
+  // leaves the path written, and on Railway that file does not exist.
+  if (keyAsValue) {
+    return { applicationId, privateKey: pemFromVariable(keyAsValue, "VONAGE_PRIVATE_KEY"), videoBase };
+  }
+
+  if (!existsSync(keyOnDisk as string)) {
+    throw new Error(
+      `VONAGE_PRIVATE_KEY_PATH points at ${keyOnDisk} and there is no file there. ` +
+        "The private key is downloaded once, when the application is created in the Vonage panel.",
+    );
+  }
+
+  return { applicationId, privateKey: readFileSync(keyOnDisk as string, "utf8"), videoBase };
 }
 
 export type VerifyCredentials = {

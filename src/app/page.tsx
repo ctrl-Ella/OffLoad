@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { User } from "lucide-react";
+import Link from "next/link";
+import { TriangleAlert, User } from "lucide-react";
+import { todayInMadrid } from "@/lib/clock";
+import { coreJourney, type Lane } from "@/lib/schedule";
 import { currentPerson, type SignedInPerson } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
+import { CallNotice } from "@/components/CallNotice";
 import { GoogleSignIn } from "@/components/google-sign-in";
 import { MiaFigure } from "@/components/mia";
 import { MIA_SKY } from "@/components/mia-states";
@@ -116,7 +120,12 @@ function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
   );
 }
 
-function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
+async function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
+  // Only the core has a calendar to read. For the support network the day is
+  // not looked at, because there is nothing of theirs to look at.
+  const [lane] =
+    person.circle === "CORE" ? await coreJourney(todayInMadrid(), person.id) : [undefined];
+
   return (
     <main
       id="content"
@@ -155,13 +164,83 @@ function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
         cargar con todo.
       </p>
 
-      {/* The day's timeline goes here. Until it exists, the screen says only
-          what it can prove: that it knows who you are. */}
-      <Notice tone="good" title="Ya estás dentro">
-        <p className="mt-1">
-          Tu día todavía no está aquí: esto de momento solo sabe quién eres.
-        </p>
-      </Notice>
+      {/* The day's timeline goes here. Until it exists, what the screen says
+          is only what it can prove: whether something clashes today, and
+          whether there is a call open. */}
+      {lane ? (
+        <DayStatus lane={lane} />
+      ) : (
+        <Notice tone="good" title="Ya estás dentro">
+          <p className="mt-1">
+            Tu día todavía no está aquí: esto de momento solo sabe quién eres.
+          </p>
+        </Notice>
+      )}
+
+      {person.circle === "CORE" && (
+        <div className="mt-6">
+          <CallNotice />
+        </div>
+      )}
     </main>
+  );
+}
+
+/**
+ * The one thing the day can say today: whether something does not fit. The
+ * three states are told apart because they mean different things — a free
+ * day, a calendar Mia cannot see, and a calendar nobody has connected — and
+ * painting the last two as the first would claim a free day nobody knows.
+ */
+function DayStatus({ lane }: Readonly<{ lane: Lane }>) {
+  if (lane.status === "no-google") {
+    return (
+      <Notice tone="quiet" title="I can't see your calendar yet">
+        <p className="mt-1">Connect your Google account and I&apos;ll look at your day.</p>
+      </Notice>
+    );
+  }
+
+  if (lane.status === "unavailable") {
+    return (
+      <Notice tone="quiet" title="I can't read your calendar right now">
+        <p className="mt-1">Google didn&apos;t answer. Try again in a moment.</p>
+      </Notice>
+    );
+  }
+
+  const clash = lane.conflicts[0];
+
+  if (!clash) {
+    return (
+      <Notice tone="good" title="Nothing clashes today">
+        <p className="mt-1">Everything on your calendar fits.</p>
+      </Notice>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-card bg-alert p-4 text-ink">
+      <span
+        aria-hidden="true"
+        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-alert"
+      >
+        <TriangleAlert className="size-4" />
+      </span>
+
+      <p className="min-w-0 flex-1">
+        <span className="block font-display font-semibold">Something doesn&apos;t fit today</span>
+        <span className="block text-[15px]">
+          You won&apos;t make it to &ldquo;{clash.next.title}&rdquo;.
+        </span>
+      </p>
+
+      <Link
+        href="/conflict"
+        className="inline-flex min-h-11 items-center justify-center rounded-control border border-ink px-4 text-[15px] font-medium text-ink hover:bg-white/40"
+      >
+        See the clash
+      </Link>
+    </div>
   );
 }
