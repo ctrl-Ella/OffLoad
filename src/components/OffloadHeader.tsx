@@ -27,7 +27,7 @@ export function OffloadHeader({ person }: { person: SignedInPerson | null }) {
       {person ? (
         <details className="relative">
           <summary
-            aria-label="Tu perfil"
+            aria-label="Your profile"
             className="flex h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-control bg-accent text-ink hover:brightness-95 [&::-webkit-details-marker]:hidden"
           >
             <User className="h-5 w-5" aria-hidden="true" />
@@ -36,12 +36,12 @@ export function OffloadHeader({ person }: { person: SignedInPerson | null }) {
           <div className="absolute right-0 z-10 mt-2 w-72 rounded-card border border-border bg-white p-4 text-left shadow-sm">
             <p className="text-sm font-medium text-ink">{person.name}</p>
             <p className="mt-1 text-sm text-ink-muted">
-              Línea acabada en {person.phoneTail}, confirmada por tu operador. Te
-              recuerdo treinta días.
+              Line ending in {person.phoneTail}, confirmed by your carrier. I remember
+              you for thirty days.
             </p>
             <form action="/api/auth/logout" method="post" className="mt-3">
               <Button type="submit" variant="secondary" size="small">
-                Cerrar sesión
+                Sign out
               </Button>
             </form>
           </div>

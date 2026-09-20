@@ -1,4 +1,4 @@
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { z } from "zod";
@@ -34,12 +34,32 @@ const schema = z.object({
   VONAGE_API_BASE: z.url().default("https://api-eu.vonage.com"),
   VONAGE_BRAND_NAME: z.string().min(1).default("OFFLOAD"),
 
+  /** The video application, which is a different one from Verify's. */
+  VONAGE_APPLICATION_ID: z.string().min(1).optional(),
+  VONAGE_PRIVATE_KEY_PATH: z.string().min(1).optional(),
+  /** On Railway the key travels as content, same as Verify's. */
+  VONAGE_PRIVATE_KEY: z.string().min(1).optional(),
+  /** Video has its own host. `api.opentok.com` is the previous generation and
+   *  answers 403 to an application JWT. */
+  VONAGE_VIDEO_BASE: z.url().default("https://video.api.vonage.com"),
+
   /**
    * At least 32 characters. Spanish mobile numbers are about a billion
    * combinations: an unsalted SHA-256 of one is walked through in seconds, so
    * without this, storing the digest is storing the number.
    */
   VERIFICATION_PEPPER: z.string().min(32).optional(),
+
+  /** Nebius Token Factory: all the reasoning, at two tiers. The key is
+   *  optional for the same reason as the rest; the model identifiers have no
+   *  default in code because Nebius retires checkpoints without redirecting
+   *  traffic, and a name written here expires without warning. */
+  NEBIUS_API_KEY: z.string().min(1).optional(),
+  NEBIUS_BASE_URL: z.url().default("https://api.tokenfactory.nebius.com/v1"),
+  /** The interpreter's model: cheap extraction. */
+  NEBIUS_MODEL_SMALL: z.string().min(1).optional(),
+  /** The negotiator's model: the one that chooses whom to ask. */
+  NEBIUS_MODEL_LARGE: z.string().min(1).optional(),
 
   /** SLNG, which is what Mia says. Optional for the same reason as the rest:
    *  `next build` needs no secrets, and everything else works without a voice. */
@@ -96,6 +116,28 @@ export const env = load();
 const MATERIALISED_KEY = join(tmpdir(), "vonage-verify.key");
 
 /**
+ * The PEM inside a variable, whichever way it was pasted.
+ *
+ * Base64 is accepted because escaped newlines do not survive every route in:
+ * Railway's CLI truncated the key at the first `\n`, storing 28 characters of
+ * 1703 and reporting success. Base64 has no newlines to lose.
+ */
+function pemFromVariable(key: string, variable: string): string {
+  const pem = key.includes("BEGIN")
+    ? key.replace(/\\n/g, "\n")
+    : Buffer.from(key, "base64").toString("utf8");
+
+  if (!pem.includes("BEGIN") || !pem.includes("\n")) {
+    throw new Error(
+      `${variable} is not a usable PEM. Either the whole key with newlines ` +
+        "escaped as \\n, or the same key base64-encoded.",
+    );
+  }
+
+  return pem;
+}
+
+/**
  * Writes the key that arrives as a variable to disk and returns its path,
  * because the Vonage SDK wants a path and not a string.
  *
@@ -104,19 +146,7 @@ const MATERIALISED_KEY = join(tmpdir(), "vonage-verify.key");
  * that never mentions newlines.
  */
 function materialise(key: string): string {
-  // Base64 is accepted because escaped newlines do not survive every route in:
-  // Railway's CLI truncated the key at the first `\n`, storing 28 characters of
-  // 1703 and reporting success. Base64 has no newlines to lose.
-  const pem = key.includes("BEGIN")
-    ? key.replace(/\\n/g, "\n")
-    : Buffer.from(key, "base64").toString("utf8");
-
-  if (!pem.includes("BEGIN") || !pem.includes("\n")) {
-    throw new Error(
-      "VONAGE_VERIFY_PRIVATE_KEY is not a usable PEM. Either the whole key with " +
-        "newlines escaped as \\n, or the same key base64-encoded.",
-    );
-  }
+  const pem = pemFromVariable(key, "VONAGE_VERIFY_PRIVATE_KEY");
 
   // 0600, and written once per process: this runs on every verification.
   if (!existsSync(MATERIALISED_KEY)) {
@@ -124,6 +154,54 @@ function materialise(key: string): string {
   }
 
   return MATERIALISED_KEY;
+}
+
+export type VideoCredentials = {
+  applicationId: string;
+  /** The whole PEM, not its path: `tokenGenerate` signs with the content. */
+  privateKey: string;
+  videoBase: string;
+};
+
+/**
+ * What the video room needs, which is less than verification: no public URL
+ * and no pepper. Demanding those would leave the call off over a variable it
+ * does not use.
+ */
+export function requireVideoCredentials(): VideoCredentials {
+  const {
+    VONAGE_APPLICATION_ID: applicationId,
+    VONAGE_PRIVATE_KEY: keyAsValue,
+    VONAGE_PRIVATE_KEY_PATH: keyOnDisk,
+    VONAGE_VIDEO_BASE: videoBase,
+  } = env;
+
+  if (!applicationId || (!keyAsValue && !keyOnDisk)) {
+    const missing = [
+      !applicationId && "VONAGE_APPLICATION_ID",
+      !keyAsValue && !keyOnDisk && "VONAGE_PRIVATE_KEY_PATH or VONAGE_PRIVATE_KEY",
+    ].filter(Boolean);
+
+    throw new Error(
+      `The video call needs these variables and they are not in .env: ${missing.join(", ")}. ` +
+        "They come from the video application in the Vonage panel.",
+    );
+  }
+
+  // The value wins over the path, same as verification: the template always
+  // leaves the path written, and on Railway that file does not exist.
+  if (keyAsValue) {
+    return { applicationId, privateKey: pemFromVariable(keyAsValue, "VONAGE_PRIVATE_KEY"), videoBase };
+  }
+
+  if (!existsSync(keyOnDisk as string)) {
+    throw new Error(
+      `VONAGE_PRIVATE_KEY_PATH points at ${keyOnDisk} and there is no file there. ` +
+        "The private key is downloaded once, when the application is created in the Vonage panel.",
+    );
+  }
+
+  return { applicationId, privateKey: readFileSync(keyOnDisk as string, "utf8"), videoBase };
 }
 
 export type VerifyCredentials = {
@@ -175,6 +253,37 @@ export function requireVerifyCredentials(): VerifyCredentials {
   }
 
   return { applicationId, privateKeyPath, publicUrl, pepper };
+}
+
+/** The model key, demanded right before an agent is invoked, not at start-up. */
+export function requireModelKey(): string {
+  if (!env.NEBIUS_API_KEY) {
+    throw new Error(
+      "NEBIUS_API_KEY is missing from .env. The agents cannot answer without it: " +
+        "it comes from tokenfactory.nebius.com, under API keys.",
+    );
+  }
+
+  return env.NEBIUS_API_KEY;
+}
+
+/**
+ * The model of one tier, by its variable name. If it is missing the error
+ * says WHICH: "the agent does not answer" cannot be fixed, "NEBIUS_MODEL_LARGE
+ * is missing" can. The live catalogue:
+ *   curl -H "Authorization: Bearer $NEBIUS_API_KEY" $NEBIUS_BASE_URL/models
+ */
+export function requireModel(variable: "NEBIUS_MODEL_SMALL" | "NEBIUS_MODEL_LARGE"): string {
+  const id = env[variable];
+
+  if (!id) {
+    throw new Error(
+      `${variable} is missing from .env. It comes from Nebius's live catalogue, which changes: ` +
+        `curl -H "Authorization: Bearer $NEBIUS_API_KEY" ${env.NEBIUS_BASE_URL}/models`,
+    );
+  }
+
+  return id;
 }
 
 export type MiaVoice = {

@@ -531,7 +531,7 @@ export function Mia({ state }: { state: MiaState }) {
           Mia
         </span>
         <span role="status" className={`block font-mono text-xs ${LABEL_TONE[state]}`}>
-          {/* The subject first: in a call there are more tiles, and «Callada»
+          {/* The subject first: in a call there are more tiles, and "Quiet"
               alone does not say whose. */}
           <span className="sr-only">Mia: </span>
           {MIA_LABELS[state]}

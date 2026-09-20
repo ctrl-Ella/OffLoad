@@ -1,13 +1,20 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 
-type Variant = "primary" | "secondary";
+type Variant = "primary" | "secondary" | "danger" | "room";
 type Size = "normal" | "small";
 
 const VARIANTS: Record<Variant, string> = {
   // The teal is a fill, so the ink on it is the onyx: 11.86:1.
   primary: "bg-accent text-ink hover:brightness-95",
   secondary: "bg-transparent text-ink border border-border-strong hover:bg-white",
+  // The coral is a fill too: onyx on it measures 6.15:1. For the one action
+  // that ends something, like hanging up.
+  danger: "bg-alert text-ink hover:brightness-95",
+  // The secondary, on the video room's dark canvas: its edge measures 4.83:1
+  // there and the hover lifts to the frame colour instead of to white, which
+  // on that canvas would swallow the light ink.
+  room: "bg-transparent text-room-ink border border-border-strong hover:bg-room-frame",
 };
 
 const SIZES: Record<Size, string> = {

@@ -11,11 +11,17 @@ Interface pieces reused across the three screens of the `interface` lane (the da
 proposal card, the recovered time), plus the trace strip and the voice entry. A full screen lives
 in `src/app/<route>/page.tsx` and composes the components here — never the other way round.
 
-The voice entry (`ListeningScreen` and what it composes) is the one deliberate exception to the
+The voice entry (`ListeningScreen` and what it composes) is one of two deliberate exceptions to the
 light palette below: full screen, full attention, no chrome from the rest of the app around it. It
-draws on its own `*-immersive` tokens in `tokens.css` instead of the ones every other screen uses,
-and its own visible text stays English rather than Spanish — both confirmed decisions, not gaps to
-close by making it match the rest of the folder.
+draws on its own `*-immersive` tokens in `tokens.css` instead of the ones every other screen uses —
+a confirmed decision, not a gap to close by making it match the rest of the folder. The video room
+(`Room` and `useRoom`) is the other, on its own `room-*` tokens and for its own reason: faces are
+what is looked at there, and a light surface around a video tile glares. It is also the one
+component with no example on `/system`, because it only knows how to paint a real call.
+
+Every visible string in this folder is English, Mia's state labels included. The only Spanish a
+person meets is what Mia says out loud, and that text never lives in a component: it comes from the
+workflow with the card, already worded.
 
 ## The lane's rules, applied to this folder
 

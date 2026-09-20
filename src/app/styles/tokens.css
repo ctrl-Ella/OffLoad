@@ -83,6 +83,23 @@
      --color-ink-immersive, 5.85:1 for --color-ink-muted-immersive. */
   --color-alert-surface-immersive: #3a1f1a; /* 13.86:1 ink · 5.85:1 ink-muted */
 
+  /* ── the video room
+     The second deliberately dark corner, and dark for a reason of its own: a
+     room is dark at eleven in the morning as at eleven at night. What is
+     looked at are faces, and a light background around a video tile glares
+     and flattens the one thing that matters on the screen. Not the immersive
+     surface: that one is the brand's onyx worn as a background, this is a
+     neutral stage that stays out of the way of skin tones.
+
+     Contrast below is measured against --color-room-canvas. The controls on
+     it reuse what already exists: --color-border-strong measures 4.83:1 here
+     as a button's edge, --color-accent 12.03:1 and --color-alert 6.23:1 as
+     fills, with the onyx ink on them as everywhere else. */
+  --color-room-canvas: #14161a;    /* the stage the tiles sit on */
+  --color-room-ink: #eef1f5;       /* 15.99:1 · names, and Mia's label */
+  --color-room-ink-muted: #a8b2bf; /*  8.44:1 · captions and the status line */
+  --color-room-frame: #2b3038;     /*  1.36:1 · separates tiles, decorative only */
+
   --radius-card: 24px;
   --radius-control: 10px; /* 24px on a text input reads as a pill */
 
@@ -131,6 +148,11 @@
   --color-card-immersive: var(--color-card-immersive);
   --color-chip-immersive: var(--color-chip-immersive);
   --color-alert-surface-immersive: var(--color-alert-surface-immersive);
+
+  --color-room-canvas: var(--color-room-canvas);
+  --color-room-ink: var(--color-room-ink);
+  --color-room-ink-muted: var(--color-room-ink-muted);
+  --color-room-frame: var(--color-room-frame);
 
   --radius-card: var(--radius-card);
   --radius-control: var(--radius-control);
