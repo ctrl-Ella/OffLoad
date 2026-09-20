@@ -28,8 +28,17 @@ export function AppNavigation({ person }: Readonly<{ person: SignedInPerson | nu
         </Link>
 
         {/* Same account menu as the voice flow's header (see
-            `OffloadHeader`): who's signed in, and the way out. */}
-        {person ? <AccountMenu person={person} tone="light" /> : null}
+            `OffloadHeader`): who's signed in, and the way out. `ml-auto`
+            here and not on the menu itself: `.presentation-header-link`
+            carries its own `margin-left: auto` but disappears on mobile
+            (see `presentation.css`'s breakpoint), and without this the menu
+            loses the only thing pushing it to the right and lands next to
+            the logo instead. */}
+        {person ? (
+          <div className="ml-auto">
+            <AccountMenu person={person} tone="light" />
+          </div>
+        ) : null}
       </header>
       <nav className="presentation-mobile-nav" aria-label="Mobile navigation">
         <Link href="/" aria-current={pathname === "/" ? "page" : undefined}>

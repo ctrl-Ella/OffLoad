@@ -26,8 +26,16 @@ type Options = {
   theirSlot: React.RefObject<HTMLDivElement | null>;
   /** What to do with each transcribed line, theirs and my own. */
   onCaption?: (text: string, who: string, isFinal: boolean) => void;
-  /** What to do when the room signals there is something new to look at. */
-  onSignal?: () => void;
+  /** What to do with any signal the room sends, by its type. Vonage's own
+   *  generic `signal` event carries both, so one subscription covers every
+   *  type this or a caller adds later — a guest's link, for one, has no
+   *  proposal to look for and passes nothing here at all. */
+  onSignal?: (type: string, data: string) => void;
+  /** Where the room's key comes from. Defaults to the core's own route; a
+   *  guest arriving by SMS passes `/api/room/guest/[token]` instead. Both
+   *  answer the same shape, `{ applicationId, sessionId, token }`, so nothing
+   *  else in this hook needs to know which one it is. */
+  keyEndpoint?: string;
 };
 
 /**
@@ -110,7 +118,7 @@ function loadSdk(): Promise<typeof OT> {
   return sdk;
 }
 
-export function useRoom({ mySlot, theirSlot, onCaption, onSignal }: Options) {
+export function useRoom({ mySlot, theirSlot, onCaption, onSignal, keyEndpoint = "/api/room" }: Options) {
   const [status, setStatus] = useState<RoomStatus>("outside");
   const [failure, setFailure] = useState<string | null>(null);
   const [accompanied, setAccompanied] = useState(false);
@@ -187,20 +195,18 @@ export function useRoom({ mySlot, theirSlot, onCaption, onSignal }: Options) {
         throw Object.assign(new Error("unsupported browser"), { name: "OT_NOT_SUPPORTED" });
       }
 
-      const response = await fetch("/api/room");
+      const response = await fetch(keyEndpoint);
 
       if (!response.ok) {
-        if (response.status === 503) {
-          const body: unknown = await response.json();
-          const said =
-            typeof body === "object" && body !== null && "error" in body
-              ? String(body.error)
-              : GENERIC_FAILURE;
+        // Every route behind this hands back `{ error }` on failure. The 503
+        // used to be the only one read this way; generalising it is what
+        // lets a guest's link answer with its own wording — "this link has
+        // expired" — without teaching this hook a second map of statuses.
+        const body: unknown = await response.json().catch(() => null);
+        const said =
+          typeof body === "object" && body !== null && "error" in body ? String(body.error) : null;
 
-          throw new Error(said);
-        }
-
-        throw new Error(DOOR[response.status] ?? GENERIC_FAILURE);
+        throw new Error(DOOR[response.status] ?? said ?? GENERIC_FAILURE);
       }
 
       const key = (await response.json()) as RoomKey;
@@ -236,7 +242,7 @@ export function useRoom({ mySlot, theirSlot, onCaption, onSignal }: Options) {
         setAccompanied(false);
       });
 
-      theSession.on("signal:proposal", () => signal.current?.());
+      theSession.on("signal", (event) => signal.current?.(event.type ?? "", event.data ?? ""));
 
       setStatus("joining");
 
@@ -290,7 +296,7 @@ export function useRoom({ mySlot, theirSlot, onCaption, onSignal }: Options) {
       setStatus("failed");
       leave();
     }
-  }, [mySlot, theirSlot, leave]);
+  }, [mySlot, theirSlot, leave, keyEndpoint]);
 
   const toggleMic = useCallback(() => {
     setMicOn((on) => {

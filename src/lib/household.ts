@@ -20,3 +20,13 @@ export async function otherCorePerson(personId: string): Promise<string | null> 
 
   return other?.name ?? null;
 }
+
+/** Everyone Mia could invite by SMS. `phone` travels with it and can still be
+ *  null: decision 0003 sets it once, by hand, and a household that has not
+ *  gotten to that yet should not fail this query, only fail to invite. */
+export async function supportNetwork(): Promise<{ id: string; name: string; phone: string | null }[]> {
+  return db.person.findMany({
+    where: { circle: "SUPPORT" },
+    select: { id: true, name: true, phone: true },
+  });
+}

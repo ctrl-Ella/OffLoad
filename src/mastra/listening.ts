@@ -17,6 +17,11 @@
  *
  * Pure: no network, no clock, no database. What goes in is what was said,
  * what comes out is a decision, so the whole thing can be tested.
+ *
+ * `isAnInviteCommand` and `matchInvitedPerson` share the file for the same
+ * reason: recognising "invita a Rosa" is the same kind of deterministic
+ * pattern match as recognising a refusal, and CLAUDE.md rules out a third
+ * agent for it (spec 0009).
  */
 
 /** What someone says when they cannot. Spain's Spanish, as it is spoken. */
@@ -42,7 +47,7 @@ const REFUSALS = [
 ];
 
 /** No accents and lower case: whoever transcribes does not always accent the same way. */
-function flatten(text: string): string {
+export function flatten(text: string): string {
   return text
     .toLowerCase()
     .normalize("NFD")
@@ -75,4 +80,49 @@ export function bothHaveRuledItOut(said: Utterance[]): boolean {
   const whoSaidNo = new Set(said.filter((line) => isARefusal(line.text)).map((line) => line.who));
 
   return whoSaidNo.size >= 2;
+}
+
+/**
+ * Asking Mia to bring someone from the support network in. Spain's Spanish,
+ * as it is said, and deliberately short: a longer list widens what counts as
+ * an invitation, and every false positive here costs a real SMS to a real
+ * phone, not just a missed beat in a negotiation.
+ */
+const INVITE_TRIGGERS = ["invita a", "que se una"];
+
+/**
+ * Does this line ask Mia to invite someone at all, regardless of whom? Cheap
+ * on purpose: checked on every final caption, before anything reaches the
+ * database.
+ */
+export function isAnInviteCommand(text: string): boolean {
+  const flat = flatten(text);
+
+  return INVITE_TRIGGERS.some((trigger) => flat.includes(trigger));
+}
+
+/**
+ * Which one, out of the support network, the line names.
+ *
+ * Matched on the LAST word of the stored name, which is how a person is
+ * actually said out loud: the demo's own rows are stored role-first —
+ * "Abuela Rosa", "Vecina Marta" — and nobody says "invita a Abuela". Matching
+ * on every word of the name would let "abuela" alone trigger a match with no
+ * name spoken at all.
+ *
+ * Zero matches and more than one both come back `null`. Either way Mia
+ * cannot say a name back with confidence, and the caller's answer is the
+ * same in both cases: nothing is sent, and something true is said about not
+ * having caught it.
+ */
+export function matchInvitedPerson<T extends { name: string }>(text: string, network: T[]): T | null {
+  const flat = flatten(text);
+
+  const matches = network.filter((person) => {
+    const firstName = flatten(person.name).split(" ").filter(Boolean).pop();
+
+    return firstName ? new RegExp(`\\b${firstName}\\b`).test(flat) : false;
+  });
+
+  return matches.length === 1 ? matches[0] : null;
 }

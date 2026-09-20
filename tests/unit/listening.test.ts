@@ -1,6 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { bothHaveRuledItOut, isARefusal } from "../../src/mastra/listening.ts";
+import {
+  bothHaveRuledItOut,
+  isAnInviteCommand,
+  isARefusal,
+  matchInvitedPerson,
+} from "../../src/mastra/listening.ts";
 
 /**
  * When Mia has something to say, tested for real. It exists because this is
@@ -96,5 +101,66 @@ describe("Mia waits until both have ruled it out", () => {
 
   it("with nothing said yet, neither", () => {
     assert.equal(bothHaveRuledItOut([]), false);
+  });
+});
+
+describe("recognising «invita a Rosa»", () => {
+  it("«invita a» is the command", () => {
+    assert.equal(isAnInviteCommand("Mia, invita a Rosa"), true);
+  });
+
+  it("«que se una» is too", () => {
+    assert.equal(isAnInviteCommand("Que se una Nicolás a la llamada"), true);
+  });
+
+  it("even without accents", () => {
+    assert.equal(isAnInviteCommand("que se una nicolas"), true);
+  });
+
+  it("an ordinary sentence is not a command", () => {
+    assert.equal(isAnInviteCommand("El niño tiene piscina a las siete"), false);
+  });
+
+  it("saying someone's name with no trigger phrase is not a command either", () => {
+    assert.equal(isAnInviteCommand("Rosa dice que no puede"), false);
+  });
+});
+
+const NETWORK = [
+  { id: "person_nicolas", name: "Nicolás" },
+  { id: "person_rosa", name: "Abuela Rosa" },
+  { id: "person_marta", name: "Vecina Marta" },
+];
+
+describe("matching who «invita a» names", () => {
+  it("matches on the first name alone against a role-prefixed stored name", () => {
+    const match = matchInvitedPerson("Mia, invita a Rosa", NETWORK);
+
+    assert.equal(match?.id, "person_rosa");
+  });
+
+  it("matches a name with no role prefix directly", () => {
+    const match = matchInvitedPerson("que se una Nicolás", NETWORK);
+
+    assert.equal(match?.id, "person_nicolas");
+  });
+
+  it("matches with no accent, the same as the transcript sometimes carries", () => {
+    const match = matchInvitedPerson("invita a nicolas", NETWORK);
+
+    assert.equal(match?.id, "person_nicolas");
+  });
+
+  it("names nobody when the sentence carries no name from the network", () => {
+    assert.equal(matchInvitedPerson("invita a alguien", NETWORK), null);
+  });
+
+  it("does not guess between two names both said in the same line", () => {
+    assert.equal(matchInvitedPerson("invita a Rosa o a Marta", NETWORK), null);
+  });
+
+  it("does not fire on the role word alone, with no name said", () => {
+    // "Abuela" on its own should not stand in for "Rosa".
+    assert.equal(matchInvitedPerson("dile a la abuela que la llamo luego", NETWORK), null);
   });
 });

@@ -44,12 +44,29 @@ const schema = z.object({
    *  answers 403 to an application JWT. */
   VONAGE_VIDEO_BASE: z.url().default("https://video.api.vonage.com"),
 
+  /** The virtual number Nicolás's SIP leg comes in on, and the SMS sender
+   *  when Mia invites the support network. Declared here since spec 0009: it
+   *  sat in `.env.example` since spec 0008 with nothing reading it. */
+  VONAGE_NUMBER: z.string().min(1).optional(),
+
+  /** The SMS API's own credentials: classic API key and secret over Basic
+   *  auth, not the video application's JWT — the SMS API has no JWT form.
+   *  From the account's API settings, never from an application. */
+  VONAGE_SMS_API_KEY: z.string().min(1).optional(),
+  VONAGE_SMS_API_SECRET: z.string().min(1).optional(),
+
   /**
    * At least 32 characters. Spanish mobile numbers are about a billion
    * combinations: an unsalted SHA-256 of one is walked through in seconds, so
    * without this, storing the digest is storing the number.
    */
   VERIFICATION_PEPPER: z.string().min(32).optional(),
+
+  /** Signs a guest's one-time link into a call. Its own secret and not
+   *  `VERIFICATION_PEPPER`: the two protect different things for different
+   *  reasons, and reusing one for the other is the kind of coupling that
+   *  reads as a mistake to whoever finds it next. */
+  GUEST_LINK_SECRET: z.string().min(32).optional(),
 
   /** Nebius Token Factory: all the reasoning, at two tiers. The key is
    *  optional for the same reason as the rest; the model identifiers have no
@@ -215,6 +232,44 @@ export function requireVideoCredentials(): VideoCredentials {
   }
 
   return { applicationId, privateKey: readFileSync(keyOnDisk as string, "utf8"), videoBase };
+}
+
+export type SmsCredentials = { apiKey: string; apiSecret: string; from: string };
+
+/**
+ * What the SMS API needs, checked at the point an invite is actually sent —
+ * not at start-up, the same way the other Vonage credentials are: a household
+ * that never invites the support network should not fail to build over a
+ * variable it never uses.
+ */
+export function requireSmsCredentials(): SmsCredentials {
+  const { VONAGE_SMS_API_KEY: apiKey, VONAGE_SMS_API_SECRET: apiSecret, VONAGE_NUMBER: from } = env;
+
+  if (!apiKey || !apiSecret || !from) {
+    const missing = [
+      !apiKey && "VONAGE_SMS_API_KEY",
+      !apiSecret && "VONAGE_SMS_API_SECRET",
+      !from && "VONAGE_NUMBER",
+    ].filter(Boolean);
+
+    throw new Error(
+      `Inviting the support network needs these variables and they are not in .env: ${missing.join(", ")}. ` +
+        "The key and secret come from the account's API settings in the Vonage dashboard, not from an application.",
+    );
+  }
+
+  return { apiKey, apiSecret, from };
+}
+
+/** Checked at the point a guest link is signed or verified, not at start-up. */
+export function requireGuestLinkSecret(): string {
+  if (!env.GUEST_LINK_SECRET) {
+    throw new Error(
+      "GUEST_LINK_SECRET is missing from .env. A guest's link into the call cannot be signed without it.",
+    );
+  }
+
+  return env.GUEST_LINK_SECRET;
 }
 
 export type VerifyCredentials = {
