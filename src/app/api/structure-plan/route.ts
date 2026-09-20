@@ -275,11 +275,27 @@ export async function POST(request: Request) {
     );
   }
 
-  const completionBody = (await completion.json()) as {
-    choices: { message: { content: string } }[];
-  };
-  const content = completionBody.choices[0]?.message.content ?? "";
-  const extraction = ExtractionSchema.parse(JSON.parse(content));
+  let extraction: z.infer<typeof ExtractionSchema>;
+  try {
+    const completionBody = (await completion.json()) as {
+      choices: { message: { content: string } }[];
+    };
+    const content = completionBody.choices[0]?.message.content ?? "";
+    extraction = ExtractionSchema.parse(JSON.parse(content));
+  } catch (error) {
+    // Constrained decoding makes bad JSON unlikely, not impossible — this
+    // project's own measurements found format failures at 0% but content
+    // accuracy well under 100%, so a still-malformed or schema-violating
+    // response is a real, if rare, external-API failure to guard against
+    // rather than let crash the request.
+    logger.error("Nebius's response wasn't the extraction schema expected", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return NextResponse.json(
+      { error: "Nebius's response couldn't be read." },
+      { status: 502 },
+    );
+  }
 
   const items = toPlanItems(extraction.items);
 
