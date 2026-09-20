@@ -10,7 +10,9 @@
   transform: translateY(-160%);
 }
 
-.skip-link:focus-visible {
+/* `:focus`, not `:focus-visible`: focus moved by script does not always match
+   `:focus-visible`, and a skip link nobody can see is a skip link nobody has. */
+.skip-link:focus {
   transform: translateY(0);
 }
 
