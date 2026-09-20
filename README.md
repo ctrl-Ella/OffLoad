@@ -1,104 +1,116 @@
 # OFFLOAD
 
-Una aplicación familiar que reparte la carga mental. Mia, el agente, encuentra los problemas antes de que nadie los vea, resuelve sola lo que no cambia el plan de nadie, y solo pide un sí o un no cuando hace falta. Lo que devuelve, medido, es tiempo.
+A family app that shares out the mental load. Mia, the agent, finds the problems before anyone sees them, resolves on her own whatever changes nobody's plans, and only asks for a yes or a no when it matters. What it gives back, measured, is time.
 
-[![Estado de la integración continua en la rama main](https://github.com/ctrl-Ella/OffLoad/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ctrl-Ella/OffLoad/actions/workflows/ci.yml)
-[![Número de issues abiertas](https://img.shields.io/github/issues/ctrl-Ella/OffLoad?label=issues%20abiertas)](https://github.com/ctrl-Ella/OffLoad/issues)
-[![Número de pull requests abiertas](https://img.shields.io/github/issues-pr/ctrl-Ella/OffLoad?label=pull%20requests)](https://github.com/ctrl-Ella/OffLoad/pulls)
-[![Fecha del último cambio](https://img.shields.io/github/last-commit/ctrl-Ella/OffLoad?label=último%20cambio)](https://github.com/ctrl-Ella/OffLoad/commits/main)
+[![Continuous integration status on the main branch](https://github.com/ctrl-Ella/OffLoad/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ctrl-Ella/OffLoad/actions/workflows/ci.yml)
+[![Open issues count](https://img.shields.io/github/issues/ctrl-Ella/OffLoad?label=open%20issues)](https://github.com/ctrl-Ella/OffLoad/issues)
+[![Open pull requests count](https://img.shields.io/github/issues-pr/ctrl-Ella/OffLoad?label=pull%20requests)](https://github.com/ctrl-Ella/OffLoad/pulls)
+[![Date of the last change](https://img.shields.io/github/last-commit/ctrl-Ella/OffLoad?label=last%20commit)](https://github.com/ctrl-Ella/OffLoad/commits/main)
 
-Proyecto del equipo CTRL4ELLA para HackBarna AI Summit 26.
+Built by team CTRL4ELLA for HackBarna AI Summit 26.
 
-> **Estado:** en construcción. El esqueleto está en pie y la integración continua en verde. El producto se está montando encima.
+> **Status:** under construction. The skeleton is standing and continuous integration is green. The product is being built on top of it.
 
 ---
 
-## El problema
+## The problem
 
-La carga mental de una casa no son las tareas: es acordarse de que existen. Quién lleva al niño a la piscina el jueves si esa tarde hay reunión, si alguien pasa cerca del supermercado de camino a otro sitio, a quién se le puede pedir ayuda sin quedar mal.
+The mental load of running a home isn't the tasks: it's remembering they exist. Who takes the kid to the pool on Thursday if there's a meeting that afternoon, whether someone is passing near the supermarket on the way somewhere else, who can be asked for help without it costing something.
 
-Eso no se reparte con una lista compartida, porque la lista también hay que llevarla.
+That doesn't get shared with a shared list, because the list itself still has to be carried by someone.
 
-## Cómo funciona
+## How it works
 
-Mia observa las agendas del núcleo familiar y encuentra los choques antes de que ocurran. Y entonces se hace una sola pregunta:
+Mia watches the core family's calendars and finds the clashes before they happen. Then she asks herself one question:
 
-> **¿Esto cambia el plan de alguien?**
+> **Does this change anyone's plans?**
 
-| Respuesta | Qué hace Mia |
+| Answer | What Mia does |
 |---|---|
-| No lo cambia | Lo resuelve sola y lo notifica. Acoplar un recado a un trayecto que alguien ya iba a hacer, reordenar recordatorios, montar la lista de la compra |
-| Sí lo cambia | Lo prepara entero y pide un sí o un no. Una tarjeta, dos botones |
-| No se resuelve con un sí o un no | Videollamada. Es la excepción, y que sea rara es la métrica de éxito |
+| It doesn't | She resolves it herself and says so. Attaching an errand to a trip someone was making anyway, reordering reminders, building the shopping list |
+| It does | She prepares the whole thing and asks for a yes or a no. One card, two buttons |
+| A yes or a no won't settle it | Video call. It's the exception, and how rarely it happens is the measure of success |
 
-La interfaz es móvil primero, la entrada principal es la voz, y todo el producto está en español de España.
+The interface is mobile first, the main input is voice, and Mia speaks Spanish from Spain.
 
-### Dos círculos, y la diferencia es estructural
+### Two circles, and the difference is structural
 
-El **núcleo** conecta su Google, y Mia ve sus agendas. La **red de apoyo** —un abuelo, una vecina, un amigo— solo está en la lista de contactos: Mia no ve nada suyo, no puede saber si están libres y **nunca afirma su disponibilidad**. Para saberlo hay que llamarles, y por eso existe la videollamada.
+The **core** connects their Google accounts, and Mia sees their calendars. The **support network** — a grandparent, a neighbour, a friend — only exists in the contact list: Mia sees nothing of theirs, cannot know whether they're free, and **never claims they're available**. Finding out means calling them, and that's why the video call exists.
 
-## La tesis técnica
+## The technical thesis
 
-> **El modelo interpreta, el workflow decide.**
+> **The model interprets, the workflow decides.**
 
-Detectar que dos paradas chocan es aritmética sobre horas y distancias, y eso no se le pregunta a un modelo de lenguaje. Al modelo se le da solo lo que una máquina determinista no sabe hacer: entender una frase dicha en voz alta y elegir a quién conviene pedirle qué.
+Working out that two stops collide is arithmetic over times and distances, and you don't ask a language model for that. The model gets only what a deterministic machine can't do: understanding a sentence said out loud, and choosing who's the right person to ask.
 
-De los ocho pasos de un run, solo dos tocan un modelo, y el que más decide no lo toca.
+Of the eight steps in a run, only two touch a model — and the one that decides the most touches none.
 
-El estado vive en Postgres, así que el proceso se suspende esperando a que una persona conteste y se reanuda en el paso exacto, aunque el servidor se reinicie por medio. El conflicto es un estado del sistema, no un error.
+State lives in Postgres, so the process suspends waiting for someone to answer and resumes at the exact step, even across a server restart. A conflict is a state of the system, not an error.
 
-## Quién pone qué
+## Who does what
 
-| Pieza | Responsabilidad |
+| Piece | Responsibility |
 |---|---|
-| **Mastra** | Orquestación, estado y herramientas tipadas |
-| **Nebius Token Factory** | Todo el razonamiento, en dos niveles de modelo |
-| **Vonage** | La sesión de vídeo, las transcripciones en directo y el puente telefónico |
-| **SLNG** | Lo que Mia dice y lo que oye fuera de la llamada |
-| **Google** | Calendar y Tasks del núcleo |
-| **Make** | Los efectos secundarios de una decisión ya tomada |
+| **Mastra** | Orchestration, state and typed tools |
+| **Nebius Token Factory** | All the reasoning, at two model tiers |
+| **Vonage** | The video session, live captions and the phone bridge |
+| **SLNG** | Everything Mia says and hears outside the call |
+| **Google** | Calendar and Tasks for the core |
+| **Make** | The side effects of a decision already taken |
 
-Encima de Next.js 16, React 19, Prisma 7 y Tailwind 4, con TypeScript en todo.
+Built on Next.js 16, React 19, Prisma 7 and Tailwind 4, in TypeScript throughout.
 
-## Las seis reglas que no se rompen
+## Sponsors
 
-Están cubiertas por pruebas y bloquean la mezcla:
+What each hackathon sponsor's platform actually does in this project, not what it could do.
 
-1. Nunca se escribe en un calendario sin confirmación humana
-2. Mia no emite audio sin que alguien le haya dado la palabra
-3. Nunca se afirma la disponibilidad de alguien de la red de apoyo
-4. Mia no anuncia nada que todavía no sea verdad
-5. La cercanía se calcula entre paradas, nunca entre personas
-6. Las cifras de tiempo se calculan o se declaran como estimación
+**Vonage** — three real capabilities, all shipped. The video call itself: a `routed` session, not peer-to-peer, because that's what Live Captions needs to run — it's literally how Mia hears what's said during a call. Silent Auth: phone sign-in with no code to type, confirmed over the carrier's own network. And SMS: on command, during a call, Mia texts someone from the support network a signed, time-limited link that lets them join with no sign-in at all. Checking the SMS API against Vonage's own documentation turned up something the rest of this project doesn't do: it authenticates with a plain API key and secret, not the JWT everything else here uses — a deliberate, documented exception, not an oversight.
 
-## Cómo arrancarlo
+**Nebius (Token Factory)** — two model tiers, both constrained to structured JSON-schema output, so a response that breaks the schema is impossible rather than merely unlikely. A small model extracts events and tasks out of a dictated sentence or a call's transcript; a larger one, the negotiator, decides who to ask and writes the proposal. Which model fills each tier came from measuring real candidates against a benchmark, not from picking a name off the catalogue: the intent classifier reaches 93.3% accuracy over 30 written cases (`bench/results/`). That figure is over typed sentences, not spoken ones — the thirty voice recordings needed to measure the same classifier against what a person actually says out loud are made, but the comparison run itself hasn't happened yet. [`docs/specs/0004-nebius-benchmark-and-voice-measurement.md`](docs/specs/0004-nebius-benchmark-and-voice-measurement.md) is the plan for it, staged and not yet done.
 
-Hace falta Node 22.13 o superior y una base de datos Postgres.
+**SLNG** — both directions of Mia's voice outside the video call. Speech-to-text turns a recorded voice note into a transcript; text-to-speech is Mia's own voice, both the short clips she plays and the streaming voice used live inside a call. Worth saying plainly: the first speech-to-text model tried — the one SLNG's own examples point to — turned out to silently ignore Spanish and transcribe only English. The path that actually works is SLNG's batch API with Speechmatics instead.
+
+**Norma (QualityClouds)** — static analysis run against the real code partway through the build. It flagged genuine gaps: two API routes that only handled a failure on their first network call and not the steps after it, and every network request in the project missing a timeout. Both are fixed. Not every finding was acted on as reported: a couple turned out to be false positives on inspection — a synchronous call flagged as an async one, an error already handled one call frame up — and were left alone rather than "fixed" to match the report. The full account of what was fixed, what wasn't, and why, is in [`DEFENCE.md`](DEFENCE.md).
+
+## The six rules that never break
+
+Covered by tests, and they block the merge:
+
+1. Nothing is ever written to a calendar without human confirmation
+2. Mia doesn't play audio until someone has given her the floor
+3. Nobody in the support network is ever described as available
+4. Mia announces nothing that isn't true yet
+5. Proximity is measured between stops, never between people
+6. Time-saved figures are either computed or declared as estimates
+
+## How to run it
+
+Needs Node 22.13 or later and a Postgres database.
 
 ```bash
 npm ci
-cp .env.example .env        # y rellenar los valores
+cp .env.example .env        # and fill in the values
 npx prisma generate
 npm run dev
 ```
 
-Las credenciales que hay que dar de alta, en qué orden y con qué trampas, están en `docs/guides/`. El `.env` no se sube nunca: lo que se versiona es `.env.example`, con los nombres de las variables y sin un solo valor.
+Which credentials to set up, in what order, and their traps, are in `docs/guides/`. `.env` never gets committed: what's versioned is `.env.example`, with the variable names and not a single value.
 
-## Cómo trabajamos
+## How we work
 
-`main` es producción y `dev` es donde se integra. Cada rama sale de `dev` con el número de su issue en el nombre, y vuelve por pull request. Ninguna tarea empieza por el código: primero se escribe qué se va a hacer y cómo se sabrá que está hecho.
+`main` is production and `dev` is where work integrates. Every branch comes off `dev` with its issue number in the name, and returns by pull request. No task starts with the code: first it's written down what will be done and how it'll be known to be done.
 
-| Dónde | Qué hay |
+| Where | What's there |
 |---|---|
-| [`docs/workflow/`](docs/workflow/) | Ramas y pull requests, commits, issues y etiquetas, spec driven development |
-| [`docs/specs/`](docs/specs/) | Una spec por tarea, más la plantilla |
-| [`docs/decisions/`](docs/decisions/) | Las decisiones de arquitectura, con sus alternativas descartadas |
-| [`docs/guides/`](docs/guides/) | Accesibilidad y automatizaciones |
-| [`CLAUDE.md`](CLAUDE.md) | El contexto con el que trabajan las sesiones de Claude Code |
-| [`CHANGELOG.md`](CHANGELOG.md) | Qué ha cambiado, una línea por pull request |
+| [`docs/workflow/`](docs/workflow/) | Branches and pull requests, commits, issues and labels, spec-driven development |
+| [`docs/specs/`](docs/specs/) | One spec per task, plus the template |
+| [`docs/decisions/`](docs/decisions/) | Architecture decisions, with their rejected alternatives |
+| [`docs/guides/`](docs/guides/) | Accessibility and automations |
+| [`CLAUDE.md`](CLAUDE.md) | The context Claude Code sessions work from |
+| [`CHANGELOG.md`](CHANGELOG.md) | What's changed, one line per pull request |
 
-## Accesibilidad
+## Accessibility
 
-El listón es **EN 301 549, que remite a WCAG 2.1 nivel AA**, y es una decisión de alcance razonada en [`docs/guides/accessibility.md`](docs/guides/accessibility.md).
+The bar is **EN 301 549, which points to WCAG 2.1 level AA**, a scope decision reasoned through in [`docs/guides/accessibility.md`](docs/guides/accessibility.md).
 
-Lo que no depende de ese nivel se cumple igual: foco siempre visible, teclado completo, etiquetas reales, `prefers-reduced-motion`, móvil en horizontal y zoom al 200 %. Cada token de color lleva anotado su contraste medido, porque un token es una promesa y sin medirla se rompe en silencio.
+What doesn't depend on that level is met all the same: focus always visible, full keyboard support, real labels, `prefers-reduced-motion`, mobile landscape and 200% zoom. Every colour token carries its measured contrast, because a token is a promise, and one left unmeasured breaks silently.
