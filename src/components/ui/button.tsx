@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 import { Loader2 } from "lucide-react";
 
 type Variant = "primary" | "secondary" | "danger" | "room";
@@ -28,6 +28,9 @@ type Common = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className"> & {
   loading?: boolean;
   icon?: ReactNode;
   className?: string;
+  /** Declared rather than left to `...rest`: a caller that has to move focus
+   *  onto a button needs the type to allow the ref. */
+  ref?: Ref<HTMLButtonElement>;
 };
 
 /** An icon-only button must pass `label`: the type turns the most broken
