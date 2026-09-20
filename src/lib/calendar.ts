@@ -67,7 +67,8 @@ export async function eventsBetween(
     // with nothing.
     singleEvents: "true",
     orderBy: "startTime",
-    maxResults: "50",
+    // Enough for the three weeks the home screen browses; a day needs far less.
+    maxResults: "250",
   });
 
   const response = await fetch(`${CALENDAR}?${query}`, {

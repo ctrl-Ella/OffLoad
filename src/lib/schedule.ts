@@ -46,11 +46,11 @@ export function toStops(events: CalendarEvent[], personId: string): Stop[] {
 }
 
 /**
- * One core person's day. A Google failure does not take the screen down: it
- * is logged with its reason and comes back as `unavailable`, which the screen
- * knows how to tell.
+ * One core person's calendar between two instants. A Google failure does not
+ * take the screen down: it is logged with its reason and comes back as
+ * `unavailable`, which the screen knows how to tell.
  */
-export async function personDay(personId: string, day = todayInMadrid()): Promise<PersonDay> {
+export async function personEvents(personId: string, from: Date, to: Date): Promise<PersonDay> {
   const account = await db.googleAccount.findUnique({
     where: { personId },
     select: { refreshToken: true },
@@ -60,15 +60,26 @@ export async function personDay(personId: string, day = todayInMadrid()): Promis
 
   try {
     const token = await accessToken(account.refreshToken);
-    const { from, to } = dayRange(day);
 
     return { status: "ready", events: await eventsBetween(token, from, to) };
   } catch (error) {
     // No title and no place of any event: personal data, and this is a server log.
-    log.warn("schedule: could not read the day", { personId, day, reason: reason(error) });
+    log.warn("schedule: could not read the calendar", {
+      personId,
+      from: from.toISOString(),
+      to: to.toISOString(),
+      reason: reason(error),
+    });
 
     return { status: "unavailable" };
   }
+}
+
+/** One core person's day. */
+export async function personDay(personId: string, day = todayInMadrid()): Promise<PersonDay> {
+  const { from, to } = dayRange(day);
+
+  return personEvents(personId, from, to);
 }
 
 /** One core person's day, with their stops and their clashes. */
@@ -104,17 +115,26 @@ export type Lane = {
  * where there is only a family spread out.
  */
 export async function coreJourney(day = todayInMadrid(), onlyFor?: string): Promise<Lane[]> {
+  const { from, to } = dayRange(day);
+
+  return coreRange(from, to, onlyFor);
+}
+
+/**
+ * The same lanes over any range: what the home screen's calendar browses.
+ * Clashes are still found between consecutive stops, and across days the gap
+ * is hours long, so a range finds exactly the clashes each day would.
+ */
+export async function coreRange(from: Date, to: Date, onlyFor?: string): Promise<Lane[]> {
   const core = await db.person.findMany({
     where: onlyFor ? { id: onlyFor } : { circle: "CORE" },
     select: { id: true, name: true },
     orderBy: { name: "asc" },
   });
 
-  const { from, to } = dayRange(day);
-
   return Promise.all(
     core.map(async (person) => {
-      const theirDay = await personDay(person.id, day);
+      const theirDay = await personEvents(person.id, from, to);
 
       if (theirDay.status !== "ready") {
         return {
