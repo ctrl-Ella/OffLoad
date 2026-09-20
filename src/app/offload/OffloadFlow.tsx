@@ -45,6 +45,30 @@ const EMPTY_TRANSCRIPT_MESSAGE = "I didn't hear anything. Try again.";
 const TRANSCRIPTION_FAILED_MESSAGE =
   "I couldn't transcribe what you said. Try again.";
 const STRUCTURE_FAILED_MESSAGE = "I couldn't put that together. Try again.";
+const REQUEST_TIMED_OUT_MESSAGE = "That's taking too long. Try again.";
+
+// Generous on purpose: `/api/transcribe` polls SLNG's own batch job to
+// completion server-side before it responds at all, which alone can take up
+// to a minute (see that route). A short client timeout would fail calls
+// that are still genuinely working, not stuck.
+const REQUEST_TIMEOUT_MS = 90_000;
+
+function isTimeout(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
+/** `fetch`, but it gives up after `REQUEST_TIMEOUT_MS` instead of waiting
+ *  forever on a server that's stopped answering. Every caller distinguishes
+ *  this from an ordinary failure with `isTimeout`, so the person hears
+ *  "that's taking too long" instead of a generic error. */
+function fetchWithTimeout(input: RequestInfo, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  return fetch(input, { ...init, signal: controller.signal }).finally(() => {
+    clearTimeout(timeout);
+  });
+}
 
 function extensionForMimeType(mimeType: string): string {
   if (mimeType.includes("ogg")) return "ogg";
@@ -54,7 +78,7 @@ function extensionForMimeType(mimeType: string): string {
 }
 
 async function structurePlan(transcript: string): Promise<PlanItem[]> {
-  const response = await fetch("/api/structure-plan", {
+  const response = await fetchWithTimeout("/api/structure-plan", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ transcript }),
@@ -216,7 +240,7 @@ export function OffloadFlow({ person }: { person: SignedInPerson | null }) {
         const formData = new FormData();
         formData.append("audio", blob, `recording.${extensionForMimeType(mimeType)}`);
 
-        const response = await fetch("/api/transcribe", {
+        const response = await fetchWithTimeout("/api/transcribe", {
           method: "POST",
           body: formData,
         });
@@ -246,13 +270,13 @@ export function OffloadFlow({ person }: { person: SignedInPerson | null }) {
           const nextItems = await structurePlan(text);
           setItems(nextItems);
           setStatus("reviewing");
-        } catch {
+        } catch (error) {
           setStatus("error");
-          setErrorMessage(STRUCTURE_FAILED_MESSAGE);
+          setErrorMessage(isTimeout(error) ? REQUEST_TIMED_OUT_MESSAGE : STRUCTURE_FAILED_MESSAGE);
         }
-      } catch {
+      } catch (error) {
         setStatus("error");
-        setErrorMessage(TRANSCRIPTION_FAILED_MESSAGE);
+        setErrorMessage(isTimeout(error) ? REQUEST_TIMED_OUT_MESSAGE : TRANSCRIPTION_FAILED_MESSAGE);
       }
     };
 
