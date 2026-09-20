@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- The Nebius benchmark, in `bench/`: 36 real product cases, the five-model comparison from 2026-09-18 and the fourteen result files behind it, plus `npm run bench:transcribe` to turn the recorded sentences into transcripts through the product's own route. It arrives as a standalone npm package, with the three defects that blocked the voice measurement fixed.
 - Mia, the character, with her five states and her voice: the drawing on the door and on a `/system` reference page, her colour tokens, the SLNG synthesis call with its environment contract, and `npm run mia:say` to hear her from the command line.
 - Initial database migration: seven tables and the `Circulo` enum, generated with `migrate diff --from-empty` so the SQL could be reviewed before it was applied.
 - Production image and Railway deployment guide: a four-stage `Dockerfile` with an unprivileged user, `.dockerignore`, Next's `standalone` output and the `/api/health` route.
