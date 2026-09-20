@@ -25,9 +25,9 @@
     "bench:grounding": "npm run bench -- --suite grounding",
     "bench:voice": "npm run bench -- --suite intent --cases cases/intent-voice.json",
     "bench:transcribe": "node --experimental-strip-types --env-file=.env scripts/transcribe-bench-audio.ts",
-    "demo:sembrar": "node --experimental-strip-types --env-file=.env scripts/agenda-demo.ts sembrar",
-    "demo:borrar": "node --experimental-strip-types --env-file=.env scripts/agenda-demo.ts borrar",
-    "demo:ver": "node --experimental-strip-types --env-file=.env scripts/agenda-demo.ts ver"
+    "demo:seed": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts seed",
+    "demo:clear": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts clear",
+    "demo:show": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts show"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "3.0.48",
