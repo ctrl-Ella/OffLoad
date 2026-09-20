@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- The yes to «¿Llamo a alguno?» now leads somewhere: the screen that pressed **Call** lists the support network, pressing a name sends the same invitation spec 0009 sends for a spoken «invita a Marta», and the guest's video takes its place beside the other core person's instead of under it. The seed writes the support network's numbers, so an invitation can actually go out.
 - The yes that puts something on a calendar: what is dictated to Mia is saved as a capture, the review screen offers **Add to calendar** on the rows that really can go on one, and `POST /api/captures/[id]/confirm` writes the event and records the id Google gave it. Pressing twice books one afternoon, not two. Rule 1 enters `npm run test:guardrails`, checked on `confirmable` in `src/lib/captures.ts`.
 - A clash card leads somewhere: it links to that clash's day on `/conflict`, which now reads `?day=` instead of only ever looking at today.
 - The family calendar on the home screen shows what is on the core circle's real Google calendars, the week before and after this one, with today selected, the stops of a clash marked, and the foot saying whose calendar could be read. An expired Google grant is told apart from a Google that did not answer, and the button to connect again sits right there.
