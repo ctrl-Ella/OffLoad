@@ -1,0 +1,188 @@
+{
+  "description": "Sentences dictated out loud by members of the family, transcribed as they came out. They include filler words, self-corrections and sentences that trail off, because that is what a real dictation produces and it is where a small model breaks. The label values are the classifier's own vocabulary and stay in Spanish, as do the sentences themselves: the family speaks Spanish to Mia. EXCLUDES i21: no matching recording exists for this run (Voz 045.m4a was never recorded). n = 29 of 30. THIS FILE IS THE SPOKEN VERSION: every text is what SLNG transcribed from a recording of the sentence, through POST /api/transcribe, the same path the app uses. n = 29 of 29.",
+  "labels": [
+    "parada",
+    "recordatorio",
+    "nota",
+    "delegar",
+    "mover",
+    "consulta",
+    "compra"
+  ],
+  "cases": [
+    {
+      "id": "i01",
+      "text": "Mañana. El niño tiene piscina a las siete.",
+      "expected": "parada",
+      "audio": "Voz 025.m4a"
+    },
+    {
+      "id": "i02",
+      "text": "Recuérdame de llamar al dentista.",
+      "expected": "recordatorio",
+      "audio": "Voz 026.m4a"
+    },
+    {
+      "id": "i03",
+      "text": "Apunta que Carlos tiene que devolver el libro de la biblioteca.",
+      "expected": "nota",
+      "audio": "Voz 027.m4a"
+    },
+    {
+      "id": "i04",
+      "text": "Pregunta Carlos si puedes llevar el niño a la piscina.",
+      "expected": "delegar",
+      "audio": "Voz 028.m4a"
+    },
+    {
+      "id": "i05",
+      "text": "Modifica la reunión de las cinco a las siete.",
+      "expected": "mover",
+      "audio": "Voz 029.m4a"
+    },
+    {
+      "id": "i06",
+      "text": "Dime que tengo hoy.",
+      "expected": "consulta",
+      "audio": "Voz 030.m4a"
+    },
+    {
+      "id": "i07",
+      "text": "Añade leche y pan a la compra.",
+      "expected": "compra",
+      "audio": "Voz 031.m4a"
+    },
+    {
+      "id": "i08",
+      "text": "Eh? Pues mira, el jueves tengo médico a las 10:30.",
+      "expected": "parada",
+      "audio": "Voz 032.m4a"
+    },
+    {
+      "id": "i09",
+      "text": "No, espera. El jueves? No, el viernes. Médico a las 10:30.",
+      "expected": "parada",
+      "audio": "Voz 033.m4a"
+    },
+    {
+      "id": "i10",
+      "text": "Que no se me olvide de sacar las entradas.",
+      "expected": "recordatorio",
+      "audio": "Voz 034.m4a"
+    },
+    {
+      "id": "i11",
+      "text": "Oye, me puedes sacar un hueco esta semana que tengo que ir a comprar?",
+      "expected": "consulta",
+      "audio": "Voz 035.m4a"
+    },
+    {
+      "id": "i12",
+      "text": "Pon a Carlos que recoja a la niña el martes.",
+      "expected": "delegar",
+      "audio": "Voz 036.m4a"
+    },
+    {
+      "id": "i13",
+      "text": "Muevo lo del gimnasio a mañana, que hoy ya no llego.",
+      "expected": "mover",
+      "audio": "Voz 037.m4a"
+    },
+    {
+      "id": "i14",
+      "text": "Toma nota de que hay que renovar el abono de transporte.",
+      "expected": "nota",
+      "audio": "Voz 038.m4a"
+    },
+    {
+      "id": "i15",
+      "text": "Pollo, patatas y algo para el postre.",
+      "expected": "compra",
+      "audio": "Voz 039.m4a"
+    },
+    {
+      "id": "i16",
+      "text": "El sábado hay cumple en casa de Marta a las cinco.",
+      "expected": "parada",
+      "audio": "Voz 040.m4a"
+    },
+    {
+      "id": "i17",
+      "text": "Recuérdame antes de salir del trabajo.",
+      "expected": "recordatorio",
+      "audio": "Voz 041.m4a"
+    },
+    {
+      "id": "i18",
+      "text": "Carlos está libre el miércoles por la tarde.",
+      "expected": "consulta",
+      "audio": "Voz 042.m4a"
+    },
+    {
+      "id": "i19",
+      "text": "A ver si puede ir mi madre a por el niño el jueves.",
+      "expected": "delegar",
+      "audio": "Voz 043.m4a"
+    },
+    {
+      "id": "i20",
+      "text": "Lo del dentista. Pásalo a la semana que viene.",
+      "expected": "mover",
+      "audio": "Voz 044.m4a"
+    },
+    {
+      "id": "i22",
+      "text": "Que falta detergente.",
+      "expected": "compra",
+      "audio": "Voz 046.m4a"
+    },
+    {
+      "id": "i23",
+      "text": "Es que el lunes entro a las nueve en vez de a las ocho.",
+      "expected": "mover",
+      "audio": "Voz 047.m4a"
+    },
+    {
+      "id": "i24",
+      "text": "Extraescolar de inglés los martes de 6 a 7.",
+      "expected": "parada",
+      "audio": "Voz 048.m4a"
+    },
+    {
+      "id": "i25",
+      "text": "Qué me queda por hacer hoy?",
+      "expected": "consulta",
+      "audio": "Voz 049.m4a"
+    },
+    {
+      "id": "i26",
+      "text": "Dile a Carlos que ya que va al súper, se lleve el libro.",
+      "expected": "delegar",
+      "audio": "Voz 050.m4a"
+    },
+    {
+      "id": "i27",
+      "text": "Avísame media hora antes que se me pasa.",
+      "expected": "recordatorio",
+      "audio": "Voz 051.m4a"
+    },
+    {
+      "id": "i28",
+      "text": "Anota que hay que mirar campamentos de veranos en algún momento.",
+      "expected": "nota",
+      "audio": "Voz 052.m4a"
+    },
+    {
+      "id": "i29",
+      "text": "Compra papel de horno que se acabó ayer.",
+      "expected": "compra",
+      "audio": "Voz 053.m4a"
+    },
+    {
+      "id": "i30",
+      "text": "Pues nada, que el niño sale del cole a las cinco y no a las 04:30, como siempre.",
+      "expected": "mover",
+      "audio": "Voz 054.m4a"
+    }
+  ]
+}

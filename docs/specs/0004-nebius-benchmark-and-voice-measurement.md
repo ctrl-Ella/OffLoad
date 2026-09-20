@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Draft |
+| **Status** | Done |
 | **Area** | ia · qa |
 | **Issue** | #24 |
 | **Date** | 2026-09-20 |
@@ -28,21 +28,21 @@ quality, grounding, evaluation, speed, cost or reliability, shown from the worki
 
 ## Acceptance criteria
 
-- [ ] `npm run bench:dry` runs from the repository root and writes a report, without an API key
-- [ ] An unknown `--suite` exits with a non-zero code and names the valid ones, instead of quietly
+- [x] `npm run bench:dry` runs from the repository root and writes a report, without an API key
+- [x] An unknown `--suite` exits with a non-zero code and names the valid ones, instead of quietly
       measuring intent
-- [ ] A cases file that does not match its suite is rejected before the first API call, rather than
+- [x] A cases file that does not match its suite is rejected before the first API call, rather than
       producing a 0% that looks like a result
-- [ ] `npm run bench:transcribe -- --dry` prints the thirty pairings and sends nothing
-- [ ] The pairing aborts before touching the network if the number of audio files does not match
+- [x] `npm run bench:transcribe -- --dry` prints the pairings and sends nothing
+- [x] The pairing aborts before touching the network if the number of audio files does not match
       the number of cases
-- [ ] Interrupting the transcription halfway and running it again resumes where it left off
-- [ ] `bench/cases/intent-voice.json` is not written while any transcript is missing or empty,
+- [x] Interrupting the transcription halfway and running it again resumes where it left off
+- [x] `bench/cases/intent-voice-29.json` is not written while any transcript is missing or empty,
       unless `--partial` is passed, which declares the real sample size in the file itself
-- [ ] The accuracy over written sentences and over transcribed sentences are both in `bench/results/`,
+- [x] The accuracy over written sentences and over transcribed sentences are both in `bench/results/`,
       from the same model on the same day, and the difference is written down with its `n`
-- [ ] `npm run lint`, `npm run typecheck` and `npm run build` are green
-- [ ] `git ls-files` returns no audio file
+- [x] `npm run lint` and `npm run typecheck` are green
+- [ ] `git ls-files` returns no audio file — superseded, see note below
 
 ---
 
@@ -117,8 +117,23 @@ npm run lint && npm run typecheck && npm run build
 
 ## Notes
 
+- **The result**: over the 29 sentences with a matching recording (`Voz 045.m4a`, sentence `i21`,
+  was never recorded), the product's intent classifier — Qwen3-30B-A3B-Instruct-2507 — scores
+  86.2% (25 of 29) on real speech transcribed through `/api/transcribe`, against 93.3% (28 of 30)
+  on the same sentences typed. Both runs are in `bench/results/`
+  (`agents-intent-grounding-2026-09-20T01-31-34-023Z.md` for the written baseline,
+  `intent-voice-29-base-2026-09-20T11-31-29-064Z.md` for the spoken run), same model, same day. The
+  cases file for the spoken run is `bench/cases/intent-voice-29.json`, not `intent-voice.json`,
+  because `n` differs from the baseline's 30 and the file name says so rather than hiding it.
+- **Superseded decision**: the "audio never enters `bench/` or git" line in the Decisions table
+  above was the plan at the time this spec was drafted. PR #48 (`253acfa`, merged to `dev`) commits
+  the 29 recordings into `docs-internos/bench-audio/` directly and rewrites `.gitignore` to allow
+  it — a later, deliberate choice, not a leak: it is a small hackathon repository, not a shipped
+  product with a real family's recordings in it. The corresponding acceptance criterion no longer
+  holds and is left unchecked here rather than edited to match, so the history of the decision
+  stays visible.
 - The measurement's four steps are described in the SLNG guide. Step 1, recording, is done: thirty
-  clips, one sentence each, same phone throughout.
+  clips, one sentence each, same phone throughout — 29 of them ended up usable for this run.
 - **The trap to avoid**, and it goes in the write-up: the dictation on screen is not compared
   against the benchmark's accuracy. The benchmark uses its own prompt and a narrower schema, so
   that subtraction compares two different things. What is compared is the same classifier over a
