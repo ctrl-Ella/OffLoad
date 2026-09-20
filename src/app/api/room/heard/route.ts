@@ -55,7 +55,18 @@ const MAX_LINES = 200;
 const ALREADY_WOKEN = new Set<string>();
 
 export async function POST(request: Request) {
-  const person = await currentPerson();
+  let person: Awaited<ReturnType<typeof currentPerson>>;
+
+  // Reading who you are is a query, and a database that is down throws rather
+  // than answering nobody. Uncaught it would leave a caption with no answer and
+  // no line in the log, which is the failure this route exists to make visible.
+  try {
+    person = await currentPerson();
+  } catch (error) {
+    log.error("listening: could not tell who is asking", { reason: reason(error) });
+
+    return NextResponse.json({ error: "could not process" }, { status: 503 });
+  }
 
   if (!person) {
     return NextResponse.json({ error: "not signed in" }, { status: 401 });

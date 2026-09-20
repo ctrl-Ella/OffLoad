@@ -27,6 +27,10 @@ export type WaitingForTheCall = {
  * The run waiting for people to talk, if there is one. The most recent: a
  * weekend of rehearsals leaves stopped runs behind, and waking the oldest
  * would be answering a conversation from an hour ago.
+ *
+ * A store that cannot be read throws from here instead of answering null. Both
+ * callers catch it, and "nothing is waiting" is an answer Mia acts on: it is
+ * not the same as not having been able to look.
  */
 export async function runWaitingForTheCall(): Promise<WaitingForTheCall | null> {
   const workflow = mastra.getWorkflow("resolveConflict");
@@ -94,9 +98,9 @@ async function look(personId: string): Promise<void> {
     // before anyone has opened their mouth.
     const old = await workflow.listWorkflowRuns({ status: "suspended", page: 0, perPage: MAX_RUNS });
 
-    for (const run of old.runs) {
-      await workflow.deleteWorkflowRunById(run.runId);
-    }
+    // Together and not one after another: this is on the way into the room,
+    // and a weekend of rehearsals can leave fifty runs to clear.
+    await Promise.all(old.runs.map((run) => workflow.deleteWorkflowRunById(run.runId)));
 
     if (old.runs.length > 0) {
       log.info("listening: earlier conversations discarded", { count: old.runs.length });
