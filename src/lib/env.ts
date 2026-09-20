@@ -50,6 +50,17 @@ const schema = z.object({
    */
   VERIFICATION_PEPPER: z.string().min(32).optional(),
 
+  /** Nebius Token Factory: all the reasoning, at two tiers. The key is
+   *  optional for the same reason as the rest; the model identifiers have no
+   *  default in code because Nebius retires checkpoints without redirecting
+   *  traffic, and a name written here expires without warning. */
+  NEBIUS_API_KEY: z.string().min(1).optional(),
+  NEBIUS_BASE_URL: z.url().default("https://api.tokenfactory.nebius.com/v1"),
+  /** The interpreter's model: cheap extraction. */
+  NEBIUS_MODEL_SMALL: z.string().min(1).optional(),
+  /** The negotiator's model: the one that chooses whom to ask. */
+  NEBIUS_MODEL_LARGE: z.string().min(1).optional(),
+
   /** SLNG, which is what Mia says. Optional for the same reason as the rest:
    *  `next build` needs no secrets, and everything else works without a voice. */
   SLNG_API_KEY: z.string().min(1).optional(),
@@ -242,6 +253,37 @@ export function requireVerifyCredentials(): VerifyCredentials {
   }
 
   return { applicationId, privateKeyPath, publicUrl, pepper };
+}
+
+/** The model key, demanded right before an agent is invoked, not at start-up. */
+export function requireModelKey(): string {
+  if (!env.NEBIUS_API_KEY) {
+    throw new Error(
+      "NEBIUS_API_KEY is missing from .env. The agents cannot answer without it: " +
+        "it comes from tokenfactory.nebius.com, under API keys.",
+    );
+  }
+
+  return env.NEBIUS_API_KEY;
+}
+
+/**
+ * The model of one tier, by its variable name. If it is missing the error
+ * says WHICH: "the agent does not answer" cannot be fixed, "NEBIUS_MODEL_LARGE
+ * is missing" can. The live catalogue:
+ *   curl -H "Authorization: Bearer $NEBIUS_API_KEY" $NEBIUS_BASE_URL/models
+ */
+export function requireModel(variable: "NEBIUS_MODEL_SMALL" | "NEBIUS_MODEL_LARGE"): string {
+  const id = env[variable];
+
+  if (!id) {
+    throw new Error(
+      `${variable} is missing from .env. It comes from Nebius's live catalogue, which changes: ` +
+        `curl -H "Authorization: Bearer $NEBIUS_API_KEY" ${env.NEBIUS_BASE_URL}/models`,
+    );
+  }
+
+  return id;
 }
 
 export type MiaVoice = {

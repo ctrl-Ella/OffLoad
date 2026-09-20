@@ -4,6 +4,7 @@ import { log, reason } from "@/lib/log";
 import { householdRoom } from "@/lib/room";
 import { currentPerson } from "@/lib/session";
 import { sessionToken, startCaptions } from "@/lib/video";
+import { letHerLookAtTheDay } from "@/mastra/workflows/listening";
 
 /**
  * The key to the room, for whoever is already in the house.
@@ -47,6 +48,12 @@ export async function GET() {
     // the second time Vonage answers they were already on — and it runs in
     // `after()` so joining does not wait for it.
     after(() => startCaptions(sessionId));
+
+    // And have her look at the day, if she has not already. Without this,
+    // whoever enters the room without having dictated anything meets a Mia
+    // who has no idea of their day: she hears them and has nothing to say,
+    // because no clash was found. Only starts one if none is waiting.
+    after(() => letHerLookAtTheDay(person.id));
 
     log.info("room: key handed over", { personId: person.id });
 

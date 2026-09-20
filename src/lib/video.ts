@@ -143,6 +143,41 @@ export async function startCaptions(sessionId: string): Promise<void> {
 }
 
 /**
+ * Tells whoever is in the room there is something new to look at.
+ *
+ * The signal carries no content, only the notice: the proposal's text
+ * travels over HTTP with each person's session in front, because the body of
+ * a signal reaches every participant, and a card carries whose doctor's
+ * appointment is at what time. Not arriving is not a failure: there is no
+ * delivery confirmation, an empty room answers 404, and under this there is a
+ * poll showing the same thing a few seconds later. So it never throws.
+ */
+export async function sendSignal(sessionId: string, type: string, data: string): Promise<void> {
+  try {
+    const { privateKey, applicationId, videoBase } = requireVideoCredentials();
+
+    const response = await fetch(
+      `${videoBase}/v2/project/${applicationId}/session/${sessionId}/signal`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${applicationJwt(applicationId, privateKey)}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type, data }),
+      },
+    );
+
+    // 404 is the empty room, which is normal outside a call.
+    if (!response.ok && response.status !== 404) {
+      log.warn("room: the signal did not go out", { type, status: response.status });
+    }
+  } catch (error) {
+    log.warn("room: the signal did not go out", { type, reason: reason(error) });
+  }
+}
+
+/**
  * Whether anyone is publishing in the room right now.
  *
  * Vonage is asked, not a flag of ours: marking "call open" when someone joins

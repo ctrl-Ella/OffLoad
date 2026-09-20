@@ -19,6 +19,13 @@ import type { Coordinates } from "@/lib/conflicts";
  * "Mercadona" is not here on purpose: there are dozens in the city and picking
  * one would be guessing. Without coordinates no travel time is claimed, which
  * is the right answer for a place that could be anywhere.
+ *
+ * The first eight are the household's own places, the ones the interpreter's
+ * prompt names — "tiene piscina" happens at the Piscina, "recoger al niño" at
+ * the Colegio — and two of their distances are not decorative: Elvia's work
+ * and the pool are at opposite ends of the city, more than nine kilometres at
+ * city speed, so that leaving at 18:30 does not reach 19:00. With the two
+ * close together Mia would detect nothing and the scene would not exist.
  */
 
 export type Place = {
@@ -28,6 +35,17 @@ export type Place = {
 };
 
 export const PLACES: readonly Place[] = [
+  { name: "Casa", coordinates: { lat: 41.4036, lon: 2.156 } },
+  { name: "Colegio", coordinates: { lat: 41.4058, lon: 2.1601 } },
+  // Zona Franca, to the south-west.
+  { name: "Trabajo de Elvia", coordinates: { lat: 41.352, lon: 2.133 } },
+  // Poblenou, to the east.
+  { name: "Trabajo de Carlos", coordinates: { lat: 41.404, lon: 2.199 } },
+  // Nou Barris, to the north: the far end from Zona Franca.
+  { name: "Piscina", coordinates: { lat: 41.44, lon: 2.178 } },
+  { name: "Biblioteca", coordinates: { lat: 41.4021, lon: 2.1553 } },
+  { name: "Supermercado", coordinates: { lat: 41.4004, lon: 2.1541 } },
+  { name: "Gimnasio", coordinates: { lat: 41.393, lon: 2.164 } },
   { name: "Carrer de Sants 42", coordinates: { lat: 41.376, lon: 2.142 } },
   { name: "Clínica Bonanova", coordinates: { lat: 41.406, lon: 2.129 } },
   { name: "Club Esportiu Sants", coordinates: { lat: 41.3745, lon: 2.128 } },

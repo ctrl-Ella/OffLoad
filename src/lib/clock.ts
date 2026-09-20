@@ -22,6 +22,23 @@ export function todayInMadrid(now = new Date()): string {
 }
 
 /**
+ * The household's offset ON THAT DAY, as `+02:00`, not today's. Written by
+ * hand it works all summer and breaks on the last Sunday of October, when
+ * nobody is looking.
+ */
+export function zoneOffset(day: string): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: ZONE,
+    timeZoneName: "longOffset",
+  }).formatToParts(new Date(`${day}T12:00:00Z`));
+
+  const name = parts.find((part) => part.type === "timeZoneName")?.value;
+
+  // Comes as `GMT+02:00`. In winter Madrid is `GMT` alone, with no offset written.
+  return name?.replace("GMT", "") || "+00:00";
+}
+
+/**
  * The two instants a local day runs between. Computed through the zone and
  * not with a written `+02:00`: Madrid is `+01:00` half the year, and a fixed
  * offset would shift every winter day by an hour.

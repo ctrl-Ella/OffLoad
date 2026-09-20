@@ -13,7 +13,7 @@
 
 Mia's whole job is finding what does not fit in a day and, when a yes or a no will not settle it, getting the two people who can settle it in front of each other. Today the product can read a calendar and it can draw Mia, and it does neither of those two things: there is no arithmetic that says two stops clash, no screen that shows one, and no room to talk it through in.
 
-The internal prototype has all three, and they are built on the rule that decides almost everything: a clash changes someone's plans, so Mia shows it and asks, and the call is the exception she never opens on her own. Bringing them over is not a copy. The prototype's identifiers, tokens and copy are Spanish, its design system is a different one, and half of what its room does — Mia's proposal, her voice, the yes-or-no card — leans on a workflow that does not exist here yet.
+The internal prototype has all three, and they are built on the rule that decides almost everything: a clash changes someone's plans, so Mia shows it and asks, and the call is the exception she never opens on her own. Bringing them over is not a copy. The prototype's identifiers, tokens and copy are Spanish, its design system is a different one, and half of what its room does — Mia's proposal, her voice, the yes-or-no card — leans on the `resolveConflict` workflow, which arrives with this spec because the room does not stand without it.
 
 ---
 
@@ -42,6 +42,16 @@ The internal prototype has all three, and they are built on the rule that decide
 - [ ] Microphone, camera and the call's sound can each be switched off on their own, and hanging up releases the camera
 - [ ] Live captions in Spanish appear under the tiles as people speak, and Mia's tile reads "Escuchando" only once the first caption has arrived
 - [ ] Whoever did not open the call sees on `/` that the other person did, with a link in, and the notice goes away by itself when the room empties
+
+### Mia inside the call
+
+- [ ] Handing over the room's key starts one run that reads both calendars and stops at the clash, waiting for the call. A second person joining starts no second run
+- [ ] Mia stays quiet while one person has said they cannot; once both have, her tile reads "Pide la palabra" and a button to give her the floor appears
+- [ ] Pressing it plays her clip; her tile reads "Hablando" only while it plays, and the two buttons appear only when it ends. Without a clip the buttons appear anyway
+- [ ] The proposal names someone in the core only if their calendar was read and is free in the slot; of the support network she says they exist and asks whether to call, never that they are free. `npm run test:guardrails` holds that with code
+- [ ] Either core person answers; the run resumes at the step it stopped and the card leaves both screens. A "no" from the partner brings the question about the network to whoever started
+- [ ] No log line carries a caption, a proposal's text or a name from the support network
+- [ ] Missing `NEBIUS_API_KEY`, `NEBIUS_MODEL_SMALL` or `NEBIUS_MODEL_LARGE` fails naming the variable, when the agent is called and not at start-up
 - [ ] Every colour on the room is a token in `tokens.css` with its measured contrast beside it
 - [ ] `npm run typecheck`, `npm run lint`, `npm run test:unit` and `npm run build` pass
 
@@ -55,17 +65,21 @@ The internal prototype has all three, and they are built on the rule that decide
 
 **The room**: `src/lib/video.ts` for Vonage (session, tokens, captions, who is inside), `src/lib/room.ts` for the one stored room, the two routes under `/api/room`, the `useRoom` hook, the `Room` component and the `/call` screen. **The `room-*` tokens** and two `Button` variants, `danger` and `room`.
 
-**The environment**: the four video variables read by `requireVideoCredentials()`. They were already in `.env.example`; the schema now reads them.
+**The workflow**, `src/mastra/`: the one Mastra instance with its store in the `mastra` schema; the two agents, `interpreter` on the small tier and `negotiator` on the large one, with rule 3 in `agents/support-network.ts` as code that imports only Zod; and `resolveConflict`, seven steps in `workflows/resolve-conflict.ts` — interpret, read the calendars, detect the clash, listen to the call, propose, ask the partner, ask whether to call — with the case file, the card and the date border in their own modules. `workflows/proposals.ts` reads the open question out of the suspended runs, `workflows/listening.ts` starts a run when the room's key is handed over and wakes it when both have said no, and `mastra/listening.ts` is the deterministic rule for that moment.
+
+**Mia in the room**: `/api/room/heard` receives every final caption and decides whether she speaks, `/api/room/proposal` is what is on the table, `/api/room/voice` is her clip, `/api/proposals/[runId]/answer` resumes the run, and the Vonage signal that tells both screens to look again. The room polls, downloads the clip as soon as she raises her hand, plays it only when someone gives her the floor, and shows the two buttons when it ends.
+
+**The environment**: the four video variables and the four Nebius ones, read by `requireVideoCredentials()`, `requireModelKey()` and `requireModel()`.
+
+**The places table** gains the household's own eight places, the ones the interpreter's prompt names.
 
 ---
 
 ## Out of scope
 
-**Mia's proposal inside the call, her voice, and the yes-or-no card.** In the prototype the room polls for the open proposal, fetches its clip, and shows the two buttons when the clip ends. All of that reads a suspended run. There is no workflow here yet, and a room that showed a card with nothing behind it would announce something that is not true. Mia's tile stays: it listens, and it says so once the captions prove it.
+**Starting a run from dictation.** The prototype's `/api/conflicto` takes the transcript of a brain dump and starts the workflow with it; here the voice flow has its own extraction route and does not start a run. The workflow's first step keeps the interpreter and the capture saving, so wiring the two is one route. Until then a run only starts when the room's key is handed over, with empty text.
 
-**Sending what is heard to Mia.** The captions are shown; nothing is posted anywhere. The hand-off to the interpreter is the workflow's first step and arrives with it.
-
-**The signal that wakes the room** when a proposal lands. Same reason: there is nothing to signal.
+**Showing pending proposals outside the call.** `openProposalsFor()` exists for it; the screen that lists them belongs to the day's journey, which is not built.
 
 **The SIP leg for Nicolás.** The room is created `routed` so it can take one; the leg itself is the call lane's next piece.
 
@@ -93,6 +107,13 @@ The internal prototype has all three, and they are built on the rule that decide
 | Its own dark tokens, `room-*`, not the immersive ones | Reusing `surface-immersive` | The immersive surface is the brand's onyx worn as a background. A room wants a neutral stage that stays out of the way of skin tones, and it is dark for a different reason |
 | Two `Button` variants, `danger` and `room` | Overriding classes at the call site | A hover to white on the dark canvas swallows the light ink. A variant measured once beats a class fought over at every use |
 | The interface text of these screens is English | Spanish, as the root rules say the family's screens are | The port was asked for in English, and the voice flow already carries the same exception. Mia's own labels stay Spanish, since they are her contract from spec 0003. This is the one open question below |
+| Mia speaks only once both have said they cannot, decided by a list of refusals and not by a model | Waking her when the clash is named, or asking a third model whether to speak | Waking her on the clash's name put her in the middle of the negotiation repeating what had just been said. When to speak is a decision, and the thesis is that the workflow decides. The list misses a no said without saying no, and that is written down |
+| The run reads the day through `coreJourney`, captures included | Reading Google again inside the workflow, as the prototype did | One read path for the screen and for the run means the clash on `/conflict` is the clash Mia talks about. The capture that opened the run is already in the lanes, so the workflow no longer carries it separately |
+| The interpreter's seven labels are the English ones `Capture.kind` documents | The prototype's Spanish labels, which the benchmark measured | The schema comment is this repository's contract, and the benchmark already had a pending re-run because the output shape changed. Both are one more reason to run it again, and that goes in the notes |
+| The negotiator's decisions are `propose`, `call`, `no-way-out` and the empty person is `nobody` | The prototype's Spanish values | Values a program branches on are identifiers, and identifiers are English by the root rules. What the model reads about them stays Spanish, in the descriptions |
+| The prompts, the card's text and the button labels are Spanish | English, like the room's chrome | The prompts are what the models were measured on, and the card is what Mia says out loud. Her voice is Spanish by the root rules |
+| The model is an AI SDK provider instance, and the identifier has no `nebius/` prefix | Mastra's own router with `nebius/…` strings | The router does not list Nebius. The prefix is the router's convention; on a provider instance it would be part of the model id and fail. `supportsStructuredOutputs` on that instance is what turns constrained decoding on |
+| The transcript of a call lives in memory on the server | Storing the lines | A call lasts three minutes and a restart cuts it anyway. What survives is the decision, which goes to the run. Nothing of the text is logged |
 
 ---
 
@@ -121,8 +142,18 @@ function coreJourney(day?: string, onlyFor?: string): Promise<Lane[]>;
 
 | Route | Answers |
 |---|---|
-| `GET /api/room` | `{ applicationId, sessionId, token }` for the core; 401, 403, 502 or 503 with a reason |
+| `GET /api/room` | `{ applicationId, sessionId, token }` for the core; 401, 403, 502 or 503 with a reason. Starts a run if none waits |
 | `GET /api/room/status` | `{ inCall: boolean, who: string \| null }`; `inCall: false` to the support network |
+| `POST /api/room/heard` | `{ text, who, force? }` → `{ speaks: boolean, why, because? }` |
+| `GET /api/room/proposal` | `{ proposal: { runId, question, detail, yesLabel, noLabel, recipientName, forYou } \| null }` |
+| `GET /api/room/voice` | `audio/wav` of the open proposal; 404 with nothing to say; 502 when SLNG fails |
+| `POST /api/proposals/[runId]/answer` | `{ accepts: boolean }` → 202; 409 when the question is no longer open; 403 outside the core |
+
+**The card**, `cardSchema`, frozen once the first full rehearsal runs: it is serialised inside the run's snapshot.
+
+```ts
+{ recipientId; recipientName; question; detail; yesLabel; noLabel }
+```
 
 **Environment**, already in `.env.example`:
 
@@ -131,9 +162,13 @@ VONAGE_APPLICATION_ID=                          # the video application, not Ver
 VONAGE_PRIVATE_KEY_PATH=./private.key           # local
 VONAGE_PRIVATE_KEY=                             # Railway: escaped newlines or base64. Wins over the path
 VONAGE_VIDEO_BASE=https://video.api.vonage.com  # never api.opentok.com
+NEBIUS_API_KEY=
+NEBIUS_MODEL_SMALL=                             # the interpreter. No default in code
+NEBIUS_MODEL_LARGE=                             # the negotiator. No default in code
+NEBIUS_BASE_URL=https://api.tokenfactory.nebius.com/v1
 ```
 
-**Command**: `npm run test:unit`.
+**Commands**: `npm run test:unit`, `npm run test:guardrails`.
 
 ---
 
@@ -154,6 +189,12 @@ npm run dev
 8. Open the app over the network address of the machine, `http://192.168…`, and press "Join the room": the sentence says https or localhost is needed, before anything is downloaded.
 9. Tab through `/conflict` and `/call`: every control shows the focus ring, the icon-only buttons announce their action and whether they are pressed, and hanging up is reachable in phone landscape without scrolling past it.
 10. Sign in as someone from the support network: `/call` answers 404 and `/api/room/status` answers `inCall: false`.
+11. With a clash on Elvia's day, both join the room. The log shows one run reading the calendars and stopping at "waiting for the call", and only one even though two people joined. Mia reads "Escuchando" and no button appears.
+12. Carlos says "es que yo a esa hora no puedo". Nothing changes. Elvia says "yo tampoco". Within a few seconds Mia reads "Pide la palabra" on both screens and the button to give her the floor appears.
+13. Press it. She speaks in Silvia's voice, her tile reads "Hablando" while the clip plays, and when it ends the two buttons appear with the card's own labels. Turn the call's sound off before pressing: she is still heard.
+14. Press the declining button on either screen. The card leaves both screens; if the network exists in `people`, the next card asks whoever started whether to call, naming them and never saying they are free.
+15. Read the terminal output of steps 11 to 14: no caption, no proposal text and no support-network name appears in any line.
+16. Empty `NEBIUS_MODEL_LARGE` and repeat step 12: the run fails at the proposing step with a message naming the variable, the call goes on, and the room shows no card.
 
 ---
 
@@ -166,6 +207,10 @@ npm run dev
 **The places table is the QA lane's to own.** Its coordinates are neighbourhood level and say so. "Mercadona" is left out on purpose: there are dozens, and picking one would be guessing.
 
 **Open question: the language of these screens.** The root rules say the family's screens are Spanish, and the home screen, the door and Mia's labels are. The voice flow is English by a confirmed decision, and this port was asked for in English. Both now sit on the same home screen. Whichever way it is settled, it is one pass over four files and it should be settled before the demo.
+
+**The support network has to exist in `people` with `circle = SUPPORT`.** The negotiator reads it from there, and the seed writes only the core. Without Nicolás, Rosa and Marta in the table, Mia never asks whether to call anyone: whoever rehearses adds them first, or the seed gains them.
+
+**The benchmark has to run again** before any accuracy figure is quoted: the intent labels are now English and the output shape had already changed since the last measurement.
 
 **Open question: the label under Mia in the room** reads "Callada" and "Escuchando" on an English screen, because `MIA_LABELS` is her contract from spec 0003 and this spec does not touch it.
 

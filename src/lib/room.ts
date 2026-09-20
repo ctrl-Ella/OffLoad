@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { log } from "@/lib/log";
-import { createSession } from "@/lib/video";
+import { createSession, sendSignal } from "@/lib/video";
 
 /**
  * The household's room: the same one for the whole core circle, created once.
@@ -27,6 +27,21 @@ export async function openRoom(): Promise<string | null> {
   const stored = await db.room.findUnique({ where: { key: HOUSEHOLD_KEY } });
 
   return stored?.sessionId ?? null;
+}
+
+/**
+ * Tell whoever is inside there is something new to look at. Only the run's
+ * identifier travels; what has to be read is fetched by its route, with each
+ * person's session in front. Never throws: without a room, with nobody
+ * inside or with Vonage slow, the screen's poll shows the same card a few
+ * seconds later.
+ */
+export async function notifyRoom(runId: string): Promise<void> {
+  const sessionId = await openRoom();
+
+  if (!sessionId) return;
+
+  await sendSignal(sessionId, "proposal", JSON.stringify({ runId }));
 }
 
 export async function householdRoom(): Promise<string> {

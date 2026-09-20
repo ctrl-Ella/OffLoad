@@ -26,6 +26,8 @@ type Options = {
   theirSlot: React.RefObject<HTMLDivElement | null>;
   /** What to do with each transcribed line, theirs and my own. */
   onCaption?: (text: string, who: string, isFinal: boolean) => void;
+  /** What to do when the room signals there is something new to look at. */
+  onSignal?: () => void;
 };
 
 /**
@@ -108,7 +110,7 @@ function loadSdk(): Promise<typeof OT> {
   return sdk;
 }
 
-export function useRoom({ mySlot, theirSlot, onCaption }: Options) {
+export function useRoom({ mySlot, theirSlot, onCaption, onSignal }: Options) {
   const [status, setStatus] = useState<RoomStatus>("outside");
   const [failure, setFailure] = useState<string | null>(null);
   const [accompanied, setAccompanied] = useState(false);
@@ -130,10 +132,12 @@ export function useRoom({ mySlot, theirSlot, onCaption }: Options) {
   // In a ref so changing the handler does not rebuild the whole connection.
   // Updated in an effect and not during render.
   const caption = useRef(onCaption);
+  const signal = useRef(onSignal);
 
   useEffect(() => {
     caption.current = onCaption;
-  }, [onCaption]);
+    signal.current = onSignal;
+  }, [onCaption, onSignal]);
 
   /** Release the camera, and really release it: otherwise the recording light stays on after hanging up. */
   const leave = useCallback(() => {
@@ -231,6 +235,8 @@ export function useRoom({ mySlot, theirSlot, onCaption }: Options) {
         setStatus("outside");
         setAccompanied(false);
       });
+
+      theSession.on("signal:proposal", () => signal.current?.());
 
       setStatus("joining");
 
