@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Draft |
 | **Area** | frontend · backend · video |
-| **Issue** | #25 |
+| **Issue** | #33 |
 | **Date** | 2026-09-20 |
 
 ---
@@ -223,5 +223,3 @@ npm run dev
 The two intent misses are judgement calls the earlier benchmark also lost: "A ver si puede ir mi madre a por el niño" read as a question instead of a delegation, and "la profe dijo que hay reunión pronto, sin fecha" read as a reminder instead of a note. Both are one label away and neither puts a time on anyone's calendar.
 
 Two things the first run of the day found, and both changed the code rather than the report. The interpreter's schema demanded `title`, `place` and `when` on every intent, and on questions — "¿qué me queda por hacer hoy?" — the small model left them out, which turned three sentences into failed runs with the whole dump lost: the model now gets a schema where every field but `kind` may be missing, and `interpretDump` fills the gaps with the sentinel or the sentence itself. And neither agent set a temperature, so both ran at the provider's default: the negotiator scored 4 of 6 and took 14 seconds per case, and with temperature zero — what the benchmark had always measured with — it scored 6 of 6 in 3 seconds. The first run is kept in `bench/results/` next to the last so the difference can be checked.
-
-**The issue number is provisional.** The branch and this spec carry #25; if the issue lands with another number, both are renamed before the pull request.
