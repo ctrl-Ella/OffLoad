@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Status** | Draft |
+| **Status** | Implemented |
 | **Area** | backend · video |
-| **Issue** | #NN |
+| **Issue** | #43 |
 | **Date** | 2026-09-20 |
 
 ---

@@ -32,7 +32,7 @@ export function AppNavigation({ person }: Readonly<{ person: SignedInPerson | nu
             own background is already the one that menu's white card and
             `Button`'s `secondary` variant are calibrated for. */}
         {person ? (
-          <details className="relative">
+          <details className="relative ml-auto">
             <summary
               aria-label="Your profile"
               className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-control text-ink-muted hover:bg-white [&::-webkit-details-marker]:hidden"
