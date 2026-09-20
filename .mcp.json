@@ -7,6 +7,10 @@
     "vonage-docs": {
       "type": "http",
       "url": "https://documentation-mcp.vonage.dev/mcp"
+    },
+    "norma": {
+      "type": "http",
+      "url": "https://api.qualityclouds.ai/mcp"
     }
   }
 }

@@ -58,6 +58,14 @@ next-env.d.ts
 # datos locales de Docker por si alguien monta el volumen en el repo
 /docker/data
 
+# el banco es un paquete npm aparte, con sus propias dependencias
+/bench/node_modules
+
+# los audios del banco son voz de una persona real: viaja la transcripcion
+*.m4a
+*.wav
+*.webm
+
 # --- credenciales en forma de archivo ---
 # La clave privada de Vonage se descarga como archivo .key y acaba, por
 # defecto, en la carpeta del proyecto. El repositorio es publico: un .key
