@@ -20,21 +20,21 @@ export default function HomePage() {
       <main id="content">
         <section className="presentation-hero" aria-labelledby="presentation-title">
           <div className="presentation-hero-copy">
-            <span className="presentation-eyebrow"><span /> TU DÍA, MÁS LIGERO</span>
+            <span className="presentation-eyebrow"><span /> A LIGHTER DAY</span>
             <TypingHeadline />
             <div className="presentation-actions">
-              <Link className="presentation-button presentation-button-primary" href="/offload"><Mic2 size={18} aria-hidden="true" /> Soltar una nota de voz</Link>
-              <a className="presentation-button presentation-button-outline" href="#agenda">Ver calendario <ArrowRight size={18} aria-hidden="true" /></a>
+              <Link className="presentation-button presentation-button-primary" href="/offload"><Mic2 size={18} aria-hidden="true" /> Leave a voice note</Link>
+              <a className="presentation-button presentation-button-outline" href="#agenda">View calendar <ArrowRight size={18} aria-hidden="true" /></a>
             </div>
           </div>
           <div className="presentation-hero-art">
             <div className="presentation-orbit presentation-orbit-one" />
             <div className="presentation-orbit presentation-orbit-two" />
             <div className="presentation-mascot">
-              <Image className="presentation-mascot-animated" src="/mia-blink.gif" alt="Mia, la asistente de Offload, parpadeando" width={360} height={400} unoptimized priority />
-              <Image className="presentation-mascot-still" src="/mia-still.png" alt="Mia, la asistente de Offload" width={360} height={400} priority />
+              <Image className="presentation-mascot-animated" src="/mia-blink.gif" alt="Mia, Offload's assistant, blinking" width={360} height={400} unoptimized priority />
+              <Image className="presentation-mascot-still" src="/mia-still.png" alt="Mia, Offload's assistant" width={360} height={400} priority />
             </div>
-            <span className="presentation-note presentation-note-top"><Sparkles size={16} aria-hidden="true" /> Hola, soy Mia</span>
+            <span className="presentation-note presentation-note-top"><Sparkles size={16} aria-hidden="true" /> Hi, I&apos;m Mia</span>
           </div>
         </section>
 
