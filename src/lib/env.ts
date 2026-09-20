@@ -80,6 +80,11 @@ const schema = z.object({
   TEST_PHONE_CARLOS: z.string().min(1).optional(),
   TEST_EMAIL_ELVIA: z.string().min(1).optional(),
   TEST_EMAIL_CARLOS: z.string().min(1).optional(),
+  /** The support network. Numbers and no addresses: outside the core nobody
+   *  connects a Google account, which is the difference between the circles. */
+  TEST_PHONE_NICOLAS: z.string().min(1).optional(),
+  TEST_PHONE_ROSA: z.string().min(1).optional(),
+  TEST_PHONE_MARTA: z.string().min(1).optional(),
 
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });

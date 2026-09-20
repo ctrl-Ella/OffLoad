@@ -20,12 +20,19 @@ import { giveMiaTheFloor, runWaitingForTheCall } from "@/mastra/workflows/listen
  * Nothing of the text is logged: it is a couple's conversation.
  */
 
-const requestSchema = z.object({
-  text: z.string().min(1, "something has to have been said").max(2000),
-  who: z.string().min(1).max(200).describe("The stream it came from, so it is not counted twice"),
-  // Set by a manual "give her the floor", the net under the automatic trigger.
-  force: z.boolean().optional(),
-});
+const requestSchema = z
+  .object({
+    text: z.string().max(2000),
+    who: z.string().min(1).max(200).optional().describe("The stream it came from, so it is not counted twice"),
+    // Set by a manual "give her the floor", the net under the automatic trigger.
+    force: z.boolean().optional(),
+  })
+  // Asking her to step in is a press, not something said: it carries neither a
+  // line nor a stream. Anything else has to carry both.
+  .refine((body) => body.force === true || (body.text.length > 0 && body.who !== undefined), {
+    message: "something has to have been said, and by someone",
+    path: ["text"],
+  });
 
 /**
  * What was said in each room, without repeats and without losing who said it.
@@ -48,7 +55,18 @@ const MAX_LINES = 200;
 const ALREADY_WOKEN = new Set<string>();
 
 export async function POST(request: Request) {
-  const person = await currentPerson();
+  let person: Awaited<ReturnType<typeof currentPerson>>;
+
+  // Reading who you are is a query, and a database that is down throws rather
+  // than answering nobody. Uncaught it would leave a caption with no answer and
+  // no line in the log, which is the failure this route exists to make visible.
+  try {
+    person = await currentPerson();
+  } catch (error) {
+    log.error("listening: could not tell who is asking", { reason: reason(error) });
+
+    return NextResponse.json({ error: "could not process" }, { status: 503 });
+  }
 
   if (!person) {
     return NextResponse.json({ error: "not signed in" }, { status: 401 });
@@ -88,7 +106,9 @@ export async function POST(request: Request) {
     const { runId } = waiting;
     const said = SAID.get(runId) ?? new Map<string, Utterance>();
 
-    if (said.size < MAX_LINES) said.set(`${who}: ${text}`, { who, text });
+    // An empty text is the button, not a line: it would reach the negotiator as
+    // someone who spoke and said nothing.
+    if (who && text.length > 0 && said.size < MAX_LINES) said.set(`${who}: ${text}`, { who, text });
 
     SAID.set(runId, said);
 
