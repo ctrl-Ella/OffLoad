@@ -24,6 +24,10 @@ import { log, reason } from "@/lib/log";
  */
 export type PersonDay =
   | { status: "no-google" }
+  /** The grant was revoked or expired: Google will not renew it, and only
+   *  connecting again fixes it. Told apart from a Google that did not answer,
+   *  because the person has to do something and retrying does nothing. */
+  | { status: "expired" }
   | { status: "unavailable" }
   | { status: "ready"; events: CalendarEvent[] };
 
@@ -63,15 +67,19 @@ export async function personEvents(personId: string, from: Date, to: Date): Prom
 
     return { status: "ready", events: await eventsBetween(token, from, to) };
   } catch (error) {
+    // `invalid_grant` is Google refusing to renew: revoked, or expired after a
+    // week while the app is in testing. Retrying does nothing; connecting does.
+    const expired = reason(error).includes("invalid_grant");
+
     // No title and no place of any event: personal data, and this is a server log.
-    log.warn("schedule: could not read the calendar", {
+    log.warn(expired ? "schedule: the Google grant expired" : "schedule: could not read the calendar", {
       personId,
       from: from.toISOString(),
       to: to.toISOString(),
       reason: reason(error),
     });
 
-    return { status: "unavailable" };
+    return { status: expired ? "expired" : "unavailable" };
   }
 }
 
