@@ -20,6 +20,7 @@ const fullDateFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", da
 const STATUS_LINE: Record<CalendarStatus["status"], string> = {
   ready: "synced with Google",
   "no-google": "Google not connected yet",
+  expired: "Google connection expired, sign in with Google again",
   unavailable: "Google didn't answer",
 };
 
