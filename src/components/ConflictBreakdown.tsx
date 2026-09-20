@@ -37,7 +37,7 @@ export function whyItDoesNotFit(conflict: Conflict): string {
 
 export function ConflictBreakdown({ conflict }: Readonly<{ conflict: Conflict }>) {
   return (
-    <div className="rounded-card border border-border bg-white p-4 sm:p-5">
+    <div className="presentation-panel">
       <ol className="grid gap-4">
         <li className="flex items-center gap-3">
           <span

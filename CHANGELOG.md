@@ -29,6 +29,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- The clash screen and the video call join the application's design. Both had written their own chrome — a bare `OFFLOAD` in text, a back arrow, no navigation, a narrow column on the cream background — and next to the home screen's white page, wordmark and pill buttons they read as a different product. They now use `AppNavigation` and the presentation language. The video room keeps its dark canvas, which is a designed surface with its own measured contrast.
 - Every Vonage variable says which application it belongs to. The video set becomes `VONAGE_VIDEO_APPLICATION_ID`, `VONAGE_VIDEO_PRIVATE_KEY_PATH` and `VONAGE_VIDEO_PRIVATE_KEY`, and the key file `video.key`. Verify already had its prefix and video did not, so video read as "the Vonage application" — and the two keys are not interchangeable. Nothing on the voice side is renamed.
 - Every screen is English, by team decision: the door, the sign-in, the home screen, `/system`, Mia's state labels and the card's buttons. What Mia says out loud stays Spanish. The rule is written in `CLAUDE.md`.
 - The whole project moves to English: rules, documentation, code comments, templates, labels, agent instructions and product copy.
