@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Notice } from "@/components/ui/notice";
 import { forgetAttemptInBrowser, pendingAttempt } from "@/lib/browser-attempt";
+import { fetchWithTimeout } from "@/lib/fetch-with-timeout";
 
 /**
  * Where the carrier sends the browser back, and the only place the silent code
@@ -31,6 +32,13 @@ export function VerificationReturn() {
     if (started.current) return;
     started.current = true;
 
+    // Set once this effect's own instance stops being the current one — on
+    // unmount, if whoever is on this screen navigates away while the fetch
+    // below is still in flight. Every `setOutcome` after an `await` checks
+    // it first: without this, a state update lands on a component that's
+    // already gone.
+    let cancelled = false;
+
     const fromFragment = new URLSearchParams(window.location.hash.slice(1));
     const code = fromFragment.get("code") ?? new URLSearchParams(window.location.search).get("code");
     const requestId = pendingAttempt();
@@ -50,14 +58,14 @@ export function VerificationReturn() {
 
     void (async () => {
       try {
-        const response = await fetch("/api/verification/check", {
+        const response = await fetchWithTimeout("/api/verification/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ requestId, code, channel: "silent_auth" }),
         });
 
         if (!response.ok) {
-          setOutcome({ state: "failed" });
+          if (!cancelled) setOutcome({ state: "failed" });
           return;
         }
 
@@ -70,18 +78,18 @@ export function VerificationReturn() {
         if (data.status !== "completed" || !data.phoneTail) {
           // The attempt is NOT forgotten here: the carrier said no, so the
           // fallback SMS is alive and the code screen still needs it.
-          setOutcome({ state: "failed" });
+          if (!cancelled) setOutcome({ state: "failed" });
           return;
         }
 
         forgetAttemptInBrowser();
 
         if (!data.person) {
-          setOutcome({ state: "not-family", tail: data.phoneTail });
+          if (!cancelled) setOutcome({ state: "not-family", tail: data.phoneTail });
           return;
         }
 
-        setOutcome({ state: "in", name: data.person.name });
+        if (!cancelled) setOutcome({ state: "in", name: data.person.name });
 
         // A full load, not router.replace: Next keeps the RSC payload of
         // visited routes in the browser, and the home page is already in there
@@ -90,9 +98,13 @@ export function VerificationReturn() {
         // `replace` so "back" does not land here with a spent code.
         window.location.replace("/");
       } catch {
-        setOutcome({ state: "failed" });
+        if (!cancelled) setOutcome({ state: "failed" });
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // 400ms before saying anything: on the way out this is never seen, and a

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { fetchWithTimeout } from "@/lib/fetch-with-timeout";
 import { logger } from "@/lib/logger";
 
 // Turns a Spanish transcript into the list the "review plan" screen shows:
@@ -219,43 +220,51 @@ export async function POST(request: Request) {
 
   let completion: Response;
   try {
-    completion = await fetch(`${NEBIUS_BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0,
-        messages: [
-          {
-            role: "system",
-            content:
-              `Today is ${today}. Extract calendar events and tasks from a ` +
-              "Spanish voice transcript into structured data. Resolve " +
-              "relative day references ('el jueves', 'mañana') to the next " +
-              "real occurrence from today. This is extraction only: never " +
-              "decide whether two items conflict with each other, and never " +
-              "translate the speaker's words.",
-          },
-          { role: "user", content: transcript },
-        ],
-        // The project's hard rule for every Nebius call (CLAUDE.md, "Code
-        // conventions"): structured output via JSON Schema, which turns on
-        // constrained decoding in vLLM. No defensive parsing and no retry
-        // on bad formatting below, because the schema makes bad formatting
-        // impossible rather than merely unlikely.
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "plan_extraction",
-            schema: jsonSchema,
-            strict: true,
-          },
+    // 30s: measured live at ~4s for the model this route uses, but the
+    // project's own benchmark saw other candidates take up to 29s for the
+    // same kind of structured-output call — generous enough not to cut off
+    // a slow-but-working response.
+    completion = await fetchWithTimeout(
+      `${NEBIUS_BASE_URL}/chat/completions`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
         },
-      }),
-    });
+        body: JSON.stringify({
+          model,
+          temperature: 0,
+          messages: [
+            {
+              role: "system",
+              content:
+                `Today is ${today}. Extract calendar events and tasks from a ` +
+                "Spanish voice transcript into structured data. Resolve " +
+                "relative day references ('el jueves', 'mañana') to the next " +
+                "real occurrence from today. This is extraction only: never " +
+                "decide whether two items conflict with each other, and never " +
+                "translate the speaker's words.",
+            },
+            { role: "user", content: transcript },
+          ],
+          // The project's hard rule for every Nebius call (CLAUDE.md, "Code
+          // conventions"): structured output via JSON Schema, which turns on
+          // constrained decoding in vLLM. No defensive parsing and no retry
+          // on bad formatting below, because the schema makes bad formatting
+          // impossible rather than merely unlikely.
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "plan_extraction",
+              schema: jsonSchema,
+              strict: true,
+            },
+          },
+        }),
+      },
+      30_000,
+    );
   } catch (error) {
     logger.error("Failed to reach Nebius", {
       error: error instanceof Error ? error.message : String(error),

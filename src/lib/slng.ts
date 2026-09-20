@@ -1,5 +1,6 @@
 // With the extension, so Node can run it outside Next: `npm run mia:say`.
 import { requireMiaVoice } from "./env.ts";
+import { fetchWithTimeout } from "./fetch-with-timeout.ts";
 
 /**
  * What Mia says, as a whole clip ready to play.
@@ -23,7 +24,7 @@ const MAX_SPOKEN_CHARACTERS = 500;
 export async function synthesise(text: string): Promise<ArrayBuffer> {
   const { apiKey, model, voice, base } = requireMiaVoice();
 
-  const response = await fetch(`${base}/v1/tts/${model}`, {
+  const response = await fetchWithTimeout(`${base}/v1/tts/${model}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: voice, text: text.slice(0, MAX_SPOKEN_CHARACTERS) }),
