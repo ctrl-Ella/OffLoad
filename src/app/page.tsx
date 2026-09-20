@@ -1,27 +1,26 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { TriangleAlert, User } from "lucide-react";
-import { todayInMadrid, ZONE } from "@/lib/clock";
+import { ArrowRight, Mic2, Sparkles, TriangleAlert } from "lucide-react";
+import { AppNavigation } from "@/components/app-navigation";
+import { CallNotice } from "@/components/CallNotice";
+import { PresentationCalendar } from "@/components/presentation-calendar";
+import { TypingHeadline } from "@/components/typing-headline";
+import { GoogleSignIn } from "@/components/google-sign-in";
+import { PhoneSignIn } from "@/components/phone-sign-in";
+import { Notice } from "@/components/ui/notice";
+import { todayInMadrid } from "@/lib/clock";
 import { coreJourney, type Lane } from "@/lib/schedule";
 import { currentPerson, type SignedInPerson } from "@/lib/session";
-import { Button } from "@/components/ui/button";
-import { Notice } from "@/components/ui/notice";
-import { CallNotice } from "@/components/CallNotice";
-import { GoogleSignIn } from "@/components/google-sign-in";
-import { MiaFigure } from "@/components/mia";
-import { MIA_SKY } from "@/components/mia-states";
-import { PhoneSignIn } from "@/components/phone-sign-in";
 
 /**
- * The door to OFFLOAD.
- *
- * Arriving and signing in are the same screen on purpose: the phone is the
- * identity here, with no password to remember and no account to create, so a
- * "Get started" in front would decide nothing.
+ * The door to OFFLOAD, and what is behind it.
  *
  * A server component, because the question that decides what gets painted —
  * who you are — can only be answered by the server: the session lives in an
- * httpOnly cookie the browser cannot read.
+ * httpOnly cookie the browser cannot read. The presentation screen (the
+ * hero, Mia's mascot, the calendar preview) only exists for someone already
+ * signed in; anyone else is asked to sign in first, and never sees it.
  */
 
 export const metadata: Metadata = {
@@ -30,32 +29,19 @@ export const metadata: Metadata = {
     "Organising a family is a job. Let Mia do it. You sign in with your phone, and your carrier confirms it.",
 };
 
-/** The greeting runs on the household's clock: the container runs in UTC and
- *  at ten at night it would say "good afternoon". */
-function greeting(): string {
-  const hour = Number(
-    new Intl.DateTimeFormat("en-GB", {
-      hour: "numeric",
-      hour12: false,
-      timeZone: ZONE,
-    }).format(new Date()),
-  );
-
-  if (hour < 6 || hour >= 21) return "Good evening";
-  if (hour < 14) return "Good morning";
-  return "Good afternoon";
-}
-
 type Props = { searchParams: Promise<{ google?: string }> };
 
-export default async function Home({ searchParams }: Props) {
+export default async function HomePage({ searchParams }: Props) {
   const person = await currentPerson();
   const { google } = await searchParams;
 
-  return person ? <Inside person={person} /> : <Door googleOutcome={google} />;
+  return person ? <Presentation person={person} /> : <Door googleOutcome={google} />;
 }
 
-/** What Google's callback redirects back with. Anything else is ignored. */
+/** What Google's callback redirects back with, when there is no session to
+ *  show instead. Anything else — including a successful "connected" — needs
+ *  no message here: signing in and landing on the presentation screen
+ *  already says it worked. */
 const GOOGLE_OUTCOMES: Record<string, string> = {
   "no-permission":
     "You didn't grant the permission, so I saved nothing. You can sign in with your phone.",
@@ -65,124 +51,94 @@ const GOOGLE_OUTCOMES: Record<string, string> = {
   failed: "I couldn't finish with Google. Try again in a moment.",
 };
 
-/**
- * Two compositions, not one. On a phone it is a column — Mia, the headline,
- * the two ways in — and on a desktop the text sits on one side and Mia on the
- * other: stretching the phone column to 1440px left the headline in four
- * short lines with half a metre of empty background above it.
- */
 function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
   const message = googleOutcome ? GOOGLE_OUTCOMES[googleOutcome] : undefined;
 
   return (
     <main
       id="content"
-      className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 pt-11 pb-7 lg:max-w-6xl lg:px-10 lg:pt-8 lg:pb-10"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 pt-11 pb-7 lg:max-w-4xl lg:px-10"
     >
-      <p className="font-display text-xl font-bold tracking-tight text-ink">OFFLOAD</p>
+      {/* Same mark as the presentation page's header (`AppNavigation`) —
+          reused as-is, not rebuilt: this screen sits on the same cream
+          background, so `.presentation-brand`'s colours already fit. */}
+      <span className="presentation-brand">
+        <Image src="/mia-still.png" alt="" width={38} height={42} />
+        <span>offload<span className="presentation-brand-dot">.</span></span>
+      </span>
 
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:items-center lg:gap-16">
-        {/* The figure alone, with no state label: nothing is running here yet.
-            The height is declared rather than left to `flex-1`: scaled by the
-            column's width, in phone landscape she pushed the headline and the
-            buttons off the screen. */}
-        <div className="relative my-4 flex h-[34vh] max-h-80 shrink-0 items-center justify-center lg:order-2 lg:my-0 lg:h-[26rem] lg:max-h-none lg:basis-96">
-          {/* Overflows top and bottom only: she fills the box's height, so the
-              sky needs room outside it to fade. Sideways overflow would bring
-              a horizontal scrollbar. */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -inset-y-14"
-            style={{ background: MIA_SKY }}
-          />
+      <div className="mt-12 flex min-h-0 flex-1 flex-col gap-8">
+        <h1 className="font-display text-[2.125rem] leading-[1.1] text-ink lg:text-5xl">
+          Organising a family is a job.{" "}
+          <span className="text-accent-strong">Let Mia do it.</span>
+        </h1>
 
-          <MiaFigure state="quiet" className="relative h-full w-full" />
-        </div>
+        {message ? (
+          <Notice tone="alert">
+            <p>{message}</p>
+          </Notice>
+        ) : null}
 
-        <div className="flex flex-col gap-8 lg:order-1 lg:flex-1">
-          <h1 className="font-display text-[2.125rem] leading-[1.1] text-ink lg:text-5xl">
-            Organising a family is a job.{" "}
-            <span className="text-accent-strong">Let Mia do it.</span>
-          </h1>
-
-          {message ? (
-            <Notice tone="alert">
-              <p>{message}</p>
-            </Notice>
-          ) : null}
-
-          <div className="lg:max-w-md">
-            <PhoneSignIn alternative={<GoogleSignIn />} />
-          </div>
+        <div className="lg:max-w-md">
+          <PhoneSignIn alternative={<GoogleSignIn />} />
         </div>
       </div>
     </main>
   );
 }
 
-async function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
+async function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
+  const today = todayInMadrid();
+
   // Only the core has a calendar to read. For the support network the day is
   // not looked at, because there is nothing of theirs to look at.
-  const [lane] =
-    person.circle === "CORE" ? await coreJourney(todayInMadrid(), person.id) : [undefined];
+  const [lane] = person.circle === "CORE" ? await coreJourney(today, person.id) : [undefined];
 
   return (
-    <main
-      id="content"
-      className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 pt-11 pb-7 lg:max-w-4xl lg:px-10"
-    >
-      <div className="flex items-center justify-between">
-        <p className="font-display text-xl font-bold tracking-tight text-ink">OFFLOAD</p>
+    <div className="presentation-page">
+      <AppNavigation person={person} />
 
-        {/* `details` and not a JavaScript menu: it opens and closes on its own,
-            works with the keyboard, and hydrates nothing. */}
-        <details className="relative">
-          <summary
-            aria-label="Your profile"
-            className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-control text-ink-muted hover:bg-white [&::-webkit-details-marker]:hidden"
-          >
-            <User className="size-5" aria-hidden="true" />
-          </summary>
-
-          <div className="absolute right-0 z-10 mt-2 w-72 rounded-card border border-border bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-ink">{person.name}</p>
-            <p className="mt-1 text-sm text-ink-muted">
-              Line ending in {person.phoneTail}, confirmed by your carrier. I remember
-              you for thirty days.
-            </p>
-            <form action="/api/auth/logout" method="post" className="mt-3">
-              <Button type="submit" variant="secondary" size="small">
-                Sign out
-              </Button>
-            </form>
+      <main id="content">
+        <section className="presentation-hero" aria-labelledby="presentation-title">
+          <div className="presentation-hero-copy">
+            <span className="presentation-eyebrow"><span /> A LIGHTER DAY</span>
+            <TypingHeadline />
+            <div className="presentation-actions">
+              <Link className="presentation-button presentation-button-primary" href="/offload"><Mic2 size={18} aria-hidden="true" /> Leave a voice note</Link>
+              <a className="presentation-button presentation-button-outline" href="#agenda">View calendar <ArrowRight size={18} aria-hidden="true" /></a>
+            </div>
           </div>
-        </details>
-      </div>
+          <div className="presentation-hero-art">
+            <div className="presentation-orbit presentation-orbit-one" />
+            <div className="presentation-orbit presentation-orbit-two" />
+            <div className="presentation-mascot">
+              <Image className="presentation-mascot-animated" src="/mia-blink.gif" alt="Mia, Offload's assistant, blinking" width={360} height={400} unoptimized priority />
+              <Image className="presentation-mascot-still" src="/mia-still.png" alt="Mia, Offload's assistant" width={360} height={400} priority />
+            </div>
+            <span className="presentation-note presentation-note-top"><Sparkles size={16} aria-hidden="true" /> Hi, I&apos;m Mia</span>
+          </div>
+        </section>
 
-      <p className="py-8 text-[clamp(1rem,0.95rem+0.3vw,1.15rem)] text-ink-muted">
-        {greeting()}, <span className="text-ink">{person.name}</span>. You don&apos;t have
-        to carry all of it.
-      </p>
+        {/* What the day can prove today, between the hero and the calendar
+            preview: whether something clashes, and whether a call is open.
+            Same width as the sections around it, so it reads as one page. */}
+        {lane ? (
+          <section
+            id="today"
+            aria-labelledby="today-heading"
+            className="mx-auto flex w-[min(1240px,calc(100%-64px))] flex-col gap-4 pb-10"
+          >
+            <h2 id="today-heading" className="presentation-section-label">
+              TODAY
+            </h2>
+            <DayStatus lane={lane} />
+            <CallNotice />
+          </section>
+        ) : null}
 
-      {/* The day's timeline goes here. Until it exists, what the screen says
-          is only what it can prove: whether something clashes today, and
-          whether there is a call open. */}
-      {lane ? (
-        <DayStatus lane={lane} />
-      ) : (
-        <Notice tone="good" title="You're in">
-          <p className="mt-1">
-            Your day isn&apos;t here yet: for now this only knows who you are.
-          </p>
-        </Notice>
-      )}
-
-      {person.circle === "CORE" && (
-        <div className="mt-6">
-          <CallNotice />
-        </div>
-      )}
-    </main>
+        <PresentationCalendar today={today} />
+      </main>
+    </div>
   );
 }
 

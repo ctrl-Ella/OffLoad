@@ -298,13 +298,6 @@ export function PhoneSignIn({ alternative }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <Notice title="Turn the wifi off before you start">
-        <p>
-          The check goes through your carrier&apos;s network. With the wifi on it
-          doesn&apos;t go that way, and a code has to be typed.
-        </p>
-      </Notice>
-
       <form
         className="flex flex-col gap-4"
         onSubmit={(event) => {

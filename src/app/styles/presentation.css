@@ -1,0 +1,120 @@
+.presentation-page { background: var(--color-white); color: var(--color-text); }
+.presentation-page h1, .presentation-page h2, .presentation-page h3 { font-family: 'Bricolage Grotesque', Figtree, sans-serif; }
+.presentation-page a { text-decoration: none; }
+.presentation-header { width: min(1240px, calc(100% - 64px)); min-height: 84px; margin: auto; display: flex; align-items: center; gap: 56px; }
+.presentation-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-text); font: 800 27px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -1.5px; }
+.presentation-brand img { object-fit: contain; }
+.presentation-brand-dot { color: var(--color-alert); }
+.presentation-header-link { margin-left: auto; display: inline-flex; align-items: center; gap: 9px; padding: 12px 18px; border-radius: 999px; background: var(--color-text); color: var(--color-white) !important; font-size: 15px; font-weight: 800; }
+.presentation-hero { width: min(1240px, calc(100% - 64px)); min-height: 606px; margin: auto; display: grid; grid-template-columns: 1.08fr .92fr; align-items: center; gap: 40px; padding: 40px 0 80px; }
+.presentation-eyebrow, .presentation-section-label { color: var(--color-accent-strong); font-size: 11px; font-weight: 800; letter-spacing: .11em; }
+.presentation-eyebrow { display: inline-flex; align-items: center; gap: 9px; }
+.presentation-eyebrow span { width: 18px; height: 2px; background: currentColor; }
+.presentation-hero h1 { max-width: 720px; margin: 23px 0; font-size: clamp(52px, 5.5vw, 84px); line-height: 1.03; letter-spacing: -.065em; }
+.presentation-hero h1 em { color: var(--color-accent-strong); font-style: normal; }
+.presentation-typing-title { position: relative; }
+.presentation-title-reserve { visibility: hidden; }
+.presentation-title-live { position: absolute; inset: 0; }
+.presentation-cursor { display: inline-block; width: 3px; height: .8em; margin-left: 3px; background: currentColor; vertical-align: -.06em; animation: presentation-cursor 700ms step-end infinite; }
+@keyframes presentation-cursor { 50% { opacity: 0; } }
+.presentation-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 31px; }
+.presentation-button { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: 11px; padding: 0 23px; border-radius: 999px; font-size: 13px; font-weight: 800; transition: transform .2s, background .2s; }
+.presentation-button:hover { transform: translateY(-2px); }
+.presentation-button-primary { background: var(--color-text); color: var(--color-white) !important; font-size: 16px; }
+.presentation-button-outline { border: 1px solid var(--color-border); color: var(--color-text); }
+.presentation-hero-art { position: relative; min-height: 520px; display: grid; place-items: center; isolation: isolate; }
+.presentation-hero-art::before { content: ""; position: absolute; bottom: 10%; left: 50%; width: min(84%, 430px); height: 42%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(ellipse, color-mix(in srgb, var(--mia-glow-blue) 78%, transparent) 0%, color-mix(in srgb, var(--mia-glow-blue) 42%, transparent) 42%, transparent 68%); filter: blur(22px); pointer-events: none; }
+.presentation-orbit { position: absolute; width: 390px; aspect-ratio: 1; border: 1px solid var(--color-border); border-radius: 50%; }
+.presentation-orbit-two { width: 550px; border-color: var(--color-border); }
+.presentation-mascot { position: relative; z-index: 1; width: min(72%, 360px); filter: drop-shadow(0 18px 18px color-mix(in srgb, var(--color-text) 12%, transparent)); }
+.presentation-mascot img { display: block; width: 100%; height: auto; }
+.presentation-mascot-still { display: none !important; }
+.presentation-note { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 12px 15px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-white); box-shadow: 0 12px 26px color-mix(in srgb, var(--color-text) 8%, transparent); color: var(--color-text); font-size: 12px; font-weight: 800; }
+.presentation-note svg { color: var(--color-accent-strong); }
+.presentation-note-top { top: 14%; left: 6%; transform: rotate(-6deg); font-size: 20px; }
+.presentation-calendar-section { width: min(1240px, calc(100% - 64px)); margin: auto; padding: 55px 0 105px; scroll-margin-top: 30px; }
+.presentation-calendar-heading { display: flex; align-items: end; justify-content: space-between; gap: 25px; margin-bottom: 28px; }
+.presentation-calendar-heading h2 { margin: 12px 0; font-size: clamp(34px, 3.5vw, 50px); letter-spacing: -.045em; }
+.presentation-calendar-heading p { color: var(--color-text-muted); font-size: 15px; }
+.presentation-demo-badge { flex: none; padding: 9px 13px; border-radius: 999px; background: var(--color-background); color: var(--color-accent-strong); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.presentation-calendar-card { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-white); box-shadow: 0 20px 55px color-mix(in srgb, var(--color-text) 4%, transparent); }
+.presentation-calendar-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 25px 31px; }
+.presentation-calendar-title { display: flex; align-items: center; gap: 12px; }
+.presentation-calendar-title > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: var(--color-background); color: var(--color-accent-strong); }
+.presentation-calendar-title strong, .presentation-calendar-title small { display: block; }
+.presentation-calendar-title strong { font: 800 19px 'Bricolage Grotesque', sans-serif; }
+.presentation-calendar-title small { margin-top: 2px; color: var(--color-text-muted); font-size: 12px; text-transform: capitalize; }
+.presentation-calendar-navigation { display: flex; align-items: center; gap: 5px; }
+.presentation-calendar-navigation button { min-width: 36px; min-height: 36px; display: grid; place-items: center; padding: 0 9px; border: 1px solid var(--color-border); border-radius: 9px; font-size: 12px; font-weight: 700; }
+.presentation-calendar-navigation button:hover, .presentation-week button:hover { background: var(--color-background); }
+.presentation-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; padding: 0 31px 23px; }
+.presentation-week button { min-height: 73px; display: grid; justify-items: center; align-content: center; gap: 3px; border: 1px solid var(--color-border); border-radius: 13px; }
+.presentation-week button span { color: var(--color-text-muted); font-size: 11px; text-transform: capitalize; }
+.presentation-week button strong { font-size: 18px; }
+.presentation-week button i { width: 4px; height: 4px; border-radius: 50%; background: var(--color-accent-strong); }
+.presentation-week button.is-selected { border-color: var(--color-text); background: var(--color-text); color: var(--color-white); }
+.presentation-week button.is-selected span { color: var(--color-background); }
+.presentation-week button.is-selected i { background: var(--color-accent); }
+.presentation-agenda-content { display: grid; grid-template-columns: 1.3fr .7fr; gap: 24px; padding: 28px 31px 31px; border-top: 1px solid var(--color-border); background: var(--color-white); }
+.presentation-agenda-list h3 { margin: 0 0 22px; font-size: 22px; text-transform: capitalize; }
+.presentation-events { display: grid; gap: 13px; }
+.presentation-event { display: grid; grid-template-columns: 50px 1fr; align-items: start; gap: 13px; }
+.presentation-event time { padding-top: 14px; color: var(--color-text-muted); font-size: 12px; font-weight: 700; }
+.presentation-event-body { display: grid; gap: 3px; padding: 14px 18px; border-left: 3px solid; border-radius: 9px; }
+.presentation-event-body strong { font-size: 14px; }
+.presentation-event-body span { color: var(--color-text-muted); font-size: 12px; }
+.presentation-event-accent { border-color: var(--color-accent-strong); background: var(--color-background); }
+.presentation-event-alert { border-color: var(--color-alert); background: var(--color-background); }
+.presentation-event-neutral { border-color: var(--color-text-muted); background: var(--color-background); }
+.presentation-calendar-disclaimer { margin-top: 22px; color: var(--color-text-muted); font-size: 11px; }
+.presentation-calendar-insight { align-self: stretch; padding: 25px; border-radius: 19px; background: var(--color-text); color: var(--color-white); }
+.presentation-calendar-insight > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: var(--color-accent); color: var(--color-text); }
+.presentation-calendar-insight h3 { margin: 20px 0 10px; font-size: 25px; line-height: 1.15; }
+.presentation-calendar-insight p { color: var(--color-background); font-size: 13px; line-height: 1.6; }
+.presentation-calendar-insight > a { display: flex; align-items: center; gap: 8px; margin-top: 24px; color: var(--color-accent); font-size: 12px; font-weight: 700; }
+.presentation-mobile-nav { display: none; }
+
+@media (max-width: 900px) {
+  .presentation-header, .presentation-hero, .presentation-calendar-section { width: min(100% - 40px, 700px); }
+  .presentation-hero { grid-template-columns: 1fr; gap: 30px; padding-top: 55px; }
+  .presentation-hero-art { min-height: 420px; }
+  .presentation-calendar-section { padding: 70px 0; }
+}
+
+@media (max-width: 620px) {
+  .presentation-header { min-height: 70px; gap: 12px; }
+  .presentation-header-link { display: none; }
+  .presentation-brand { font-size: 23px; }
+  .presentation-hero { padding: 45px 0 58px; }
+  .presentation-hero h1 { font-size: clamp(43px, 11vw, 61px); }
+  .presentation-hero-art { min-height: 355px; }
+  .presentation-mascot { width: min(72%, 245px); }
+  .presentation-orbit { width: 260px; }
+  .presentation-orbit-two { width: 370px; }
+  .presentation-note { padding: 9px 10px; font-size: 10px; }
+  .presentation-note-top { top: 11%; font-size: 17px; }
+  .presentation-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .presentation-mobile-nav { position: fixed; z-index: 30; inset: auto 0 0; display: grid; grid-template-columns: repeat(3, 1fr); height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--color-border); background: var(--color-white); }
+  .presentation-mobile-nav a { display: grid; justify-items: center; align-content: center; gap: 3px; color: var(--color-text-muted); font-size: 12px; font-weight: 700; }
+  .presentation-mobile-nav a[aria-current="page"] { color: var(--color-accent-strong); }
+  .presentation-calendar-heading { display: block; }
+  .presentation-demo-badge { display: inline-block; margin-top: 15px; }
+  .presentation-calendar-toolbar { flex-wrap: wrap; padding: 20px 17px; }
+  .presentation-week { gap: 4px; padding: 0 12px 17px; }
+  .presentation-week button { min-height: 62px; }
+  .presentation-agenda-content { grid-template-columns: 1fr; padding: 22px 17px; }
+}
+
+@media (max-width: 380px) {
+  .presentation-actions .presentation-button { width: 100%; }
+  .presentation-calendar-title strong { font-size: 15px; }
+  .presentation-week { grid-template-columns: repeat(7, minmax(44px, 1fr)); overflow-x: auto; }
+  .presentation-week button strong { font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presentation-mascot-animated { display: none !important; }
+  .presentation-mascot-still { display: block !important; }
+  .presentation-button { transition: none; }
+  .presentation-cursor { animation: none; }
+}

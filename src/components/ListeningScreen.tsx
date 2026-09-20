@@ -1,11 +1,13 @@
 "use client";
 
-import { ArrowLeft, Mic, Square } from "lucide-react";
+import { Mic, Square } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ListeningOrb } from "@/components/ListeningOrb";
 import { AudioWaveform } from "@/components/AudioWaveform";
+import { OffloadHeader } from "@/components/OffloadHeader";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/ui/notice";
+import type { SignedInPerson } from "@/lib/session";
 
 /**
  * The four moments of a listening turn. `"error"` covers every way the turn
@@ -62,9 +64,9 @@ export function ListeningScreen({
   transcript,
   errorMessage,
   levels,
+  person,
   onStart,
   onStop,
-  onBack,
 }: {
   /** Where this listening turn is right now. */
   status: ListeningStatus;
@@ -74,9 +76,10 @@ export function ListeningScreen({
   errorMessage?: string;
   /** Audio level per bar, from 0 to 1. */
   levels: number[];
+  /** Who's signed in, for the header's account menu. `null` renders no menu. */
+  person: SignedInPerson | null;
   onStart: () => void;
   onStop: () => void;
-  onBack: () => void;
 }) {
   const isListening = status === "listening";
   const isTranscribing = status === "transcribing";
@@ -96,19 +99,7 @@ export function ListeningScreen({
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col px-6 pb-6 sm:max-w-lg sm:pb-10">
-        <header className="pt-[max(1rem,env(safe-area-inset-top))]">
-          {/* `secondary`'s ink text and border-strong outline are calibrated
-              for the cream page everywhere else and all but disappear here;
-              `primary`'s accent fill carries its own contrast wherever it
-              sits, so it's the one variant of the two that survives the trip
-              onto this dark surface. */}
-          <Button
-            variant="primary"
-            onClick={onBack}
-            icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
-            label="Back"
-          />
-        </header>
+        <OffloadHeader person={person} />
 
         <main
           id="content"
