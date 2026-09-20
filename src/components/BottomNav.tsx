@@ -14,10 +14,7 @@ type Tab = {
 type BottomNavVariant = "immersive" | "light";
 
 // Week and Plan are gone: neither is a screen of its own, and Week's slot
-// now points back to the presentation page instead. Time doesn't exist yet
-// either, out of scope for this task — its link is ready for when that
-// screen gets built; until then, navigating to it lands on a route Next.js
-// resolves as 404, which beats a button that does nothing.
+// now points back to the presentation page instead.
 const TABS: Tab[] = [
   { href: "/", label: "Home", Icon: Home },
   { href: "/offload", label: "Offload", Icon: Circle },
