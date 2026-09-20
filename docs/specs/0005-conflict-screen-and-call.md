@@ -161,9 +161,9 @@ function coreJourney(day?: string, onlyFor?: string): Promise<Lane[]>;
 **Environment**, already in `.env.example`:
 
 ```bash
-VONAGE_APPLICATION_ID=                          # the video application, not Verify's
-VONAGE_PRIVATE_KEY_PATH=./private.key           # local
-VONAGE_PRIVATE_KEY=                             # Railway: escaped newlines or base64. Wins over the path
+VONAGE_VIDEO_APPLICATION_ID=                    # the video application, not Verify's
+VONAGE_VIDEO_PRIVATE_KEY_PATH=./video.key       # local
+VONAGE_VIDEO_PRIVATE_KEY=                       # Railway: escaped newlines or base64. Wins over the path
 VONAGE_VIDEO_BASE=https://video.api.vonage.com  # never api.opentok.com
 NEBIUS_API_KEY=
 NEBIUS_MODEL_SMALL=                             # the interpreter. No default in code

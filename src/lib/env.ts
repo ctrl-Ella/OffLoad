@@ -34,11 +34,12 @@ const schema = z.object({
   VONAGE_API_BASE: z.url().default("https://api-eu.vonage.com"),
   VONAGE_BRAND_NAME: z.string().min(1).default("OFFLOAD"),
 
-  /** The video application, which is a different one from Verify's. */
-  VONAGE_APPLICATION_ID: z.string().min(1).optional(),
-  VONAGE_PRIVATE_KEY_PATH: z.string().min(1).optional(),
+  /** Qualified like Verify's: with one of the two unqualified, that one reads
+   *  as "the Vonage application". Neither is the default. */
+  VONAGE_VIDEO_APPLICATION_ID: z.string().min(1).optional(),
+  VONAGE_VIDEO_PRIVATE_KEY_PATH: z.string().min(1).optional(),
   /** On Railway the key travels as content, same as Verify's. */
-  VONAGE_PRIVATE_KEY: z.string().min(1).optional(),
+  VONAGE_VIDEO_PRIVATE_KEY: z.string().min(1).optional(),
   /** Video has its own host. `api.opentok.com` is the previous generation and
    *  answers 403 to an application JWT. */
   VONAGE_VIDEO_BASE: z.url().default("https://video.api.vonage.com"),
@@ -170,34 +171,41 @@ export type VideoCredentials = {
  */
 export function requireVideoCredentials(): VideoCredentials {
   const {
-    VONAGE_APPLICATION_ID: applicationId,
-    VONAGE_PRIVATE_KEY: keyAsValue,
-    VONAGE_PRIVATE_KEY_PATH: keyOnDisk,
+    VONAGE_VIDEO_APPLICATION_ID: applicationId,
+    VONAGE_VIDEO_PRIVATE_KEY: keyAsValue,
+    VONAGE_VIDEO_PRIVATE_KEY_PATH: keyOnDisk,
     VONAGE_VIDEO_BASE: videoBase,
   } = env;
 
   if (!applicationId || (!keyAsValue && !keyOnDisk)) {
     const missing = [
-      !applicationId && "VONAGE_APPLICATION_ID",
-      !keyAsValue && !keyOnDisk && "VONAGE_PRIVATE_KEY_PATH or VONAGE_PRIVATE_KEY",
+      !applicationId && "VONAGE_VIDEO_APPLICATION_ID",
+      !keyAsValue && !keyOnDisk && "VONAGE_VIDEO_PRIVATE_KEY_PATH or VONAGE_VIDEO_PRIVATE_KEY",
     ].filter(Boolean);
 
+    // Names the application: Verify's key signs a video token and fails
+    // without saying which key was used.
     throw new Error(
-      `The video call needs these variables and they are not in .env: ${missing.join(", ")}. ` +
-        "They come from the video application in the Vonage panel.",
+      `The video call needs these variables and they are not set: ${missing.join(", ")}. ` +
+        "They come from the VIDEO application in the Vonage panel, not from Verify's.",
     );
   }
 
   // The value wins over the path, same as verification: the template always
   // leaves the path written, and on Railway that file does not exist.
   if (keyAsValue) {
-    return { applicationId, privateKey: pemFromVariable(keyAsValue, "VONAGE_PRIVATE_KEY"), videoBase };
+    return {
+      applicationId,
+      privateKey: pemFromVariable(keyAsValue, "VONAGE_VIDEO_PRIVATE_KEY"),
+      videoBase,
+    };
   }
 
   if (!existsSync(keyOnDisk as string)) {
     throw new Error(
-      `VONAGE_PRIVATE_KEY_PATH points at ${keyOnDisk} and there is no file there. ` +
-        "The private key is downloaded once, when the application is created in the Vonage panel.",
+      `VONAGE_VIDEO_PRIVATE_KEY_PATH points at ${keyOnDisk} and there is no file there. ` +
+        "The video application's key downloads once, when the application is created. " +
+        "Generating a new one in the panel invalidates the previous one.",
     );
   }
 
