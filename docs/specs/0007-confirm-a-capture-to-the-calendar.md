@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Draft |
 | **Area** | frontend · backend |
-| **Issue** | #NN |
+| **Issue** | #38 |
 | **Date** | 2026-09-20 |
 
 ---
