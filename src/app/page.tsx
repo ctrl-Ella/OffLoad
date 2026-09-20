@@ -183,10 +183,28 @@ async function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
  * painting the last two as the first would claim a free day nobody knows.
  */
 function DayStatus({ lane, today }: Readonly<{ lane: Lane; today: string }>) {
+  // The button is right here in both cases: the fix is one press, and sending
+  // someone to look for it elsewhere is how a calendar stays disconnected.
   if (lane.status === "no-google") {
     return (
       <Notice tone="quiet" title="I can't see your calendar yet">
         <p className="mt-1">Connect your Google account and I&apos;ll look at your day.</p>
+        <div className="mt-3 max-w-xs">
+          <GoogleSignIn />
+        </div>
+      </Notice>
+    );
+  }
+
+  if (lane.status === "expired") {
+    return (
+      <Notice tone="alert" title="Your Google connection has expired">
+        <p className="mt-1">
+          Google stopped renewing it. Sign in with Google once more and your calendar is back.
+        </p>
+        <div className="mt-3 max-w-xs">
+          <GoogleSignIn />
+        </div>
       </Notice>
     );
   }
