@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Offload · Menos carga mental, más tiempo para vivir",
+  title: "Offload · Less mental load, more time to live",
   description:
-    "Coordina los planes familiares, resuelve imprevistos y recupera tiempo para ti con Offload y Mia.",
+    "Coordinate the family's plans, resolve what comes up and get time back for yourself with Offload and Mia.",
 };
 
-// `lang="es"` no es decorativo: sin él, un lector de pantalla pronuncia el
-// castellano con fonética inglesa y la página deja de entenderse.
+// The screens are English by team decision; only what Mia says out loud is
+// Spanish, and that is audio, not this document.
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="en">
       <body className="antialiased">
         {/* Lives in the layout, so it has to point at the id every screen uses. */}
         <a className="skip-link" href="#content">
-          Saltar al contenido principal
+          Skip to main content
         </a>
         {children}
       </body>

@@ -1,12 +1,16 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Mic2, Sparkles } from "lucide-react";
+import { ArrowRight, Mic2, Sparkles, TriangleAlert } from "lucide-react";
 import { AppNavigation } from "@/components/app-navigation";
+import { CallNotice } from "@/components/CallNotice";
 import { PresentationCalendar } from "@/components/presentation-calendar";
 import { TypingHeadline } from "@/components/typing-headline";
 import { GoogleSignIn } from "@/components/google-sign-in";
 import { PhoneSignIn } from "@/components/phone-sign-in";
 import { Notice } from "@/components/ui/notice";
+import { todayInMadrid } from "@/lib/clock";
+import { coreJourney, type Lane } from "@/lib/schedule";
 import { currentPerson, type SignedInPerson } from "@/lib/session";
 
 /**
@@ -18,6 +22,12 @@ import { currentPerson, type SignedInPerson } from "@/lib/session";
  * hero, Mia's mascot, the calendar preview) only exists for someone already
  * signed in; anyone else is asked to sign in first, and never sees it.
  */
+
+export const metadata: Metadata = {
+  title: "OFFLOAD",
+  description:
+    "Organising a family is a job. Let Mia do it. You sign in with your phone, and your carrier confirms it.",
+};
 
 type Props = { searchParams: Promise<{ google?: string }> };
 
@@ -34,11 +44,11 @@ export default async function HomePage({ searchParams }: Props) {
  *  already says it worked. */
 const GOOGLE_OUTCOMES: Record<string, string> = {
   "no-permission":
-    "No has dado el permiso, así que no he guardado nada. Puedes entrar con tu teléfono.",
+    "You didn't grant the permission, so I saved nothing. You can sign in with your phone.",
   unknown:
-    "Esa cuenta de Google no está en esta casa. Que te añada alguien de la familia y vuelve a entrar.",
-  "invalid-return": "La vuelta de Google no ha llegado bien. Vuelve a intentarlo.",
-  failed: "No he podido terminar con Google. Vuelve a intentarlo en un momento.",
+    "That Google account isn't in this household. Ask someone in the family to add you and sign in again.",
+  "invalid-return": "The return from Google didn't come through properly. Try again.",
+  failed: "I couldn't finish with Google. Try again in a moment.",
 };
 
 function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
@@ -59,8 +69,8 @@ function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
 
       <div className="mt-12 flex min-h-0 flex-1 flex-col gap-8">
         <h1 className="font-display text-[2.125rem] leading-[1.1] text-ink lg:text-5xl">
-          Organizar a una familia es un trabajo.{" "}
-          <span className="text-accent-strong">Que lo haga Mia.</span>
+          Organising a family is a job.{" "}
+          <span className="text-accent-strong">Let Mia do it.</span>
         </h1>
 
         {message ? (
@@ -77,13 +87,12 @@ function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
   );
 }
 
-function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
-  const today = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Madrid",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+async function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
+  const today = todayInMadrid();
+
+  // Only the core has a calendar to read. For the support network the day is
+  // not looked at, because there is nothing of theirs to look at.
+  const [lane] = person.circle === "CORE" ? await coreJourney(today, person.id) : [undefined];
 
   return (
     <div className="presentation-page">
@@ -110,8 +119,84 @@ function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
           </div>
         </section>
 
+        {/* What the day can prove today, between the hero and the calendar
+            preview: whether something clashes, and whether a call is open.
+            Same width as the sections around it, so it reads as one page. */}
+        {lane ? (
+          <section
+            id="today"
+            aria-labelledby="today-heading"
+            className="mx-auto flex w-[min(1240px,calc(100%-64px))] flex-col gap-4 pb-10"
+          >
+            <h2 id="today-heading" className="presentation-section-label">
+              TODAY
+            </h2>
+            <DayStatus lane={lane} />
+            <CallNotice />
+          </section>
+        ) : null}
+
         <PresentationCalendar today={today} />
       </main>
+    </div>
+  );
+}
+
+/**
+ * The one thing the day can say today: whether something does not fit. The
+ * three states are told apart because they mean different things — a free
+ * day, a calendar Mia cannot see, and a calendar nobody has connected — and
+ * painting the last two as the first would claim a free day nobody knows.
+ */
+function DayStatus({ lane }: Readonly<{ lane: Lane }>) {
+  if (lane.status === "no-google") {
+    return (
+      <Notice tone="quiet" title="I can't see your calendar yet">
+        <p className="mt-1">Connect your Google account and I&apos;ll look at your day.</p>
+      </Notice>
+    );
+  }
+
+  if (lane.status === "unavailable") {
+    return (
+      <Notice tone="quiet" title="I can't read your calendar right now">
+        <p className="mt-1">Google didn&apos;t answer. Try again in a moment.</p>
+      </Notice>
+    );
+  }
+
+  const clash = lane.conflicts[0];
+
+  if (!clash) {
+    return (
+      <Notice tone="good" title="Nothing clashes today">
+        <p className="mt-1">Everything on your calendar fits.</p>
+      </Notice>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-card bg-alert p-4 text-ink">
+      <span
+        aria-hidden="true"
+        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-alert"
+      >
+        <TriangleAlert className="size-4" />
+      </span>
+
+      <p className="min-w-0 flex-1">
+        <span className="block font-display font-semibold">Something doesn&apos;t fit today</span>
+        <span className="block text-[15px]">
+          You won&apos;t make it to &ldquo;{clash.next.title}&rdquo;.
+        </span>
+      </p>
+
+      <Link
+        href="/conflict"
+        className="inline-flex min-h-11 items-center justify-center rounded-control border border-ink px-4 text-[15px] font-medium text-ink hover:bg-white/40"
+      >
+        See the clash
+      </Link>
     </div>
   );
 }

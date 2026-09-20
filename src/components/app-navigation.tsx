@@ -13,7 +13,7 @@ export function AppNavigation({ person }: { person: SignedInPerson | null }) {
           <span>offload<span className="presentation-brand-dot">.</span></span>
         </Link>
         <Link className="presentation-header-link" href="/offload">
-          Ir a Offload
+          Go to Offload
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
 
@@ -24,7 +24,7 @@ export function AppNavigation({ person }: { person: SignedInPerson | null }) {
         {person ? (
           <details className="relative">
             <summary
-              aria-label="Tu perfil"
+              aria-label="Your profile"
               className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-control text-ink-muted hover:bg-white [&::-webkit-details-marker]:hidden"
             >
               <User className="size-5" aria-hidden="true" />
@@ -33,12 +33,12 @@ export function AppNavigation({ person }: { person: SignedInPerson | null }) {
             <div className="absolute right-0 z-10 mt-2 w-72 rounded-card border border-border bg-white p-4 text-left shadow-sm">
               <p className="text-sm font-medium text-ink">{person.name}</p>
               <p className="mt-1 text-sm text-ink-muted">
-                Línea acabada en {person.phoneTail}, confirmada por tu operador. Te
-                recuerdo treinta días.
+                Line ending in {person.phoneTail}, confirmed by your carrier. I remember
+                you for thirty days.
               </p>
               <form action="/api/auth/logout" method="post" className="mt-3">
                 <Button type="submit" variant="secondary" size="small">
-                  Cerrar sesión
+                  Sign out
                 </Button>
               </form>
             </div>
