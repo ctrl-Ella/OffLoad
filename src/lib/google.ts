@@ -1,5 +1,6 @@
 // With the extension, so Node can run it outside Next: `npm run demo:seed`.
 import { requireGoogleCredentials } from "./env.ts";
+import { fetchWithTimeout } from "./fetch-with-timeout.ts";
 
 /**
  * Google OAuth by hand, no SDK. `googleapis` is several megabytes and what is
@@ -63,7 +64,7 @@ export function consentUrl(state: string): string {
 export async function accessToken(refreshToken: string): Promise<string> {
   const { clientId, clientSecret } = requireGoogleCredentials();
 
-  const response = await fetch(EXCHANGE, {
+  const response = await fetchWithTimeout(EXCHANGE, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -112,7 +113,7 @@ type TokenResponse = {
 export async function exchangeCode(code: string): Promise<GrantedPermission> {
   const { clientId, clientSecret, publicUrl } = requireGoogleCredentials();
 
-  const response = await fetch(EXCHANGE, {
+  const response = await fetchWithTimeout(EXCHANGE, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -135,7 +136,7 @@ export async function exchangeCode(code: string): Promise<GrantedPermission> {
     );
   }
 
-  const who = await fetch(WHO, {
+  const who = await fetchWithTimeout(WHO, {
     headers: { Authorization: `Bearer ${tokens.access_token}` },
   });
 

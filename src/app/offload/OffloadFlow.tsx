@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ListeningScreen, type ListeningStatus } from "@/components/ListeningScreen";
 import { ReviewPlan, type PlanItem } from "@/components/ReviewPlan";
+import { fetchWithTimeout, isTimeout } from "@/lib/fetch-with-timeout";
 import type { SignedInPerson } from "@/lib/session";
 
 /** The voice flow's three screens, end to end: `ListeningStatus` covers the
@@ -53,23 +54,6 @@ const REQUEST_TIMED_OUT_MESSAGE = "That's taking too long. Try again.";
 // that are still genuinely working, not stuck.
 const REQUEST_TIMEOUT_MS = 90_000;
 
-function isTimeout(error: unknown): boolean {
-  return error instanceof DOMException && error.name === "AbortError";
-}
-
-/** `fetch`, but it gives up after `REQUEST_TIMEOUT_MS` instead of waiting
- *  forever on a server that's stopped answering. Every caller distinguishes
- *  this from an ordinary failure with `isTimeout`, so the person hears
- *  "that's taking too long" instead of a generic error. */
-function fetchWithTimeout(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  return fetch(input, { ...init, signal: controller.signal }).finally(() => {
-    clearTimeout(timeout);
-  });
-}
-
 function extensionForMimeType(mimeType: string): string {
   if (mimeType.includes("ogg")) return "ogg";
   if (mimeType.includes("mp4")) return "mp4";
@@ -78,11 +62,15 @@ function extensionForMimeType(mimeType: string): string {
 }
 
 async function structurePlan(transcript: string): Promise<PlanItem[]> {
-  const response = await fetchWithTimeout("/api/structure-plan", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ transcript }),
-  });
+  const response = await fetchWithTimeout(
+    "/api/structure-plan",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transcript }),
+    },
+    REQUEST_TIMEOUT_MS,
+  );
 
   if (!response.ok) {
     throw new Error(`/api/structure-plan responded with status ${response.status}`);
@@ -240,10 +228,11 @@ export function OffloadFlow({ person }: { person: SignedInPerson | null }) {
         const formData = new FormData();
         formData.append("audio", blob, `recording.${extensionForMimeType(mimeType)}`);
 
-        const response = await fetchWithTimeout("/api/transcribe", {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetchWithTimeout(
+          "/api/transcribe",
+          { method: "POST", body: formData },
+          REQUEST_TIMEOUT_MS,
+        );
 
         if (!response.ok) {
           setStatus("error");
