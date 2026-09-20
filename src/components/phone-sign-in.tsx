@@ -12,6 +12,7 @@ import {
   pendingAttempt,
   rememberAttemptInBrowser,
 } from "@/lib/browser-attempt";
+import { fetchWithTimeout, isTimeout } from "@/lib/fetch-with-timeout";
 
 /**
  * Asks for the phone number and carries the verification to the end, both ways.
@@ -40,6 +41,7 @@ type Phase =
 
 const DID_NOT_START = "I couldn't start the check. Try again in a moment.";
 const NO_CONNECTION = "I couldn't connect. Try again in a moment.";
+const TIMED_OUT = "That's taking too long. Try again.";
 const NOT_CONFIGURED = "I can't check your line yet. It's not you and it's not the number.";
 const BAD_CODE = "That code isn't right. Look at the SMS again.";
 
@@ -109,11 +111,15 @@ export function PhoneSignIn({ alternative }: Props) {
     setBusy(true);
 
     try {
-      const response = await fetch("/api/verification/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: normalised }),
-      });
+      const response = await fetchWithTimeout(
+        "/api/verification/start",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: normalised }),
+        },
+        20_000,
+      );
 
       if (!response.ok) {
         // 503 is missing configuration, and retrying does not fix that, so the
@@ -143,8 +149,11 @@ export function PhoneSignIn({ alternative }: Props) {
 
       setPhase({ step: "code", requestId });
       setBusy(false);
-    } catch {
-      setFailure({ scope: "service", message: NO_CONNECTION });
+    } catch (error) {
+      setFailure({
+        scope: "service",
+        message: isTimeout(error) ? TIMED_OUT : NO_CONNECTION,
+      });
       setBusy(false);
     }
   }
@@ -161,7 +170,7 @@ export function PhoneSignIn({ alternative }: Props) {
     setBusy(true);
 
     try {
-      const response = await fetch("/api/verification/check", {
+      const response = await fetchWithTimeout("/api/verification/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId, code: clean, channel: "sms" }),
@@ -197,8 +206,11 @@ export function PhoneSignIn({ alternative }: Props) {
       // The home page is a server component: without refreshing it would keep
       // showing the form even though the session is open.
       if (data.person) router.refresh();
-    } catch {
-      setFailure({ scope: "service", message: NO_CONNECTION });
+    } catch (error) {
+      setFailure({
+        scope: "service",
+        message: isTimeout(error) ? TIMED_OUT : NO_CONNECTION,
+      });
       setBusy(false);
     }
   }

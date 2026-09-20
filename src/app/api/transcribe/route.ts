@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fetchWithTimeout } from "@/lib/fetch-with-timeout";
 import { logger } from "@/lib/logger";
 
 // The first server route in the project. It exists for one reason only:
@@ -80,28 +81,34 @@ export async function POST(request: Request) {
 
   let submission: Response;
   try {
-    submission = await fetch(BATCH_API_BASE, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+    // 30s, longer than this file's other calls: this one's body carries the
+    // base64 audio itself, not just a status check.
+    submission = await fetchWithTimeout(
+      BATCH_API_BASE,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          input_base64: audioBuffer.toString("base64"),
+          input_filename: "recording.webm",
+          model_code: MODEL_CODE,
+          // `language` stays fixed regardless of the interface's own
+          // language: the person talks to Mia in Spanish, because that's
+          // what the support network — starting with grandmother Rosa —
+          // speaks. Only the on-screen text is in English.
+          //
+          // No `enable_entities`, no `output_locale`: those rewrite numbers,
+          // dates and addresses before the workflow gets to decide anything,
+          // and here the workflow decides, not the transcription (see
+          // CLAUDE.md, "La tesis técnica").
+          transcription_config: { language: "es", operating_point: "enhanced" },
+        }),
       },
-      body: JSON.stringify({
-        input_base64: audioBuffer.toString("base64"),
-        input_filename: "recording.webm",
-        model_code: MODEL_CODE,
-        // `language` stays fixed regardless of the interface's own
-        // language: the person talks to Mia in Spanish, because that's
-        // what the support network — starting with grandmother Rosa —
-        // speaks. Only the on-screen text is in English.
-        //
-        // No `enable_entities`, no `output_locale`: those rewrite numbers,
-        // dates and addresses before the workflow gets to decide anything,
-        // and here the workflow decides, not the transcription (see
-        // CLAUDE.md, "La tesis técnica").
-        transcription_config: { language: "es", operating_point: "enhanced" },
-      }),
-    });
+      30_000,
+    );
   } catch (error) {
     logger.error("Failed to reach SLNG batch API", {
       error: error instanceof Error ? error.message : String(error),
@@ -124,19 +131,43 @@ export async function POST(request: Request) {
     );
   }
 
-  const { job_id: jobId } = (await submission.json()) as { job_id: string };
+  let jobId: string;
+  try {
+    ({ job_id: jobId } = (await submission.json()) as { job_id: string });
+  } catch (error) {
+    logger.error("SLNG's job response wasn't valid JSON", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return NextResponse.json(
+      { error: "SLNG's response couldn't be read." },
+      { status: 502 },
+    );
+  }
 
   let job: BatchJob | null = null;
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt += 1) {
     await sleep(POLL_INTERVAL_MS);
 
-    const statusResponse = await fetch(`${BATCH_API_BASE}/${jobId}`, {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    });
-    if (!statusResponse.ok) continue;
+    // A single network blip mid-poll shouldn't throw away 40 attempts'
+    // worth of progress: logged and treated like a non-OK response, so the
+    // loop just tries again next interval instead of failing the request.
+    try {
+      const statusResponse = await fetchWithTimeout(
+        `${BATCH_API_BASE}/${jobId}`,
+        { headers: { Authorization: `Bearer ${apiKey}` } },
+        10_000,
+      );
+      if (!statusResponse.ok) continue;
 
-    job = (await statusResponse.json()) as BatchJob;
-    if (job.status === "DONE" || job.status === "FAILED") break;
+      job = (await statusResponse.json()) as BatchJob;
+      if (job.status === "DONE" || job.status === "FAILED") break;
+    } catch (error) {
+      logger.error("Polling SLNG's batch job failed", {
+        jobId,
+        attempt,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 
   if (!job || (job.status !== "DONE" && job.status !== "FAILED")) {
@@ -158,13 +189,28 @@ export async function POST(request: Request) {
     );
   }
 
-  const filesResponse = await fetch(`${BATCH_API_BASE}/${jobId}/files`, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-  });
-  if (!filesResponse.ok) {
-    logger.error("Failed to list SLNG batch job files", {
+  let files: BatchJobFiles;
+  try {
+    const filesResponse = await fetchWithTimeout(
+      `${BATCH_API_BASE}/${jobId}/files`,
+      { headers: { Authorization: `Bearer ${apiKey}` } },
+      10_000,
+    );
+    if (!filesResponse.ok) {
+      logger.error("Failed to list SLNG batch job files", {
+        jobId,
+        status: filesResponse.status,
+      });
+      return NextResponse.json(
+        { error: "Failed to retrieve the transcription result." },
+        { status: 502 },
+      );
+    }
+    files = (await filesResponse.json()) as BatchJobFiles;
+  } catch (error) {
+    logger.error("Failed to reach or read SLNG's file listing", {
       jobId,
-      status: filesResponse.status,
+      error: error instanceof Error ? error.message : String(error),
     });
     return NextResponse.json(
       { error: "Failed to retrieve the transcription result." },
@@ -172,7 +218,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const files = (await filesResponse.json()) as BatchJobFiles;
   const textOutput = files.outputs.find((output) => output.format === "txt");
   if (!textOutput) {
     logger.error("SLNG batch job has no text output", { jobId });
@@ -182,8 +227,30 @@ export async function POST(request: Request) {
     );
   }
 
-  const transcriptResponse = await fetch(textOutput.download_url);
-  const transcript = (await transcriptResponse.text()).trim();
+  let transcript: string;
+  try {
+    const transcriptResponse = await fetchWithTimeout(textOutput.download_url, {}, 15_000);
+    if (!transcriptResponse.ok) {
+      logger.error("Failed to download the transcript file", {
+        jobId,
+        status: transcriptResponse.status,
+      });
+      return NextResponse.json(
+        { error: "Failed to retrieve the transcription result." },
+        { status: 502 },
+      );
+    }
+    transcript = (await transcriptResponse.text()).trim();
+  } catch (error) {
+    logger.error("Failed to reach the transcript file", {
+      jobId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return NextResponse.json(
+      { error: "Failed to retrieve the transcription result." },
+      { status: 502 },
+    );
+  }
 
   logger.info("SLNG transcription result", {
     jobId,
