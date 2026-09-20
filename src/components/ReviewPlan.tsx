@@ -1,8 +1,9 @@
-import { ArrowLeft, CalendarDays, SquareCheck, TriangleAlert } from "lucide-react";
+import { CalendarDays, SquareCheck, TriangleAlert } from "lucide-react";
 import type { ComponentType } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { ListeningOrb } from "@/components/ListeningOrb";
-import { Button } from "@/components/ui/button";
+import { OffloadHeader } from "@/components/OffloadHeader";
+import type { SignedInPerson } from "@/lib/session";
 
 /**
  * One row of the structured plan `/api/structure-plan` returns. `detail` is
@@ -39,17 +40,15 @@ function itemCountLabel(count: number): string {
  * one card per event, task or conflict.
  *
  * Presentational and stateless, same as `ListeningScreen`. `src/app/offload/page.tsx`
- * decides where `items` comes from — today, `/api/structure-plan` — and what
- * "Review the plan" does next.
+ * decides where `items` comes from — today, `/api/structure-plan`.
  */
 export function ReviewPlan({
   items,
-  onBack,
-  onReview,
+  person,
 }: {
   items: PlanItem[];
-  onBack: () => void;
-  onReview: () => void;
+  /** Who's signed in, for the header's account menu. `null` renders no menu. */
+  person: SignedInPerson | null;
 }) {
   return (
     <div
@@ -63,14 +62,7 @@ export function ReviewPlan({
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col px-6 pb-6 sm:max-w-lg sm:pb-10">
-        <header className="pt-[max(1rem,env(safe-area-inset-top))]">
-          <Button
-            variant="primary"
-            onClick={onBack}
-            icon={<ArrowLeft className="h-5 w-5" aria-hidden="true" />}
-            label="Back"
-          />
-        </header>
+        <OffloadHeader person={person} />
 
         <main id="content" className="flex flex-1 flex-col gap-6 py-6">
           <div className="flex flex-col items-center gap-4 text-center">
@@ -127,15 +119,6 @@ export function ReviewPlan({
         </main>
 
         <footer className="flex flex-col items-center gap-5">
-          <Button
-            variant="primary"
-            onClick={onReview}
-            className="h-14 w-full text-base"
-            style={{ borderRadius: "9999px" }}
-          >
-            Review the plan
-          </Button>
-
           <hr className="w-full border-t border-border-immersive" />
 
           <BottomNav />
