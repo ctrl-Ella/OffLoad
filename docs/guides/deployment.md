@@ -92,17 +92,25 @@ Así que el borrado no puede depender de haber leído bien la respuesta. Si el `
 
 Meter la migración en el arranque del contenedor es lo correcto cuando hay varias instancias y un despliegue por hora. Con una instancia y un fin de semana, cuesta más de lo que resuelve.
 
-### 5 · La clave privada de Vonage viaja como variable
+### 5 · Las claves privadas de Vonage viajan como variable
 
-`private.key` no se sube al repositorio, y el despliegue sale del repositorio. Así que la clave va como variable de entorno y el proceso la escribe a disco al arrancar, porque el SDK quiere una ruta de fichero.
+Ningún `.key` se sube al repositorio, y el despliegue sale del repositorio. Así que cada clave va como variable de entorno.
+
+**Son dos aplicaciones distintas y dos claves distintas**, y no se pueden intercambiar: firmar un token de vídeo con la clave de Verify falla con un error que no menciona qué clave se usó. Por eso cada variable dice a qué aplicación pertenece.
 
 ```bash
-VONAGE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"
+VONAGE_VIDEO_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"
+VONAGE_VERIFY_PRIVATE_KEY="LS0tLS1CRUdJTiBQUklWQVRF..."   # base64 -w0 verify.key
 ```
 
-**Los `\n` escapados son el detalle que rompe esto.** Una clave pegada sin escapar llega al proceso en una sola línea y el JWT falla con un error de formato que no menciona los saltos de línea por ningún lado.
+Las dos no se usan igual, y la diferencia importa:
 
-En local no se toca nada: la clave sigue siendo el fichero descargado del panel.
+- **La de vídeo no toca el disco nunca.** `tokenGenerate` firma con el contenido, así que la variable se usa tal cual.
+- **La de Verify sí se escribe a disco al arrancar**, porque ese SDK quiere una ruta de fichero. Es la única razón por la que se materializa una clave.
+
+**Los `\n` escapados son el detalle que rompe esto.** Una clave pegada sin escapar llega al proceso en una sola línea y el JWT falla con un error de formato que no menciona los saltos de línea por ningún lado. Para la de Verify, base64 es la forma segura: el CLI de Railway truncó la versión con `\n` en el primer salto, guardó 28 caracteres de 1703 y dijo que había ido bien.
+
+En local no se toca nada: cada clave sigue siendo el fichero descargado del panel, `video.key` y `verify.key`.
 
 ---
 
@@ -148,7 +156,8 @@ Las mismas de `.env.example`, más estas:
 PORT=                       # lo inyecta Railway y vale 8080. No se define
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 PUBLIC_URL=https://....up.railway.app
-VONAGE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n..."
+VONAGE_VIDEO_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n..."
+VONAGE_VERIFY_PRIVATE_KEY="LS0tLS1CRUdJTiBQUklWQVRF..."
 ```
 
 `PUBLIC_URL` pasa a ser el dominio de Railway y deja de ser el del túnel. Ese cambio es el momento de reconfigurar por última vez los webhooks de Vonage y de Make **y la URI de redirección del cliente de Google**, que es la que más se olvida porque no falla hasta el final del todo.

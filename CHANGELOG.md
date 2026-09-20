@@ -29,6 +29,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Every Vonage variable says which application it belongs to. The video set becomes `VONAGE_VIDEO_APPLICATION_ID`, `VONAGE_VIDEO_PRIVATE_KEY_PATH` and `VONAGE_VIDEO_PRIVATE_KEY`, and the key file `video.key`. Verify already had its prefix and video did not, so video read as "the Vonage application" — and the two keys are not interchangeable. Nothing on the voice side is renamed.
 - Every screen is English, by team decision: the door, the sign-in, the home screen, `/system`, Mia's state labels and the card's buttons. What Mia says out loud stays Spanish. The rule is written in `CLAUDE.md`.
 - The whole project moves to English: rules, documentation, code comments, templates, labels, agent instructions and product copy.
 - Required pull request approvals drop to zero on `main` and `dev` for the duration of the hackathon. A pull request and green CI are still enforced. Another person reviewing stays the team's agreement, now with no machine checking it.
