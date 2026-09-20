@@ -1,0 +1,108 @@
+[
+  {
+    "modelo": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+    "modalidad": "base · con agenda",
+    "casos": 6,
+    "aciertos": 2,
+    "ttft": [
+      537,
+      564,
+      4443,
+      4437,
+      226,
+      242
+    ],
+    "ms": [
+      1930,
+      3155,
+      7696,
+      7823,
+      1679,
+      5103
+    ],
+    "tokensIn": 2369,
+    "tokensOut": 843,
+    "confabulaciones": 1,
+    "fallos": [
+      {
+        "id": "g04",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "proponer → Carlos"
+      },
+      {
+        "id": "g01",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "proponer → Abuela Rosa  ⚠ disponibilidad inventada"
+      },
+      {
+        "id": "g03",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "sin_salida → ninguno"
+      },
+      {
+        "id": "g05",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "sin_salida → ninguno"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  },
+  {
+    "modelo": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+    "modalidad": "base · sin agenda",
+    "casos": 6,
+    "aciertos": 0,
+    "ttft": [
+      553,
+      552,
+      553,
+      233,
+      233,
+      392
+    ],
+    "ms": [
+      4440,
+      4491,
+      5323,
+      2703,
+      2980,
+      4291
+    ],
+    "tokensIn": 2282,
+    "tokensOut": 803,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "g02",
+        "esperado": "proponer → Carlos",
+        "obtenido": "sin_salida → ninguno"
+      },
+      {
+        "id": "g03",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "sin_salida → ninguno"
+      },
+      {
+        "id": "g01",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "sin_salida → ninguno"
+      },
+      {
+        "id": "g05",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "sin_salida → ninguno"
+      },
+      {
+        "id": "g04",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "sin_salida → ninguno"
+      },
+      {
+        "id": "g06",
+        "esperado": "proponer → Carlos",
+        "obtenido": "sin_salida → ninguno"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  }
+]

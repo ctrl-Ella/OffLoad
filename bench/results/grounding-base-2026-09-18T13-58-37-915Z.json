@@ -1,0 +1,286 @@
+[
+  {
+    "modelo": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+    "modalidad": "base · con agenda",
+    "casos": 6,
+    "aciertos": 4,
+    "ttft": [
+      405,
+      405,
+      187,
+      1424,
+      194,
+      219
+    ],
+    "ms": [
+      1308,
+      1793,
+      1528,
+      3029,
+      1307,
+      1492
+    ],
+    "tokensIn": 2369,
+    "tokensOut": 608,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "g03",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "proponer → Carlos"
+      },
+      {
+        "id": "g05",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "proponer → Carlos"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  },
+  {
+    "modelo": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+    "modalidad": "base · sin agenda",
+    "casos": 6,
+    "aciertos": 4,
+    "ttft": [
+      195,
+      708,
+      195,
+      145,
+      176,
+      179
+    ],
+    "ms": [
+      1442,
+      1477,
+      1732,
+      1518,
+      1868,
+      2110
+    ],
+    "tokensIn": 2282,
+    "tokensOut": 700,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "g02",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Nicolás"
+      },
+      {
+        "id": "g06",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Nicolás"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  },
+  {
+    "modelo": "zai-org/GLM-5.3-Flash",
+    "modalidad": "base · con agenda",
+    "casos": 6,
+    "aciertos": 6,
+    "ttft": [
+      14354,
+      21129,
+      7430,
+      22838,
+      3492,
+      8602
+    ],
+    "ms": [
+      15040,
+      22287,
+      8758,
+      24618,
+      4094,
+      9311
+    ],
+    "tokensIn": 2233,
+    "tokensOut": 3681,
+    "confabulaciones": 0,
+    "fallos": []
+  },
+  {
+    "modelo": "zai-org/GLM-5.3-Flash",
+    "modalidad": "base · sin agenda",
+    "casos": 6,
+    "aciertos": 3,
+    "ttft": [
+      29289,
+      30437,
+      89865,
+      56254,
+      178556
+    ],
+    "ms": [
+      30345,
+      31191,
+      90659,
+      56461,
+      179397,
+      228177
+    ],
+    "tokensIn": 2165,
+    "tokensOut": 20864,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "g02",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Abuela Rosa"
+      },
+      {
+        "id": "g06",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Abuela Rosa"
+      },
+      {
+        "id": "g03",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "(json inválido) → "
+      }
+    ]
+  },
+  {
+    "modelo": "google/gemma-3-27b-it",
+    "modalidad": "base · con agenda",
+    "casos": 6,
+    "aciertos": 4,
+    "ttft": [
+      328,
+      203,
+      328,
+      151,
+      117,
+      169
+    ],
+    "ms": [
+      1010,
+      1016,
+      1046,
+      682,
+      762,
+      870
+    ],
+    "tokensIn": 2111,
+    "tokensOut": 399,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "g03",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "proponer → Carlos"
+      },
+      {
+        "id": "g05",
+        "esperado": "llamar → alguien de la red",
+        "obtenido": "proponer → Carlos"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  },
+  {
+    "modelo": "google/gemma-3-27b-it",
+    "modalidad": "base · sin agenda",
+    "casos": 6,
+    "aciertos": 4,
+    "ttft": [
+      201,
+      190,
+      201,
+      140,
+      133,
+      132
+    ],
+    "ms": [
+      1008,
+      1170,
+      1221,
+      1078,
+      1058,
+      1167
+    ],
+    "tokensIn": 2041,
+    "tokensOut": 530,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "g02",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Nicolás"
+      },
+      {
+        "id": "g06",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Nicolás"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  },
+  {
+    "modelo": "deepseek-ai/DeepSeek-V4-Pro",
+    "modalidad": "base · con agenda",
+    "casos": 6,
+    "aciertos": 6,
+    "ttft": [
+      661,
+      661,
+      654,
+      580,
+      580,
+      678
+    ],
+    "ms": [
+      1392,
+      1955,
+      2065,
+      1264,
+      2104,
+      1541
+    ],
+    "tokensIn": 2296,
+    "tokensOut": 435,
+    "confabulaciones": 0,
+    "fallos": [],
+    "cuotaFinal": "0%%"
+  },
+  {
+    "modelo": "deepseek-ai/DeepSeek-V4-Pro",
+    "modalidad": "base · sin agenda",
+    "casos": 6,
+    "aciertos": 4,
+    "ttft": [
+      804,
+      849,
+      814,
+      891,
+      856,
+      523
+    ],
+    "ms": [
+      1524,
+      1676,
+      4012,
+      3433,
+      3727,
+      1401
+    ],
+    "tokensIn": 2232,
+    "tokensOut": 413,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "g02",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Nicolás"
+      },
+      {
+        "id": "g06",
+        "esperado": "proponer → Carlos",
+        "obtenido": "llamar → Nicolás"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  }
+]
