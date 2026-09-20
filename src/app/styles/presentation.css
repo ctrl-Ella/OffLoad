@@ -1,7 +1,14 @@
-.presentation-page { background: var(--color-white); color: var(--color-text); }
+/* Fills the viewport: the body underneath is cream, and a short screen showed
+   the white ending halfway down. */
+.presentation-page { min-height: 100dvh; background: var(--color-white); color: var(--color-text); }
 .presentation-page h1, .presentation-page h2, .presentation-page h3 { font-family: 'Bricolage Grotesque', Figtree, sans-serif; }
 .presentation-page a { text-decoration: none; }
 .presentation-header { width: min(1240px, calc(100% - 64px)); min-height: 84px; margin: auto; display: flex; align-items: center; gap: 56px; }
+/* The same column the header and the hero sit in, for a screen that is neither. */
+.presentation-shell { width: min(1240px, calc(100% - 64px)); margin: auto; }
+.presentation-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--color-text-muted); font-size: 13px; font-weight: 700; }
+.presentation-back:hover { color: var(--color-text); }
+.presentation-panel { padding: 25px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-white); box-shadow: 0 20px 55px color-mix(in srgb, var(--color-text) 4%, transparent); }
 .presentation-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--color-text); font: 800 27px/1 'Bricolage Grotesque', sans-serif; letter-spacing: -1.5px; }
 .presentation-brand img { object-fit: contain; }
 .presentation-brand-dot { color: var(--color-alert); }
@@ -10,6 +17,8 @@
 .presentation-eyebrow, .presentation-section-label { color: var(--color-accent-strong); font-size: 11px; font-weight: 800; letter-spacing: .11em; }
 .presentation-eyebrow { display: inline-flex; align-items: center; gap: 9px; }
 .presentation-eyebrow span { width: 18px; height: 2px; background: currentColor; }
+/* A clash is not a neutral heading: the colour is carrying the meaning. */
+.presentation-eyebrow-alert { color: var(--color-alert-strong); }
 .presentation-hero h1 { max-width: 720px; margin: 23px 0; font-size: clamp(52px, 5.5vw, 84px); line-height: 1.03; letter-spacing: -.065em; }
 .presentation-hero h1 em { color: var(--color-accent-strong); font-style: normal; }
 .presentation-typing-title { position: relative; }
@@ -75,7 +84,7 @@
 .presentation-mobile-nav { display: none; }
 
 @media (max-width: 900px) {
-  .presentation-header, .presentation-hero, .presentation-calendar-section { width: min(100% - 40px, 700px); }
+  .presentation-header, .presentation-hero, .presentation-calendar-section, .presentation-shell { width: min(100% - 40px, 700px); }
   .presentation-hero { grid-template-columns: 1fr; gap: 30px; padding-top: 55px; }
   .presentation-hero-art { min-height: 420px; }
   .presentation-calendar-section { padding: 70px 0; }

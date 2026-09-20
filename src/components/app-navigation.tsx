@@ -1,10 +1,20 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CalendarDays, Home, Mic2, ArrowRight, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SignedInPerson } from "@/lib/session";
 
-export function AppNavigation({ person }: { person: SignedInPerson | null }) {
+/**
+ * The application's chrome: the same header and mobile bar on every light
+ * screen, so `/conflict` and `/call` stop drawing their own.
+ */
+export function AppNavigation({ person }: Readonly<{ person: SignedInPerson | null }>) {
+  // Read, not hardcoded: Home carried `aria-current="page"` everywhere, which
+  // only happened to be true while this rendered on one screen.
+  const pathname = usePathname();
   return (
     <>
       <header className="presentation-header">
@@ -46,9 +56,18 @@ export function AppNavigation({ person }: { person: SignedInPerson | null }) {
         ) : null}
       </header>
       <nav className="presentation-mobile-nav" aria-label="Mobile navigation">
-        <Link href="/" aria-current="page"><Home size={21} aria-hidden="true" /><span>Home</span></Link>
-        <Link href="/#agenda"><CalendarDays size={21} aria-hidden="true" /><span>Calendar</span></Link>
-        <Link href="/offload"><Mic2 size={21} aria-hidden="true" /><span>Offload</span></Link>
+        <Link href="/" aria-current={pathname === "/" ? "page" : undefined}>
+          <Home size={21} aria-hidden="true" />
+          <span>Home</span>
+        </Link>
+        <Link href="/#agenda">
+          <CalendarDays size={21} aria-hidden="true" />
+          <span>Calendar</span>
+        </Link>
+        <Link href="/offload" aria-current={pathname === "/offload" ? "page" : undefined}>
+          <Mic2 size={21} aria-hidden="true" />
+          <span>Offload</span>
+        </Link>
       </nav>
     </>
   );
