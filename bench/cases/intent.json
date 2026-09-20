@@ -1,0 +1,39 @@
+{
+  "description": "Sentences dictated out loud by members of the family, transcribed as they came out. They include filler words, self-corrections and sentences that trail off, because that is what a real dictation produces and it is where a small model breaks. The label values are the classifier's own vocabulary and stay in Spanish, as do the sentences themselves: the family speaks Spanish to Mia.",
+  "labels": ["parada", "recordatorio", "nota", "delegar", "mover", "consulta", "compra"],
+  "cases": [
+    { "id": "i01", "text": "Mañana el niño tiene piscina a las siete", "expected": "parada" },
+    { "id": "i02", "text": "Acuérdame de llamar al dentista", "expected": "recordatorio" },
+    { "id": "i03", "text": "Apunta que Carlos tiene que devolver el libro de la biblioteca", "expected": "nota" },
+    { "id": "i04", "text": "Pregúntale a Carlos si puede llevar él al niño a la piscina", "expected": "delegar" },
+    { "id": "i05", "text": "Cámbiame la reunión de las cinco a las siete", "expected": "mover" },
+    { "id": "i06", "text": "Dime qué tengo hoy", "expected": "consulta" },
+    { "id": "i07", "text": "Añade leche y pan a la compra", "expected": "compra" },
+
+    { "id": "i08", "text": "Eh, pues mira, el jueves tengo médico a las diez y media", "expected": "parada" },
+    { "id": "i09", "text": "No, espera, el jueves no, el viernes, médico a las diez y media", "expected": "parada" },
+    { "id": "i10", "text": "Que no se me olvide sacar las entradas", "expected": "recordatorio" },
+    { "id": "i11", "text": "Oye, ¿me puedes buscar un hueco esta semana que tengo que ir a comprar?", "expected": "consulta" },
+    { "id": "i12", "text": "Ponle a Carlos que recoja a la niña el martes", "expected": "delegar" },
+    { "id": "i13", "text": "Mueve lo del gimnasio a mañana que hoy no llego", "expected": "mover" },
+    { "id": "i14", "text": "Toma nota de que hay que renovar el abono del transporte", "expected": "nota" },
+    { "id": "i15", "text": "Pollo, patatas y algo para el postre", "expected": "compra" },
+
+    { "id": "i16", "text": "El sábado hay cumple en casa de Marta a las cinco", "expected": "parada" },
+    { "id": "i17", "text": "Recuérdamelo antes de salir del trabajo", "expected": "recordatorio" },
+    { "id": "i18", "text": "¿Carlos está libre el miércoles por la tarde?", "expected": "consulta" },
+    { "id": "i19", "text": "A ver si puede ir mi madre a por el niño el jueves", "expected": "delegar" },
+    { "id": "i20", "text": "Lo del dentista pásalo a la semana que viene", "expected": "mover" },
+    { "id": "i21", "text": "Guarda que la profe dijo que hay reunión pronto, sin fecha todavía", "expected": "nota" },
+    { "id": "i22", "text": "Que falta detergente", "expected": "compra" },
+
+    { "id": "i23", "text": "Es que el lunes entro a las nueve en vez de a las ocho", "expected": "mover" },
+    { "id": "i24", "text": "Extraescolar de inglés, los martes de seis a siete", "expected": "parada" },
+    { "id": "i25", "text": "¿Qué me queda por hacer hoy?", "expected": "consulta" },
+    { "id": "i26", "text": "Dile a Carlos que ya que va al súper se lleve el libro", "expected": "delegar" },
+    { "id": "i27", "text": "Avísame media hora antes, que se me pasa", "expected": "recordatorio" },
+    { "id": "i28", "text": "Anota que hay que mirar campamentos de verano en algún momento", "expected": "nota" },
+    { "id": "i29", "text": "Compra papel de horno que se acabó ayer", "expected": "compra" },
+    { "id": "i30", "text": "Pues nada, que el niño sale del cole a las cinco y no a las cuatro y media como siempre", "expected": "mover" }
+  ]
+}

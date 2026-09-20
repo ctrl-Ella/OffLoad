@@ -40,6 +40,16 @@ const eslintConfig = defineConfig([
     },
   },
 
+  {
+    // El banco de pruebas es una herramienta de linea de comandos: su informe
+    // por consola es su producto, no un resto de depuracion. El resto de reglas
+    // le siguen aplicando, porque es material que se lee desde fuera.
+    files: ["bench/**/*.ts"],
+    rules: {
+      "no-console": "off",
+    },
+  },
+
   globalIgnores([
     ".next/**",
     "out/**",
@@ -47,10 +57,11 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Codigo generado por Prisma: no es nuestro y cambia en cada `generate`.
     "src/generated/**",
-    // Material del equipo, fuera de git. El banco de pruebas de Nebius que
-    // vive ahi es una herramienta de linea de comandos: imprime su informe por
-    // consola a proposito, que es justo lo que la aplicacion tiene prohibido.
+    // Material interno del equipo, fuera de git: el brief, los archivos de
+    // referencia y los audios del banco, que son la voz de una persona real.
     "docs-internos/**",
+    // Dependencias del banco, que es un paquete npm aparte.
+    "bench/node_modules/**",
   ]),
 ]);
 

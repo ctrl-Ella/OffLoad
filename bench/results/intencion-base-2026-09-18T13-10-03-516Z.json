@@ -1,0 +1,103 @@
+[
+  {
+    "modelo": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+    "modalidad": "base",
+    "casos": 30,
+    "aciertos": 25,
+    "ttft": [
+      424,
+      426,
+      425,
+      456,
+      456,
+      222,
+      222,
+      238,
+      152,
+      168,
+      150,
+      196,
+      199,
+      202,
+      189,
+      145,
+      140,
+      163,
+      243,
+      229,
+      162,
+      189,
+      258,
+      167,
+      188,
+      154,
+      158,
+      146,
+      161,
+      157
+    ],
+    "ms": [
+      526,
+      553,
+      569,
+      674,
+      678,
+      389,
+      460,
+      478,
+      361,
+      380,
+      328,
+      335,
+      358,
+      380,
+      364,
+      309,
+      290,
+      288,
+      436,
+      437,
+      373,
+      439,
+      469,
+      310,
+      394,
+      324,
+      334,
+      322,
+      312,
+      310
+    ],
+    "tokensIn": 6044,
+    "tokensOut": 296,
+    "confabulaciones": 0,
+    "fallos": [
+      {
+        "id": "i03",
+        "esperado": "nota",
+        "obtenido": "delegar"
+      },
+      {
+        "id": "i09",
+        "esperado": "parada",
+        "obtenido": "mover"
+      },
+      {
+        "id": "i19",
+        "esperado": "delegar",
+        "obtenido": "consulta"
+      },
+      {
+        "id": "i21",
+        "esperado": "nota",
+        "obtenido": "recordatorio"
+      },
+      {
+        "id": "i28",
+        "esperado": "nota",
+        "obtenido": "recordatorio"
+      }
+    ],
+    "cuotaFinal": "0%%"
+  }
+]

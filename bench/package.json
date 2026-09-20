@@ -1,0 +1,18 @@
+{
+  "name": "offload-bench",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nebius Token Factory benchmark for OFFLOAD (CTRL4ELLA)",
+  "type": "commonjs",
+  "scripts": {
+    "bench": "tsx --env-file-if-exists=../.env bench.ts"
+  },
+  "dependencies": {
+    "openai": "4.104.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2"
+  }
+}
