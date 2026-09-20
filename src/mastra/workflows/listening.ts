@@ -59,6 +59,17 @@ export async function runWaitingForTheCall(): Promise<WaitingForTheCall | null> 
   return null;
 }
 
+/** The looks at the day, one after another: the guard inside `look` protects
+ *  nothing until the first run has suspended, and two people join seconds
+ *  apart. In memory and one instance, like the lock in `/api/room/heard`. */
+let queue: Promise<void> = Promise.resolve();
+
+export function letHerLookAtTheDay(personId: string): Promise<void> {
+  queue = queue.then(() => look(personId)).catch(() => undefined);
+
+  return queue;
+}
+
 /**
  * Have Mia look at the household's day, without anyone having told her
  * anything. It is what gives her something to talk about in the call: before
@@ -70,7 +81,7 @@ export async function runWaitingForTheCall(): Promise<WaitingForTheCall | null> 
  * nothing: two people entering at once cannot leave two runs looking at the
  * same thing.
  */
-export async function letHerLookAtTheDay(personId: string): Promise<void> {
+async function look(personId: string): Promise<void> {
   try {
     // Whoever enters second finds the run the first started and touches nothing.
     if (await runWaitingForTheCall()) return;

@@ -53,6 +53,13 @@ const LINE = {
 const EVERY_MS = 3000;
 
 /**
+ * How long a room waits for its first caption before saying none has arrived.
+ * Vonage takes a few seconds to get the transcription running, so a shorter
+ * wait would call a working call broken.
+ */
+const FIRST_CAPTION_MS = 15_000;
+
+/**
  * Echo cannot be fixed from inside: the browser's cancellation only knows its
  * own speaker, and on a table with two devices that is where the feedback
  * comes from. The only thing that cuts it is one of the two not sounding, so
@@ -76,6 +83,17 @@ export function Room({
   const [caption, setCaption] = useState("");
   const [heardSomething, setHeardSomething] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+
+  /**
+   * That the room has waited for a first caption and none came. It does not
+   * claim the captions failed — that is not known from here — only that
+   * nothing has been heard, which is what makes waiting for Mia pointless.
+   */
+  const [nothingHeardYet, setNothingHeardYet] = useState(false);
+  const [asking, setAsking] = useState(false);
+
+  /** What came back from asking her, when it was not a proposal. */
+  const [nothingToBring, setNothingToBring] = useState(false);
 
   /**
    * Which run Mia finished saying her piece in. It is what brings the buttons
@@ -161,6 +179,42 @@ export function Room({
       clearInterval(clock);
     };
   }, [inside, lookForSomething]);
+
+  useEffect(() => {
+    if (!inside || heardSomething) return;
+
+    const clock = setTimeout(() => setNothingHeardYet(true), FIRST_CAPTION_MS);
+
+    return () => clearTimeout(clock);
+  }, [inside, heardSomething]);
+
+  /**
+   * Asking Mia to step in. She asks for the floor and nothing more: what sounds
+   * and when is still decided by whoever presses the other button, so rule 2
+   * holds. The answer says whether she had anything to bring, because a day
+   * with no clash is silent in exactly the way dead captions are.
+   */
+  const askMia = useCallback(async () => {
+    setAsking(true);
+    setNothingToBring(false);
+
+    try {
+      const response = await fetch("/api/room/heard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "", force: true }),
+      });
+
+      const said = response.ok ? ((await response.json()) as { speaks?: boolean }) : null;
+
+      if (said?.speaks) await lookForSomething();
+      else setNothingToBring(true);
+    } catch {
+      setNothingToBring(true);
+    } finally {
+      setAsking(false);
+    }
+  }, [lookForSomething]);
 
   // Outside the room there is no card to show, and that follows from where
   // you are: no effect needed to clear it.
@@ -319,10 +373,24 @@ export function Room({
           )}
         </div>
 
-        {/* No button to call her here, and it is deliberate. Mia asks for the
-            floor by herself: if she had to be asked, what the product shows
-            is an AI waiting to be invited. The net for when the conversation
-            does not wake her is on the server and cannot be seen. */}
+        {/* Only with nothing heard at all: a button always standing there
+            would show an AI waiting to be invited. Spec 0005 carries the rest. */}
+        {inside && nothingHeardYet && !heardSomething && !onTheTable && (
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <p className="text-sm text-room-ink-muted">
+              {nothingToBring
+                ? "Nothing on today's calendars clashes, so Mia has nothing to bring."
+                : "No captions yet."}
+            </p>
+
+            {!nothingToBring && (
+              <Button variant="room" size="small" onClick={() => void askMia()} loading={asking}>
+                Ask Mia to step in
+              </Button>
+            )}
+          </div>
+        )}
+
         {onTheTable && saidIn === onTheTable.runId && (
           <Card proposal={onTheTable} answering={answering} answer={answer} />
         )}
