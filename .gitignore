@@ -58,10 +58,14 @@ next-env.d.ts
 # datos locales de Docker por si alguien monta el volumen en el repo
 /docker/data
 
-# el banco es un paquete npm aparte, con sus propias dependencias
+# el banco de pruebas es un paquete npm aparte, con sus propias dependencias
 /bench/node_modules
 
-# los audios del banco son voz de una persona real: viaja la transcripcion
+# --- la voz de una persona no se versiona ---
+# Los audios del banco son voz humana real, o sea un dato personal. Viven en
+# /docs-internos, que ya esta ignorado; estos globs cubren el dia que alguien
+# deje un clip suelto en otra carpeta por comodidad. Al repositorio viaja la
+# transcripcion, que es texto.
 *.m4a
 *.wav
 *.webm

@@ -19,6 +19,12 @@
     "test:unit": "node --experimental-strip-types --test \"tests/unit/**/*.test.ts\"",
     "test:guardrails": "node --experimental-strip-types --test \"tests/guardrails.test.ts\"",
     "bench:agents": "node --experimental-strip-types --env-file=.env --import ./scripts/with-alias.mjs bench/agents.ts",
+    "bench": "npm --prefix bench run bench --",
+    "bench:dry": "npm run bench -- --suite intent --dry",
+    "bench:intent": "npm run bench -- --suite intent",
+    "bench:grounding": "npm run bench -- --suite grounding",
+    "bench:voice": "npm run bench -- --suite intent --cases cases/intent-voice.json",
+    "bench:transcribe": "node --experimental-strip-types --env-file=.env scripts/transcribe-bench-audio.ts",
     "demo:seed": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts seed",
     "demo:clear": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts clear",
     "demo:show": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts show"
