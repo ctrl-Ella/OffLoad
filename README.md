@@ -11,6 +11,29 @@ Built by team CTRL4ELLA for HackBarna AI Summit 26.
 
 > **Status:** under construction. The skeleton is standing and continuous integration is green. The product is being built on top of it.
 
+One run through the product, left to right: arrive to the day's screen, leave Mia a voice note, come back to find she's already sorted it — or, when she can't, surfaced the one clash that needs the two of you.
+
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <img src="public/offload_first_screen.png" alt="The signed-in home screen: Mia, the day's headline, and the account menu open." width="220" /><br />
+      <sub><b>1. The day, on arrival.</b><br />Mia and today's plan, already there.</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="public/offload_brain_dump.png" alt="The voice entry screen, waiting for a tap to start recording." width="220" /><br />
+      <sub><b>2. Say it, don't type it.</b><br />A tap, then whatever's on your mind.</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="public/offload_conflicts.png" alt="The home screen with a clash surfaced and a call already open." width="220" /><br />
+      <sub><b>3. What Mia found.</b><br />A clash she can't resolve alone, and a call already open about it.</sub>
+    </td>
+    <td align="center" width="25%">
+      <img src="public/offload_videocall.png" alt="The video call screen, talking a clash through with Mia listening." width="220" /><br />
+      <sub><b>4. The two of you decide.</b><br />Mia listens along and only speaks once you're both stuck.</sub>
+    </td>
+  </tr>
+</table>
+
 ---
 
 ## The problem
