@@ -9,8 +9,9 @@ import { TypingHeadline } from "@/components/typing-headline";
 import { GoogleSignIn } from "@/components/google-sign-in";
 import { PhoneSignIn } from "@/components/phone-sign-in";
 import { Notice } from "@/components/ui/notice";
-import { todayInMadrid } from "@/lib/clock";
-import { coreJourney, type Lane } from "@/lib/schedule";
+import { calendarEntries, calendarStatuses } from "@/lib/calendar-entries";
+import { dayRange, todayInMadrid } from "@/lib/clock";
+import { coreRange, type Lane } from "@/lib/schedule";
 import { currentPerson, type SignedInPerson } from "@/lib/session";
 
 /**
@@ -87,12 +88,39 @@ function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
   );
 }
 
+/** How far the calendar browses either side of this week. Three weeks is
+ *  what a family plans over; beyond that the arrows stop, because a week
+ *  with nothing loaded would read as a free week. */
+const WEEKS_BEFORE = 1;
+const WEEKS_AFTER = 1;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** The instants the browsable weeks run between, Monday to Sunday, in the household's zone. */
+function browsableRange(today: string): { from: Date; to: Date } {
+  const { from: startOfToday } = dayRange(today);
+  // Monday-based: `getUTCDay` of a Madrid midnight expressed in UTC is still
+  // the same weekday, since the offset never crosses a day boundary.
+  const weekday = (new Date(startOfToday.getTime() + 12 * 60 * 60 * 1000).getUTCDay() + 6) % 7;
+  const monday = new Date(startOfToday.getTime() - weekday * DAY_MS);
+
+  return {
+    from: new Date(monday.getTime() - WEEKS_BEFORE * 7 * DAY_MS),
+    to: new Date(monday.getTime() + (WEEKS_AFTER + 1) * 7 * DAY_MS),
+  };
+}
+
 async function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
   const today = todayInMadrid();
 
-  // Only the core has a calendar to read. For the support network the day is
-  // not looked at, because there is nothing of theirs to look at.
-  const [lane] = person.circle === "CORE" ? await coreJourney(today, person.id) : [undefined];
+  // Only the core has a calendar to read. For the support network nothing is
+  // looked at, because there is nothing of theirs to look at. Both core
+  // calendars are read at once: the family calendar shows the household,
+  // and the day's status below the hero is the signed-in person's lane.
+  const { from, to } = browsableRange(today);
+  const lanes = person.circle === "CORE" ? await coreRange(from, to) : [];
+  const lane = lanes.find((candidate) => candidate.personId === person.id);
+  const todayKey = today;
 
   return (
     <div className="presentation-page">
@@ -131,12 +159,18 @@ async function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
             <h2 id="today-heading" className="presentation-section-label">
               TODAY
             </h2>
-            <DayStatus lane={lane} />
+            <DayStatus lane={lane} today={todayKey} />
             <CallNotice />
           </section>
         ) : null}
 
-        <PresentationCalendar today={today} />
+        <PresentationCalendar
+          today={today}
+          entries={calendarEntries(lanes)}
+          calendars={calendarStatuses(lanes)}
+          weeksBefore={WEEKS_BEFORE}
+          weeksAfter={WEEKS_AFTER}
+        />
       </main>
     </div>
   );
@@ -148,7 +182,7 @@ async function Presentation({ person }: Readonly<{ person: SignedInPerson }>) {
  * day, a calendar Mia cannot see, and a calendar nobody has connected — and
  * painting the last two as the first would claim a free day nobody knows.
  */
-function DayStatus({ lane }: Readonly<{ lane: Lane }>) {
+function DayStatus({ lane, today }: Readonly<{ lane: Lane; today: string }>) {
   if (lane.status === "no-google") {
     return (
       <Notice tone="quiet" title="I can't see your calendar yet">
@@ -165,7 +199,12 @@ function DayStatus({ lane }: Readonly<{ lane: Lane }>) {
     );
   }
 
-  const clash = lane.conflicts[0];
+  // The lane covers three weeks; the status is about today, so the first
+  // clash of today and not of the range. `/conflict` reads the day on its own.
+  const { from, to } = dayRange(today);
+  const clash = lane.conflicts.find(
+    (candidate) => candidate.next.startsAt >= from && candidate.next.startsAt < to,
+  );
 
   if (!clash) {
     return (
