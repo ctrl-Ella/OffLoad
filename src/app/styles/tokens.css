@@ -92,6 +92,7 @@
      a utility class would invite them onto text and backgrounds they were
      never measured for. Contrasts below are measured, not estimated. */
   --mia-sky: #1e1b4b;          /* the halo that lifts her off the page */
+  --mia-glow-blue: #3988ff;
   --mia-visor-light: #4a3f8f;  /* the glass where the light hits it */
   --mia-visor-dark: #171436;   /* and its shaded side */
   --mia-helmet: #f2f4ff;       /* 14.59:1 on the sky · 7.99:1 on the visor */

@@ -1,3 +1,21 @@
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 10px;
+  left: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--color-text);
+  color: var(--color-white);
+  transform: translateY(-160%);
+}
+
+/* `:focus`, not `:focus-visible`: focus moved by script does not always match
+   `:focus-visible`, and a skip link nobody can see is a skip link nobody has. */
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
 
   *,
