@@ -133,9 +133,14 @@ export async function startCaptions(sessionId: string): Promise<void> {
       return;
     }
 
-    log.info(response.status === 409 ? "room: captions were already on" : "room: captions did not start", {
-      status: response.status,
-    });
+    // A 409 is the second person entering and is normal. Anything else leaves
+    // Mia unable to hear for the rest of the call, which is not an `info`.
+    if (response.status === 409) {
+      log.info("room: captions were already on", { status: response.status });
+      return;
+    }
+
+    log.warn("room: captions did not start", { status: response.status });
   } catch (error) {
     // The call works without captions: what is lost is Mia hearing.
     log.warn("room: captions did not start", { reason: reason(error) });

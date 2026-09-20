@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Home, Mic2, ArrowRight, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CalendarDays, Home, Mic2, ArrowRight } from "lucide-react";
+import { AccountMenu } from "@/components/account-menu";
 import type { SignedInPerson } from "@/lib/session";
 
 /**
@@ -28,31 +28,16 @@ export function AppNavigation({ person }: Readonly<{ person: SignedInPerson | nu
         </Link>
 
         {/* Same account menu as the voice flow's header (see
-            `OffloadHeader`): who's signed in, and the way out. This page's
-            own background is already the one that menu's white card and
-            `Button`'s `secondary` variant are calibrated for. */}
+            `OffloadHeader`): who's signed in, and the way out. `ml-auto`
+            here and not on the menu itself: `.presentation-header-link`
+            carries its own `margin-left: auto` but disappears on mobile
+            (see `presentation.css`'s breakpoint), and without this the menu
+            loses the only thing pushing it to the right and lands next to
+            the logo instead. */}
         {person ? (
-          <details className="relative ml-auto">
-            <summary
-              aria-label="Your profile"
-              className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-control text-ink-muted hover:bg-white [&::-webkit-details-marker]:hidden"
-            >
-              <User className="size-5" aria-hidden="true" />
-            </summary>
-
-            <div className="absolute right-0 z-10 mt-2 w-72 rounded-card border border-border bg-white p-4 text-left shadow-sm">
-              <p className="text-sm font-medium text-ink">{person.name}</p>
-              <p className="mt-1 text-sm text-ink-muted">
-                Line ending in {person.phoneTail}, confirmed by your carrier. I remember
-                you for thirty days.
-              </p>
-              <form action="/api/auth/logout" method="post" className="mt-3">
-                <Button type="submit" variant="secondary" size="small">
-                  Sign out
-                </Button>
-              </form>
-            </div>
-          </details>
+          <div className="ml-auto">
+            <AccountMenu person={person} tone="light" />
+          </div>
         ) : null}
       </header>
       <nav className="presentation-mobile-nav" aria-label="Mobile navigation">

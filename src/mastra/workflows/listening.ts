@@ -27,6 +27,10 @@ export type WaitingForTheCall = {
  * The run waiting for people to talk, if there is one. The most recent: a
  * weekend of rehearsals leaves stopped runs behind, and waking the oldest
  * would be answering a conversation from an hour ago.
+ *
+ * A store that cannot be read throws from here instead of answering null. Both
+ * callers catch it, and "nothing is waiting" is an answer Mia acts on: it is
+ * not the same as not having been able to look.
  */
 export async function runWaitingForTheCall(): Promise<WaitingForTheCall | null> {
   const workflow = mastra.getWorkflow("resolveConflict");
@@ -59,6 +63,17 @@ export async function runWaitingForTheCall(): Promise<WaitingForTheCall | null> 
   return null;
 }
 
+/** The looks at the day, one after another: the guard inside `look` protects
+ *  nothing until the first run has suspended, and two people join seconds
+ *  apart. In memory and one instance, like the lock in `/api/room/heard`. */
+let queue: Promise<void> = Promise.resolve();
+
+export function letHerLookAtTheDay(personId: string): Promise<void> {
+  queue = queue.then(() => look(personId)).catch(() => undefined);
+
+  return queue;
+}
+
 /**
  * Have Mia look at the household's day, without anyone having told her
  * anything. It is what gives her something to talk about in the call: before
@@ -70,7 +85,7 @@ export async function runWaitingForTheCall(): Promise<WaitingForTheCall | null> 
  * nothing: two people entering at once cannot leave two runs looking at the
  * same thing.
  */
-export async function letHerLookAtTheDay(personId: string): Promise<void> {
+async function look(personId: string): Promise<void> {
   try {
     // Whoever enters second finds the run the first started and touches nothing.
     if (await runWaitingForTheCall()) return;
@@ -83,9 +98,9 @@ export async function letHerLookAtTheDay(personId: string): Promise<void> {
     // before anyone has opened their mouth.
     const old = await workflow.listWorkflowRuns({ status: "suspended", page: 0, perPage: MAX_RUNS });
 
-    for (const run of old.runs) {
-      await workflow.deleteWorkflowRunById(run.runId);
-    }
+    // Together and not one after another: this is on the way into the room,
+    // and a weekend of rehearsals can leave fifty runs to clear.
+    await Promise.all(old.runs.map((run) => workflow.deleteWorkflowRunById(run.runId)));
 
     if (old.runs.length > 0) {
       log.info("listening: earlier conversations discarded", { count: old.runs.length });

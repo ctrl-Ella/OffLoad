@@ -120,7 +120,7 @@ The Postgres schema already reflects the split — `Verification`, `Session` and
 | `GET /api/verification/check` | The return leg: confirms the line, looks up the `Person`, opens the session |
 | `POST /api/verification/failed` | Records that the silent path could not complete, so the screen can offer the other door |
 | `GET /api/auth/google` | Generates `state`, stores it in a short-lived cookie, redirects to Google |
-| `GET /api/auth/google/callback` | Validates `state`, exchanges the code, looks up the `Person`, writes `GoogleAccount` and `Session` |
+| `GET /api/auth/callback/google` | Validates `state`, exchanges the code, looks up the `Person`, writes `GoogleAccount` and `Session` |
 | `POST /api/auth/logout` | Deletes the row in `sessions` and clears the cookie |
 
 **Server functions**, in one module: `openSession(personId)`, `currentPerson()` and `closeSession()`. `currentPerson()` is the only place a cookie is turned into an identity.
@@ -149,7 +149,7 @@ npm run db:migrate
 npm run dev
 ```
 
-1. In Google Cloud Console: register `<PUBLIC_URL>/api/auth/google/callback` as an authorised redirect URI, add both addresses as test users, and check the consent screen asks for all four permissions.
+1. In Google Cloud Console: register `<PUBLIC_URL>/api/auth/callback/google` as an authorised redirect URI, add both addresses as test users, and check the consent screen asks for all four permissions.
 2. Seed the two people in the `CORE` circle with `npm run db:seed`. It reads their numbers and addresses from `TEST_PHONE_*` and `TEST_EMAIL_*`, which live in the environment and not in a committed file: the repository is public, and an address written into one is an address published.
 3. Open `/` on a phone over mobile data, type Elvia's number, and check she gets in without typing a code.
 4. Open `/` on a laptop, try the same number: silent verification cannot complete, and the screen has to say so and offer Google.

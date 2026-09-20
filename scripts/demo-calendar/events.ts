@@ -27,7 +27,10 @@ export const agenda: Record<string, DemoEvent[]> = {
   Elvia: [
     { date: "2026-09-19", from: "11:00", to: "12:00", title: "Compra semanal", place: "Mercadona" },
 
-    // Sunday the 20th is empty on both calendars, on purpose.
+    // Do not round these times: Zona Franca to Nou Barris is 35 minutes at
+    // city speed and the gap is 30, so five minutes is the whole scene.
+    { date: "2026-09-20", from: "14:00", to: "18:30", title: "Turno en el trabajo", place: "Trabajo de Elvia" },
+    { date: "2026-09-20", from: "19:00", to: "20:00", title: "Natación del niño", place: "Piscina" },
 
     { date: "2026-09-21", from: "09:00", to: "17:00", title: "Trabajo" },
     { date: "2026-09-21", from: "18:30", to: "19:30", title: "Fisioterapia", place: "Carrer de Sants 42" },
@@ -46,6 +49,8 @@ export const agenda: Record<string, DemoEvent[]> = {
   Carlos: [
     { date: "2026-09-19", from: "10:00", to: "11:30", title: "Pádel con Nicolás", place: "Club Esportiu Sants" },
 
+    // Sunday the 20th stays clear on his side: the proposal names someone in
+    // the core only when their calendar is free in the slot.
     { date: "2026-09-21", from: "08:00", to: "16:00", title: "Trabajo" },
 
     { date: "2026-09-22", from: "08:00", to: "16:00", title: "Trabajo" },
