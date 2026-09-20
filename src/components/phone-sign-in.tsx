@@ -300,13 +300,6 @@ export function PhoneSignIn({ alternative }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      <Notice title="Apaga el wifi antes de empezar">
-        <p>
-          La comprobación va por la red de tu operador. Con el wifi encendido no
-          sale por ahí y hay que teclear un código.
-        </p>
-      </Notice>
-
       <form
         className="flex flex-col gap-4"
         onSubmit={(event) => {

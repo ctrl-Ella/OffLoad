@@ -2,31 +2,23 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OFFLOAD",
+  title: "Offload · Menos carga mental, más tiempo para vivir",
   description:
-    "A family app that shares the mental load. Mia spots problems before " +
-    "anyone else does and only asks for a yes or no when needed.",
+    "Coordina los planes familiares, resuelve imprevistos y recupera tiempo para ti con Offload y Mia.",
 };
 
-// Declare the interface language so screen readers use English pronunciation.
+// `lang="es"` no es decorativo: sin él, un lector de pantalla pronuncia el
+// castellano con fonética inglesa y la página deja de entenderse.
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
       <body className="antialiased">
-        {/* First tabbable element in the whole app. Invisible until it
-            receives focus; then it jumps in front of any screen (light or
-            dark) with its own opaque box, so it doesn't depend on what
-            background is behind it. Each screen marks its main content
-            with `id="content"`. */}
-        <a
-          href="#content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-bg focus:px-4 focus:py-2 focus:font-medium focus:text-ink"
-        >
+        {/* Lives in the layout, so it has to point at the id every screen uses. */}
+        <a className="skip-link" href="#content">
           Saltar al contenido principal
         </a>
-
         {children}
       </body>
     </html>
