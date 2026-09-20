@@ -57,6 +57,13 @@ model Person {
   circle    Circle
   phoneHash String   @unique @map("phone_hash")
   phoneTail String   @map("phone_tail")
+  /// The one exception to "never store the number as given": Mia has to
+  /// actually dial or text the support network, and a hash cannot be sent an
+  /// SMS. Null for the core, which the app already reaches through a
+  /// signed-in session, never by text. Set once, when the family adds
+  /// someone to the support network — never derived from a verification, so
+  /// verifying a line never has the side effect of publishing it.
+  phone     String?
   /// The Google address, when there is one. It is the second way in.
   ///
   /// Optional on purpose: the support network has no account, and someone in

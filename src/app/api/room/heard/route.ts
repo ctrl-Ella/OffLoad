@@ -1,9 +1,12 @@
 import { after, NextResponse } from "next/server";
 import { z } from "zod";
+import { supportNetwork } from "@/lib/household";
+import { inviteToCall } from "@/lib/invite";
 import { log, reason } from "@/lib/log";
-import { notifyRoom } from "@/lib/room";
+import { notifyRoom, openRoom } from "@/lib/room";
 import { currentPerson } from "@/lib/session";
-import { bothHaveRuledItOut, type Utterance } from "@/mastra/listening";
+import { sendSignal } from "@/lib/video";
+import { bothHaveRuledItOut, isAnInviteCommand, matchInvitedPerson, type Utterance } from "@/mastra/listening";
 import { giveMiaTheFloor, runWaitingForTheCall } from "@/mastra/workflows/listening";
 
 /**
@@ -18,6 +21,10 @@ import { giveMiaTheFloor, runWaitingForTheCall } from "@/mastra/workflows/listen
  * call lasts three minutes and a process restarting halfway cuts it anyway.
  * What survives is the decision, because that goes to the run in Postgres.
  * Nothing of the text is logged: it is a couple's conversation.
+ *
+ * The same lines are also checked for "invita a Rosa" (spec 0009), which is
+ * a different question from whether both have ruled the plan out and is
+ * answered independently of it.
  */
 
 const requestSchema = z.object({
@@ -47,6 +54,46 @@ const MAX_LINES = 200;
  */
 const ALREADY_WOKEN = new Set<string>();
 
+/**
+ * Which support-network person was texted in the last minute. Guards against
+ * the duplicate this route sees by construction: the same spoken sentence
+ * reaches here once per browser subscribed to the speaker's stream —
+ * normally two, three once a guest is in the room — each POST authenticated
+ * as a different core person. Keyed by who is invited, not by the caption's
+ * text: nothing else is shared between those requests to deduplicate on.
+ */
+const RECENTLY_INVITED = new Map<string, number>();
+
+const INVITE_COOLDOWN_MS = 60_000;
+
+/**
+ * Detects and acts on "invita a Rosa", independent of whether a workflow run
+ * is waiting for the call: asking for the support network is not part of the
+ * negotiation the run tracks, and gating it on a waiting run would silently
+ * drop the command the rest of the time.
+ */
+async function handleInviteCommand(text: string): Promise<void> {
+  const sessionId = await openRoom();
+
+  if (!sessionId) return;
+
+  const network = await supportNetwork();
+  const matched = matchInvitedPerson(text, network);
+
+  if (!matched) {
+    await sendSignal(sessionId, "invite", JSON.stringify({ status: "unclear" }));
+    return;
+  }
+
+  const lastInvited = RECENTLY_INVITED.get(matched.id) ?? 0;
+
+  if (Date.now() - lastInvited < INVITE_COOLDOWN_MS) return;
+
+  RECENTLY_INVITED.set(matched.id, Date.now());
+
+  await inviteToCall(sessionId, matched);
+}
+
 export async function POST(request: Request) {
   const person = await currentPerson();
 
@@ -73,6 +120,13 @@ export async function POST(request: Request) {
   }
 
   const { text, who, force } = validated.data;
+
+  // Checked before anything else, and outside the run-waiting logic below:
+  // inviting the support network is not part of the negotiation a run
+  // tracks, so it has to work whether or not one is waiting.
+  if (isAnInviteCommand(text)) {
+    after(() => handleInviteCommand(text));
+  }
 
   try {
     const waiting = await runWaitingForTheCall();

@@ -24,6 +24,13 @@ import { useRoom } from "@/components/useRoom";
  * session. An example of it would be a stage set.
  */
 
+/**
+ * What the "invite" signal carries: whether Mia's SMS actually went out, sent
+ * only once Vonage has confirmed it — rule 4 — never from the moment the
+ * command was heard.
+ */
+type InviteSignal = { status: "sent"; name: string } | { status: "failed"; name: string } | { status: "unclear" };
+
 /** What Mia has on the table, as it arrives from the route. */
 type ProposalInRoom = {
   runId: string;
@@ -76,6 +83,7 @@ export function Room({
   const [caption, setCaption] = useState("");
   const [heardSomething, setHeardSomething] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [invite, setInvite] = useState<InviteSignal | null>(null);
 
   /**
    * Which run Mia finished saying her piece in. It is what brings the buttons
@@ -138,13 +146,37 @@ export function Room({
     [lookForSomething],
   );
 
-  const room = useRoom({
-    mySlot,
-    theirSlot,
-    onCaption,
-    onSignal: () => void lookForSomething(),
-  });
+  const onSignal = useCallback(
+    (type: string, data: string) => {
+      if (type === "proposal") {
+        void lookForSomething();
+        return;
+      }
+
+      if (type === "invite") {
+        try {
+          setInvite(JSON.parse(data) as InviteSignal);
+        } catch {
+          // A malformed signal is not worth surfacing: whoever sent it will
+          // find out from the room's own state, not from this line.
+        }
+      }
+    },
+    [lookForSomething],
+  );
+
+  const room = useRoom({ mySlot, theirSlot, onCaption, onSignal });
   const inside = room.status === "inside";
+
+  // The notice is a flash, not a state of the room: it clears itself so a
+  // long-running call does not carry "Invited Rosa to the call." forever.
+  useEffect(() => {
+    if (!invite) return;
+
+    const clear = setTimeout(() => setInvite(null), 8000);
+
+    return () => clearTimeout(clear);
+  }, [invite]);
 
   useEffect(() => {
     if (!inside) return;
@@ -282,6 +314,16 @@ export function Room({
           className="min-h-11 border-t border-room-frame px-4 py-3 font-mono text-sm text-room-ink-muted"
         >
           {caption}
+        </p>
+      )}
+
+      {/* Confirms an "invita a Rosa" once it is true and not before — rule
+          4 — and plain text rather than a coloured banner: --color-alert and
+          --color-accent are measured against the light background, not this
+          room's dark canvas, and two lines need no token of their own. */}
+      {invite && (
+        <p aria-live="polite" className="border-t border-room-frame px-4 py-3 text-sm text-room-ink">
+          <InviteLine invite={invite} />
         </p>
       )}
 
@@ -448,8 +490,20 @@ function Card({
   );
 }
 
-/** A video slot with its name underneath. */
-function Tile({
+/**
+ * What the "invite" notice says, by status. Plain English screen text, not
+ * Mia's voice: she says nothing about this out loud, it is written on
+ * screen the same way "Hasn't joined yet" is.
+ */
+function InviteLine({ invite }: Readonly<{ invite: InviteSignal }>) {
+  if (invite.status === "sent") return <>Invited {invite.name} to the call.</>;
+  if (invite.status === "failed") return <>Couldn&apos;t reach {invite.name}. Try again.</>;
+  return <>Didn&apos;t catch who to invite.</>;
+}
+
+/** A video slot with its name underneath. Exported for `GuestRoom`, which
+ *  shares this shape but not the rest of the room's screen. */
+export function Tile({
   name,
   tag,
   children,

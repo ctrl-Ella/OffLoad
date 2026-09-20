@@ -150,9 +150,15 @@ export function ReviewPlan({
         className="pointer-events-none absolute top-0 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full bg-accent-immersive opacity-20 blur-3xl"
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col px-6 pb-6 sm:max-w-lg sm:pb-10">
+      {/* Its own wrapper, wider than the column below from `lg` up: on
+          desktop the logo sits where `AppNavigation`'s header puts it —
+          near the true left edge of a wide screen — while the rest of this
+          screen stays the same narrow, centred column at every size. */}
+      <div className="relative z-10 mx-auto w-full max-w-md px-6 sm:max-w-lg lg:max-w-[1240px] lg:px-8">
         <OffloadHeader person={person} />
+      </div>
 
+      <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col px-6 pb-6 sm:max-w-lg sm:pb-10">
         <main id="content" className="flex flex-1 flex-col gap-6 py-6">
           <div className="flex flex-col items-center gap-4 text-center">
             <ListeningOrb state="success" />
