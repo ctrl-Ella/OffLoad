@@ -78,12 +78,17 @@ async function main(): Promise<void> {
   for (const { name, circle, phone, email } of people) {
     const phoneHash = phoneDigest(phone, pepper);
 
+    // Decision 0003: the number in the clear is only for the support network,
+    // written when the household adds them — which today is here. The core
+    // is reached signed in and keeps only the digest.
+    const textable = circle === "SUPPORT" ? phone : null;
+
     // Keyed on the digest: re-seeding after changing the pepper would otherwise
     // leave two rows for the same person.
     await db.person.upsert({
       where: { phoneHash },
-      create: { name, circle, phoneHash, phoneTail: phoneTail(phone), email },
-      update: { name, circle, email, phoneTail: phoneTail(phone) },
+      create: { name, circle, phoneHash, phoneTail: phoneTail(phone), phone: textable, email },
+      update: { name, circle, email, phoneTail: phoneTail(phone), phone: textable },
     });
 
     // The number and the address stay out of the output.

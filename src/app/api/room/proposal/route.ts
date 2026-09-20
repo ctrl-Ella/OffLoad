@@ -9,7 +9,14 @@ import { openHouseholdProposal } from "@/mastra/workflows/proposals";
  * goes out and `recipientId` does not: without the name the screen cannot
  * say who was asked, which is what keeps the card from looking addressed to
  * whoever reads it. The identifier paints nothing.
+ *
+ * `asksToCall` says which of the run's two questions this is, as a fact the
+ * screen can act on: a yes to this one is followed by choosing whom, and the
+ * screen must not learn that from a button's wording.
  */
+
+/** The step that asks whether to call the network. Has to match the workflow's. */
+const ASKS_TO_CALL = "askWhetherToCall";
 
 export async function GET() {
   const person = await currentPerson();
@@ -35,6 +42,7 @@ export async function GET() {
           noLabel: open.noLabel,
           recipientName: open.recipientName,
           forYou: open.recipientId === person.id,
+          asksToCall: open.stepId === ASKS_TO_CALL,
         },
       },
       { headers: { "Cache-Control": "no-store" } },

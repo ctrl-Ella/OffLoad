@@ -62,22 +62,13 @@ const MAX_LINES = 200;
 const ALREADY_WOKEN = new Set<string>();
 
 /**
- * Which support-network person was texted in the last minute. Guards against
- * the duplicate this route sees by construction: the same spoken sentence
- * reaches here once per browser subscribed to the speaker's stream —
- * normally two, three once a guest is in the room — each POST authenticated
- * as a different core person. Keyed by who is invited, not by the caption's
- * text: nothing else is shared between those requests to deduplicate on.
- */
-const RECENTLY_INVITED = new Map<string, number>();
-
-const INVITE_COOLDOWN_MS = 60_000;
-
-/**
  * Detects and acts on "invita a Rosa", independent of whether a workflow run
  * is waiting for the call: asking for the support network is not part of the
  * negotiation the run tracks, and gating it on a waiting run would silently
  * drop the command the rest of the time.
+ *
+ * The same sentence lands here once per browser subscribed to the speaker's
+ * stream; `inviteToCall` collapses those into one text.
  */
 async function handleInviteCommand(text: string): Promise<void> {
   const sessionId = await openRoom();
@@ -91,12 +82,6 @@ async function handleInviteCommand(text: string): Promise<void> {
     await sendSignal(sessionId, "invite", JSON.stringify({ status: "unclear" }));
     return;
   }
-
-  const lastInvited = RECENTLY_INVITED.get(matched.id) ?? 0;
-
-  if (Date.now() - lastInvited < INVITE_COOLDOWN_MS) return;
-
-  RECENTLY_INVITED.set(matched.id, Date.now());
 
   await inviteToCall(sessionId, matched);
 }

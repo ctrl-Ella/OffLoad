@@ -44,9 +44,9 @@ reason.
 
 **What still depends on this column being correct:** an SMS invite is only as good as the number
 stored here. Nothing in this change validates the number's format or confirms it is reachable —
-that is the concern of whoever writes it (a household-management screen, today done by hand
-against the seed data) and of the SMS-sending code itself, which finds out for certain when
-Vonage answers.
+that is the concern of whoever writes it (a household-management screen; today `prisma/seed.ts`,
+which writes it for the support network's rows and leaves the core's null) and of the SMS-sending
+code itself, which finds out for certain when Vonage answers.
 
 ## Alternatives rejected
 
