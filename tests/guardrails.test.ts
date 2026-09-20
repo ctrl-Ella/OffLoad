@@ -5,13 +5,14 @@ import {
   proposalSchema,
   type Proposal,
 } from "../src/mastra/agents/support-network.ts";
+import { confirmable, type StoredCapture } from "../src/lib/captures.ts";
 
 /**
  * The product rules that do not bend, checked against the code that can
- * break them today. Only rule 3 is here, and that is deliberate: the other
- * five are still checked by hand because no code capable of breaking them
- * exists yet. A test written against something not yet built checks nothing.
- * They enter here as their code appears.
+ * break them today. Rules 1 and 3 are here; the other four are still checked
+ * by hand because no code capable of breaking them exists yet. A test written
+ * against something not yet built checks nothing. They enter here as their
+ * code appears.
  *
  * Each test carries the rule's name, so a failure says which principle broke
  * and not which function returned `undefined`.
@@ -92,6 +93,63 @@ describe("Rule 3 · the schema does not let a person who does not exist be named
 
     assert.throws(() =>
       schema.parse({ decision: "propose", person: "Tía Manuela", reason: "this person is in no circle" }),
+    );
+  });
+});
+
+const ELVIA = "person_elvia";
+const CARLOS = "person_carlos";
+
+function capture(fields: Partial<StoredCapture> = {}): StoredCapture {
+  return {
+    id: "capture_1",
+    personId: ELVIA,
+    title: "Natación del niño",
+    startsAt: new Date("2026-09-24T18:30:00+02:00"),
+    endsAt: new Date("2026-09-24T19:30:00+02:00"),
+    place: "Piscina",
+    googleEventId: null,
+    ...fields,
+  };
+}
+
+describe("Rule 1 · nothing is ever written to a calendar without human confirmation", () => {
+  it("a capture with a time and an owner is what a yes can write", () => {
+    const decision = confirmable(capture(), ELVIA);
+
+    assert.equal(decision.verdict, "write");
+    assert.equal(decision.verdict === "write" && decision.event.title, "Natación del niño");
+  });
+
+  it("does not write somebody else's capture, whoever asks", () => {
+    assert.equal(confirmable(capture(), CARLOS).verdict, "not-yours");
+  });
+
+  it("says nothing about somebody else's capture beyond refusing it", () => {
+    // Already booked and not theirs: the answer is the same as for any capture
+    // of someone else's, so asking cannot be used to find out what exists.
+    const booked = capture({ googleEventId: "google_abc" });
+
+    assert.equal(confirmable(booked, CARLOS).verdict, "not-yours");
+  });
+
+  it("invents no hour for something nobody gave one", () => {
+    const noTime = capture({ startsAt: null, endsAt: null });
+
+    assert.equal(confirmable(noTime, ELVIA).verdict, "no-time");
+  });
+
+  it("invents no end either, when only the start was said", () => {
+    assert.equal(confirmable(capture({ endsAt: null }), ELVIA).verdict, "no-time");
+  });
+
+  it("a second yes returns the first event instead of booking the afternoon twice", () => {
+    const decision = confirmable(capture({ googleEventId: "google_abc" }), ELVIA);
+
+    assert.equal(decision.verdict, "already-on-the-calendar");
+    assert.equal(
+      decision.verdict === "already-on-the-calendar" && decision.googleEventId,
+      "google_abc",
     );
   });
 });
