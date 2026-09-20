@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, TriangleAlert, Users, Video } from "lucide-react";
 import { ConflictBreakdown } from "@/components/ConflictBreakdown";
 import { MiaFigure } from "@/components/mia";
-import { todayInMadrid } from "@/lib/clock";
+import { todayInMadrid, ZONE } from "@/lib/clock";
 import { otherCorePerson } from "@/lib/household";
 import { coreJourney } from "@/lib/schedule";
 import { currentPerson } from "@/lib/session";
@@ -25,20 +25,60 @@ export const metadata: Metadata = {
   description: "What doesn't fit today, and what can be done about it.",
 };
 
-export default async function ConflictPage() {
+/**
+ * `?day=YYYY-MM-DD`, or today when it is missing or malformed.
+ *
+ * Falling back rather than refusing: this parameter arrives from a link
+ * somebody followed, and a day that does not parse is a broken link, not an
+ * attack. Whether there is a clash on the day it lands on is answered below,
+ * the same way it always was.
+ */
+function dayAsked(raw: string | string[] | undefined): string {
+  if (typeof raw !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return todayInMadrid();
+
+  return Number.isNaN(new Date(`${raw}T12:00:00Z`).getTime()) ? todayInMadrid() : raw;
+}
+
+const LONG_DAY = new Intl.DateTimeFormat("en-GB", {
+  timeZone: ZONE,
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
+/**
+ * «today», or the day named, for the line that counts the other clashes.
+ * Saying "today" over a Sunday's clash is the kind of small lie that makes
+ * someone stop trusting the rest of the screen.
+ */
+function whenToCallIt(day: string): string {
+  if (day === todayInMadrid()) return "today";
+
+  return `on ${LONG_DAY.format(new Date(`${day}T12:00:00Z`))}`;
+}
+
+export default async function ConflictPage({
+  searchParams,
+}: Readonly<{
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}>) {
   const person = await currentPerson();
 
   if (!person) redirect("/");
 
+  const day = dayAsked((await searchParams).day);
+
   // The clash belongs to the day, not to a run: hung off a run, this page
   // stopped existing the moment the home screen reloaded, with the problem
   // still there. And what is read is the day of whoever is looking.
-  const [lane] = await coreJourney(todayInMadrid(), person.id);
+  const [lane] = await coreJourney(day, person.id);
   const clash = lane?.conflicts[0];
 
   if (!clash) notFound();
 
   const others = (lane?.conflicts.length ?? 1) - 1;
+
+  const when = whenToCallIt(day);
 
   // Looked up, not written: both core people see this screen, and each has
   // the other in front of them.
@@ -82,7 +122,7 @@ export default async function ConflictPage() {
               anything about one. */}
           {others > 0 && (
             <p className="mt-2 text-sm text-ink-muted">
-              And {others === 1 ? "one more clash" : `${others} more clashes`} today.
+              And {others === 1 ? "one more clash" : `${others} more clashes`} {when}.
             </p>
           )}
         </div>

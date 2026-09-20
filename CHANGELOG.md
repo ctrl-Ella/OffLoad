@@ -12,6 +12,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- The yes that puts something on a calendar: what is dictated to Mia is saved as a capture, the review screen offers **Add to calendar** on the rows that really can go on one, and `POST /api/captures/[id]/confirm` writes the event and records the id Google gave it. Pressing twice books one afternoon, not two. Rule 1 enters `npm run test:guardrails`, checked on `confirmable` in `src/lib/captures.ts`.
+- A clash card leads somewhere: it links to that clash's day on `/conflict`, which now reads `?day=` instead of only ever looking at today.
 - The clash screen and the video call: the day is read from Google Calendar and the unconfirmed captures, the clashes are worked out by arithmetic in `src/lib/conflicts.ts` with its unit tests, `/conflict` shows the first one full screen with the two ways out, and `/call` opens the household's Vonage room with live captions and Mia's tile. The home screen says whether something clashes and whether a call is open.
 - Mia inside the call: the `resolveConflict` workflow on Mastra with its two agents, rule 3 as code with `npm run test:guardrails`, the run that reads both calendars when the room opens and waits for the call, the deterministic moment she asks for the floor, her clip through SLNG, and the yes-or-no card that resumes the run on either screen.
 - `npm run bench:agents`: the two agents measured through the product's own functions, with the cases in `bench/cases/` and the results beside them. On 2026-09-20 the interpreter is right 28 times in 30 and the negotiator 6 in 6, inventing nobody's availability.
@@ -32,4 +34,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- Times dictated to Mia were parsed without a timezone, so half past six in Madrid was read as half past six in London on a container running in UTC. The offset now comes from the day itself, through `clock.ts`.
+- Four things dictated at the same hour produced six clash cards saying the same thing. `/api/structure-plan` had its own pairwise detector; it now calls `conflictsForOnePerson`, the one with tests behind it, which reports the problems in a row rather than one card per pair.
 - Continuous integration was failing when generating the Prisma client. `prisma.config.ts` resolves `DATABASE_URL` as it loads, so the placeholder value moves to the job level instead of only the build step.

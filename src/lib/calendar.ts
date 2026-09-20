@@ -1,5 +1,5 @@
 /**
- * Reading Google Calendar. Still no `googleapis`: it is one request and the
+ * Google Calendar. Still no `googleapis`: it is a couple of requests and the
  * package is several megabytes. The border with `google.ts` holds — there the
  * permission, here what is done with it.
  *
@@ -11,6 +11,9 @@
  * call they share, so that call moves here and the script keeps its own
  * writes.
  */
+
+import { ZONE } from "@/lib/clock";
+import { fetchWithTimeout } from "@/lib/fetch-with-timeout";
 
 const CALENDAR = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 
@@ -93,4 +96,51 @@ export async function eventsBetween(
         endsAt: toDate(event.end),
       }))
   );
+}
+
+/** What it takes to put something on a calendar. A `Capture` with both edges
+ *  filled in is already this shape. */
+export type NewEvent = {
+  title: string;
+  startsAt: Date;
+  endsAt: Date;
+  /** Free text, as a person wrote it. Google shows it and geocodes nothing. */
+  location?: string | null;
+};
+
+/**
+ * Creates the event and returns the id Google gave it. The caller stores that
+ * id: it is what says this was confirmed, and what makes confirming it twice
+ * answerable without writing it twice.
+ *
+ * `dateTime` carries its own offset, so the instant is unambiguous whatever
+ * the container's clock reads. `timeZone` goes alongside it for the event's
+ * own zone, which is what decides where it lands if someone travels.
+ */
+export async function createEvent(accessToken: string, event: NewEvent): Promise<string> {
+  const response = await fetchWithTimeout(CALENDAR, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      summary: event.title,
+      location: event.location ?? undefined,
+      start: { dateTime: event.startsAt.toISOString(), timeZone: ZONE },
+      end: { dateTime: event.endsAt.toISOString(), timeZone: ZONE },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Google did not create the event: ${response.status}`);
+  }
+
+  const { id } = (await response.json()) as { id?: string };
+
+  // Without the id there is no telling later whether this was written, and the
+  // next confirmation would write it again. A 200 with no id is a failure here.
+  if (!id) throw new Error("Google created the event and returned no id.");
+
+  return id;
 }
