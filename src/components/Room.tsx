@@ -40,7 +40,12 @@ type ProposalInRoom = {
   noLabel: string;
   recipientName: string;
   forYou: boolean;
+  /** Whether this is «¿Llamo a alguno?»: a yes to it is followed by choosing whom. */
+  asksToCall: boolean;
 };
+
+/** Someone Mia can text, as `/api/room/invite` lists them. No number: it stays on the server. */
+type Invitable = { id: string; name: string };
 
 /** What reads under the tiles, by status. */
 const LINE = {
@@ -91,6 +96,15 @@ export function Room({
   const [heardSomething, setHeardSomething] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [invite, setInvite] = useState<InviteSignal | null>(null);
+
+  /**
+   * That someone said yes to calling the network and has not yet said whom.
+   * Local to this screen: whoever pressed chooses, and the other screen finds
+   * out from the "invite" signal, the same way it would for a spoken name.
+   */
+  const [choosing, setChoosing] = useState(false);
+  const [network, setNetwork] = useState<Invitable[] | null>(null);
+  const [inviting, setInviting] = useState<string | null>(null);
 
   /**
    * That the room has waited for a first caption and none came. It does not
@@ -312,7 +326,7 @@ export function Room({
       setAnswering(true);
 
       try {
-        await fetch(`/api/proposals/${proposal.runId}/answer`, {
+        const response = await fetch(`/api/proposals/${proposal.runId}/answer`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ accepts }),
@@ -321,12 +335,59 @@ export function Room({
         // The route answers before the run has resumed, so the card is
         // removed here and the poll brings the next one when it exists.
         setProposal(null);
+
+        // A yes to «¿Llamo a alguno?» is not yet a name: the run has nothing
+        // more to ask, and whom is decided here, by whoever said yes.
+        if (response.ok && accepts && proposal.asksToCall) setChoosing(true);
       } finally {
         setAnswering(false);
       }
     },
     [proposal],
   );
+
+  // The names are fetched when they are about to be chosen from, not on
+  // entry: most calls never get this far.
+  useEffect(() => {
+    if (!choosing || network !== null) return;
+
+    let alive = true;
+
+    void fetch("/api/room/invite")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body: { network: Invitable[] } | null) => {
+        if (alive) setNetwork(body?.network ?? []);
+      })
+      .catch(() => {
+        // An empty list reads as nobody to call, which is what is known.
+        if (alive) setNetwork([]);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [choosing, network]);
+
+  /**
+   * Texting one of them. The route answers when the text is on its way, not
+   * when it arrived: the confirmation comes back as the "invite" signal once
+   * Vonage has accepted it, so nothing here claims it was sent.
+   */
+  const inviteToCall = useCallback(async (person: Invitable) => {
+    setInviting(person.id);
+
+    try {
+      await fetch("/api/room/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ personId: person.id }),
+      });
+
+      setChoosing(false);
+    } finally {
+      setInviting(null);
+    }
+  }, []);
 
   /**
    * Whose turn it is is said by the run, never by the audio. While the voice
@@ -355,7 +416,11 @@ export function Room({
         </Tile>
 
         <Tile name={theirTile} tag={room.accompanied ? "" : "Hasn't joined yet"}>
-          <div ref={theirSlot} className="size-full" />
+          {/* A grid and not a plain box: every stream that is not mine is
+              appended here, and once someone from the network joins by SMS
+              there are two. Side by side each is seen; stacked, the second
+              was clipped under the first. */}
+          <div ref={theirSlot} className="grid size-full auto-cols-fr grid-flow-col" />
         </Tile>
       </div>
 
@@ -435,6 +500,17 @@ export function Room({
 
         {onTheTable && saidIn === onTheTable.runId && (
           <Card proposal={onTheTable} answering={answering} answer={answer} />
+        )}
+
+        {/* Only with nothing else on the table: a new question from the run
+            takes precedence over a choice already made. */}
+        {choosing && inside && !onTheTable && (
+          <WhomToCall
+            network={network}
+            inviting={inviting}
+            invite={inviteToCall}
+            dismiss={() => setChoosing(false)}
+          />
         )}
       </div>
 
@@ -554,6 +630,55 @@ function Card({
       <Button variant="room" onClick={() => void answer(false)} disabled={answering}>
         {proposal.noLabel}
       </Button>
+    </div>
+  );
+}
+
+/**
+ * Whom to text, after a yes to «¿Llamo a alguno?».
+ *
+ * One button per person and nothing said about any of them: of the support
+ * network the app knows a name and a number, so the only true thing to write
+ * is that it does not know whether they are free — rule 3. The sentence is
+ * screen, so it is English; Mia has already asked the question out loud.
+ */
+function WhomToCall({
+  network,
+  inviting,
+  invite,
+  dismiss,
+}: Readonly<{
+  /** Null while the names are being fetched. */
+  network: Invitable[] | null;
+  /** Who is being texted right now, or null. */
+  inviting: string | null;
+  invite: (person: Invitable) => Promise<void>;
+  dismiss: () => void;
+}>) {
+  return (
+    <div className="mt-3">
+      <p id="whom-to-call" className="text-sm text-room-ink-muted">
+        {network?.length === 0
+          ? "There's nobody in your support network to text yet."
+          : "Who do I text a link to this call? I don't know if any of them is free."}
+      </p>
+
+      <div role="group" aria-labelledby="whom-to-call" className="mt-3 flex flex-wrap gap-2">
+        {network?.map((person) => (
+          <Button
+            key={person.id}
+            onClick={() => void invite(person)}
+            loading={inviting === person.id}
+            disabled={inviting !== null}
+          >
+            {person.name}
+          </Button>
+        ))}
+
+        <Button variant="room" onClick={dismiss} disabled={inviting !== null}>
+          Not now
+        </Button>
+      </div>
     </div>
   );
 }
