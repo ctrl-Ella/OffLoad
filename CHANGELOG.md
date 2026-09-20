@@ -14,6 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - The clash screen and the video call: the day is read from Google Calendar and the unconfirmed captures, the clashes are worked out by arithmetic in `src/lib/conflicts.ts` with its unit tests, `/conflict` shows the first one full screen with the two ways out, and `/call` opens the household's Vonage room with live captions and Mia's tile. The home screen says whether something clashes and whether a call is open.
 - Mia inside the call: the `resolveConflict` workflow on Mastra with its two agents, rule 3 as code with `npm run test:guardrails`, the run that reads both calendars when the room opens and waits for the call, the deterministic moment she asks for the floor, her clip through SLNG, and the yes-or-no card that resumes the run on either screen.
+- `npm run bench:agents`: the two agents measured through the product's own functions, with the cases in `bench/cases/` and the results beside them. On 2026-09-20 the interpreter is right 28 times in 30 and the negotiator 6 in 6, inventing nobody's availability.
 - The demo week on the core circle's real Google calendars: `npm run demo:seed`, `demo:clear` and `demo:show`, with the week in one editable file. Every event carries a private marker, so the commands never list or delete what the family added by hand.
 - Mia, the character, with her five states and her voice: the drawing on the door and on a `/system` reference page, her colour tokens, the SLNG synthesis call with its environment contract, and `npm run mia:say` to hear her from the command line.
 - Initial database migration: seven tables and the `Circulo` enum, generated with `migrate diff --from-empty` so the SQL could be reviewed before it was applied.
@@ -24,6 +25,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Every screen is English, by team decision: the door, the sign-in, the home screen, `/system`, Mia's state labels and the card's buttons. What Mia says out loud stays Spanish. The rule is written in `CLAUDE.md`.
 - The whole project moves to English: rules, documentation, code comments, templates, labels, agent instructions and product copy.
 - Required pull request approvals drop to zero on `main` and `dev` for the duration of the hackathon. A pull request and green CI are still enforced. Another person reviewing stays the team's agreement, now with no machine checking it.
 

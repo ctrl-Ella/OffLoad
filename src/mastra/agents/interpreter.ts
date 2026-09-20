@@ -76,7 +76,16 @@ export const inputSchema = z.object({
 
 export type InterpreterInput = z.infer<typeof inputSchema>;
 
-export const intentSchema = z.object({
+/**
+ * What the model is asked for. Every field but `kind` can be missing here and
+ * not in `intentSchema`: on 2026-09-20 the benchmark caught the small model
+ * skipping `place`, `when` and `title` on questions — "¿qué me queda por
+ * hacer hoy?" has no place, no day and nothing to call it — and the strict
+ * schema turned each into a failed run, with the whole dump lost. Tolerance
+ * in shape, not in content: what arrives is still validated, and a gap
+ * becomes the sentinel or the empty value in `interpretDump`.
+ */
+const modelIntentSchema = z.object({
   kind: z
     .enum(INTENT_KINDS)
     .describe(
@@ -87,9 +96,11 @@ export const intentSchema = z.object({
     ),
   fragment: z
     .string()
+    .nullish()
     .describe("El trozo de lo dictado del que sale esta intención, copiado tal cual."),
   title: z
     .string()
+    .nullish()
     .describe("Cómo se llamaría esto en un calendario o en una lista. Pocas palabras."),
   // `nullish` and not `nullable` everywhere a field can be missing, and the
   // difference cost a whole run: with no time to give, the model sometimes
@@ -108,6 +119,7 @@ export const intentSchema = z.object({
   // niño" and the place is "Piscina", and the places table does not guess.
   place: z
     .enum(POSSIBLE_PLACES)
+    .nullish()
     .describe(
       "Dónde ocurre, elegido de la lista. «no-lo-dice» solo cuando de verdad no " +
         "se puede saber. Ojo: muchas cosas se nombran por su sitio — «tiene " +
@@ -116,6 +128,7 @@ export const intentSchema = z.object({
     ),
   when: z
     .enum(["hoy", "mañana", "otro-dia", "sin-fecha"])
+    .nullish()
     .describe(
       "Qué día es. «otro-dia» cuando nombra un día que no es hoy ni mañana. " +
         "«sin-fecha» cuando no dice ninguno.",
@@ -141,23 +154,29 @@ export const intentSchema = z.object({
     .describe("Cuánto dura en minutos, si se puede saber. Null si no se dice."),
 });
 
+/** What the rest of the system sees: the same intent with no gaps left. */
+export const intentSchema = modelIntentSchema.extend({
+  fragment: z.string(),
+  title: z.string(),
+  place: z.enum(POSSIBLE_PLACES),
+  when: z.enum(["hoy", "mañana", "otro-dia", "sin-fecha"]),
+});
+
 export type Intent = z.infer<typeof intentSchema>;
 
 /**
  * What comes out of a whole brain dump. Wrapped in an object and not a bare
  * array because vLLM's constrained decoding wants an object at the root.
  */
-export const dumpSchema = z.object({
+const dumpSchema = z.object({
   intents: z
-    .array(intentSchema)
+    .array(modelIntentSchema)
     .min(1)
     .describe(
       "Una por cada cosa suelta que haya dicho. Quien habla suelta varias de " +
         "carrerilla en la misma frase, y cada una va a un sitio distinto.",
     ),
 });
-
-export type Dump = z.infer<typeof dumpSchema>;
 
 const INSTRUCTIONS = [
   "Eres el clasificador de OFFLOAD. Recibes lo que una persona de la familia ha " +
@@ -199,9 +218,25 @@ export async function interpretDump(input: InterpreterInput): Promise<Intent[]> 
 
   const response = await interpreter.generate(text, {
     structuredOutput: { schema: dumpSchema },
+    // Temperature zero, as the benchmark measured it: a classifier that
+    // answers differently on the second ask cannot be measured at all.
+    modelSettings: { temperature: 0 },
   });
 
   // `object` is already validated against the schema; parsed again so the
-  // type leaving here is ours and not the library's inference.
-  return dumpSchema.parse(response.object).intents;
+  // type leaving here is ours and not the library's inference. A missing
+  // place is "no lo dice", a missing day is "sin fecha", and a missing title
+  // is the fragment, or the sentence itself: what the model would have said
+  // had it filled the field.
+  return dumpSchema.parse(response.object).intents.map((intent) => {
+    const fragment = intent.fragment?.trim() || text;
+
+    return intentSchema.parse({
+      ...intent,
+      fragment,
+      title: intent.title?.trim() || fragment,
+      place: intent.place ?? NO_PLACE,
+      when: intent.when ?? "sin-fecha",
+    });
+  });
 }

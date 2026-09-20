@@ -18,6 +18,7 @@
     "db:studio": "prisma studio",
     "test:unit": "node --experimental-strip-types --test \"tests/unit/**/*.test.ts\"",
     "test:guardrails": "node --experimental-strip-types --test \"tests/guardrails.test.ts\"",
+    "bench:agents": "node --experimental-strip-types --env-file=.env --import ./scripts/with-alias.mjs bench/agents.ts",
     "demo:seed": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts seed",
     "demo:clear": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts clear",
     "demo:show": "node --experimental-strip-types --env-file=.env scripts/demo-calendar/index.ts show"

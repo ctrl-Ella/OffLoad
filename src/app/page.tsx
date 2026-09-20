@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TriangleAlert, User } from "lucide-react";
-import { todayInMadrid } from "@/lib/clock";
+import { todayInMadrid, ZONE } from "@/lib/clock";
 import { coreJourney, type Lane } from "@/lib/schedule";
 import { currentPerson, type SignedInPerson } from "@/lib/session";
 import { Button } from "@/components/ui/button";
@@ -27,23 +27,23 @@ import { PhoneSignIn } from "@/components/phone-sign-in";
 export const metadata: Metadata = {
   title: "OFFLOAD",
   description:
-    "Organizar a una familia es un trabajo. Que lo haga Mia. Se entra con el teléfono, que lo confirma tu operador.",
+    "Organising a family is a job. Let Mia do it. You sign in with your phone, and your carrier confirms it.",
 };
 
 /** The greeting runs on the household's clock: the container runs in UTC and
- *  at ten at night it would say "buenas tardes". */
+ *  at ten at night it would say "good afternoon". */
 function greeting(): string {
   const hour = Number(
-    new Intl.DateTimeFormat("es-ES", {
+    new Intl.DateTimeFormat("en-GB", {
       hour: "numeric",
       hour12: false,
-      timeZone: "Europe/Madrid",
+      timeZone: ZONE,
     }).format(new Date()),
   );
 
-  if (hour < 6 || hour >= 21) return "Buenas noches";
-  if (hour < 14) return "Buenos días";
-  return "Buenas tardes";
+  if (hour < 6 || hour >= 21) return "Good evening";
+  if (hour < 14) return "Good morning";
+  return "Good afternoon";
 }
 
 type Props = { searchParams: Promise<{ google?: string }> };
@@ -58,11 +58,11 @@ export default async function Home({ searchParams }: Props) {
 /** What Google's callback redirects back with. Anything else is ignored. */
 const GOOGLE_OUTCOMES: Record<string, string> = {
   "no-permission":
-    "No has dado el permiso, así que no he guardado nada. Puedes entrar con tu teléfono.",
+    "You didn't grant the permission, so I saved nothing. You can sign in with your phone.",
   unknown:
-    "Esa cuenta de Google no está en esta casa. Que te añada alguien de la familia y vuelve a entrar.",
-  "invalid-return": "La vuelta de Google no ha llegado bien. Vuelve a intentarlo.",
-  failed: "No he podido terminar con Google. Vuelve a intentarlo en un momento.",
+    "That Google account isn't in this household. Ask someone in the family to add you and sign in again.",
+  "invalid-return": "The return from Google didn't come through properly. Try again.",
+  failed: "I couldn't finish with Google. Try again in a moment.",
 };
 
 /**
@@ -101,8 +101,8 @@ function Door({ googleOutcome }: Readonly<{ googleOutcome?: string }>) {
 
         <div className="flex flex-col gap-8 lg:order-1 lg:flex-1">
           <h1 className="font-display text-[2.125rem] leading-[1.1] text-ink lg:text-5xl">
-            Organizar a una familia es un trabajo.{" "}
-            <span className="text-accent-strong">Que lo haga Mia.</span>
+            Organising a family is a job.{" "}
+            <span className="text-accent-strong">Let Mia do it.</span>
           </h1>
 
           {message ? (
@@ -138,7 +138,7 @@ async function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
             works with the keyboard, and hydrates nothing. */}
         <details className="relative">
           <summary
-            aria-label="Tu perfil"
+            aria-label="Your profile"
             className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-control text-ink-muted hover:bg-white [&::-webkit-details-marker]:hidden"
           >
             <User className="size-5" aria-hidden="true" />
@@ -147,12 +147,12 @@ async function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
           <div className="absolute right-0 z-10 mt-2 w-72 rounded-card border border-border bg-white p-4 shadow-sm">
             <p className="text-sm font-medium text-ink">{person.name}</p>
             <p className="mt-1 text-sm text-ink-muted">
-              Línea acabada en {person.phoneTail}, confirmada por tu operador. Te
-              recuerdo treinta días.
+              Line ending in {person.phoneTail}, confirmed by your carrier. I remember
+              you for thirty days.
             </p>
             <form action="/api/auth/logout" method="post" className="mt-3">
               <Button type="submit" variant="secondary" size="small">
-                Cerrar sesión
+                Sign out
               </Button>
             </form>
           </div>
@@ -160,8 +160,8 @@ async function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
       </div>
 
       <p className="py-8 text-[clamp(1rem,0.95rem+0.3vw,1.15rem)] text-ink-muted">
-        {greeting()}, <span className="text-ink">{person.name}</span>. No tienes que
-        cargar con todo.
+        {greeting()}, <span className="text-ink">{person.name}</span>. You don&apos;t have
+        to carry all of it.
       </p>
 
       {/* The day's timeline goes here. Until it exists, what the screen says
@@ -170,9 +170,9 @@ async function Inside({ person }: Readonly<{ person: SignedInPerson }>) {
       {lane ? (
         <DayStatus lane={lane} />
       ) : (
-        <Notice tone="good" title="Ya estás dentro">
+        <Notice tone="good" title="You're in">
           <p className="mt-1">
-            Tu día todavía no está aquí: esto de momento solo sabe quién eres.
+            Your day isn&apos;t here yet: for now this only knows who you are.
           </p>
         </Notice>
       )}

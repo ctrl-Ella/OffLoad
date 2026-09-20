@@ -37,7 +37,7 @@ export function Field({ label, hint, error, required, className = "", ...rest }:
             <span className="text-alert-strong" aria-hidden="true">
               *
             </span>
-            <span className="sr-only">(obligatorio)</span>
+            <span className="sr-only">(required)</span>
           </>
         ) : null}
       </label>

@@ -43,8 +43,8 @@ const NO_TIME: Conflict = {
  */
 
 export const metadata: Metadata = {
-  title: "Sistema · OFFLOAD",
-  description: "Los componentes de OFFLOAD y todos sus estados, en una sola página.",
+  title: "System · OFFLOAD",
+  description: "OFFLOAD's components and every one of their states, on a single page.",
 };
 
 export default function SystemPage() {
@@ -55,8 +55,8 @@ export default function SystemPage() {
     >
       <header>
         <p className="font-display text-xl font-bold tracking-tight text-ink">OFFLOAD</p>
-        <h1 className="mt-6 font-display text-[2rem] leading-[1.1] text-ink">Sistema</h1>
-        <p className="mt-3 text-ink-muted">Cada componente con todos sus estados a la vez.</p>
+        <h1 className="mt-6 font-display text-[2rem] leading-[1.1] text-ink">System</h1>
+        <p className="mt-3 text-ink-muted">Every component with all of its states at once.</p>
       </header>
 
       <section aria-labelledby="mia-heading" className="flex flex-col gap-6">
@@ -64,8 +64,8 @@ export default function SystemPage() {
           Mia
         </h2>
         <p className="max-w-prose text-ink-muted">
-          Cinco estados, y cada uno corresponde a algo que el sistema sabe. Cuatro conservan la
-          cara y se distinguen por un objeto; solo «Hablando» vacía el cristal.
+          Five states, and each one maps to something the system knows. Four keep the face and
+          are told apart by an object; only &ldquo;Speaking&rdquo; empties the visor.
         </p>
 
         <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
@@ -81,26 +81,26 @@ export default function SystemPage() {
           ))}
         </ul>
 
-        <h3 className="text-lg font-medium text-ink">Las transiciones</h3>
+        <h3 className="text-lg font-medium text-ink">The transitions</h3>
         <MiaLive />
       </section>
 
       <section aria-labelledby="conflict-heading" className="flex flex-col gap-6">
         <h2 id="conflict-heading" className="font-display text-2xl text-ink">
-          El choque
+          The clash
         </h2>
         <p className="max-w-prose text-ink-muted">
-          Dos formas, porque son dos cosas distintas: solaparse es aritmética exacta, y no dar
-          tiempo lleva dentro una estimación de trayecto que se declara como tal.
+          Two shapes, because they are two different things: overlapping is exact arithmetic,
+          and not having time carries a travel estimate inside, declared as one.
         </p>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="flex flex-col gap-3">
-            <h3 className="text-lg font-medium text-ink">Se solapan</h3>
+            <h3 className="text-lg font-medium text-ink">They overlap</h3>
             <ConflictBreakdown conflict={OVERLAP} />
           </div>
           <div className="flex flex-col gap-3">
-            <h3 className="text-lg font-medium text-ink">No da tiempo</h3>
+            <h3 className="text-lg font-medium text-ink">No time</h3>
             <ConflictBreakdown conflict={NO_TIME} />
           </div>
         </div>
@@ -108,11 +108,11 @@ export default function SystemPage() {
 
       <section aria-labelledby="call-heading" className="flex flex-col gap-6">
         <h2 id="call-heading" className="font-display text-2xl text-ink">
-          La llamada
+          The call
         </h2>
         <p className="max-w-prose text-ink-muted">
-          El aviso que ve quien no la ha abierto. La sala no tiene ejemplo aquí: solo sabe pintar
-          una llamada de verdad, con sus permisos de cámara y su sesión abierta.
+          The notice whoever did not open it sees. The room has no example here: it only knows
+          how to paint a real call, with its camera permissions and its open session.
         </p>
 
         <CallBanner who="Carlos" />

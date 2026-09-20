@@ -1,0 +1,39 @@
+{
+  "description": "Sentences dictated out loud by members of the family, transcribed as they came out, with filler words, self-corrections and sentences that trail off. They run through the product's own interpreter, `interpretDump`, and the mark is the `kind` of the first intent it returns. The sentences are Spanish because the family speaks Spanish to Mia; the labels are the ones `Capture.kind` documents.",
+  "labels": ["stop", "reminder", "note", "delegate", "move", "question", "shopping"],
+  "cases": [
+    { "id": "i01", "text": "Mañana el niño tiene piscina a las siete", "expected": "stop" },
+    { "id": "i02", "text": "Acuérdame de llamar al dentista", "expected": "reminder" },
+    { "id": "i03", "text": "Apunta que Carlos tiene que devolver el libro de la biblioteca", "expected": "note" },
+    { "id": "i04", "text": "Pregúntale a Carlos si puede llevar él al niño a la piscina", "expected": "delegate" },
+    { "id": "i05", "text": "Cámbiame la reunión de las cinco a las siete", "expected": "move" },
+    { "id": "i06", "text": "Dime qué tengo hoy", "expected": "question" },
+    { "id": "i07", "text": "Añade leche y pan a la compra", "expected": "shopping" },
+
+    { "id": "i08", "text": "Eh, pues mira, el jueves tengo médico a las diez y media", "expected": "stop" },
+    { "id": "i09", "text": "No, espera, el jueves no, el viernes, médico a las diez y media", "expected": "stop" },
+    { "id": "i10", "text": "Que no se me olvide sacar las entradas", "expected": "reminder" },
+    { "id": "i11", "text": "Oye, ¿me puedes buscar un hueco esta semana que tengo que ir a comprar?", "expected": "question" },
+    { "id": "i12", "text": "Ponle a Carlos que recoja a la niña el martes", "expected": "delegate" },
+    { "id": "i13", "text": "Mueve lo del gimnasio a mañana que hoy no llego", "expected": "move" },
+    { "id": "i14", "text": "Toma nota de que hay que renovar el abono del transporte", "expected": "note" },
+    { "id": "i15", "text": "Pollo, patatas y algo para el postre", "expected": "shopping" },
+
+    { "id": "i16", "text": "El sábado hay cumple en casa de Marta a las cinco", "expected": "stop" },
+    { "id": "i17", "text": "Recuérdamelo antes de salir del trabajo", "expected": "reminder" },
+    { "id": "i18", "text": "¿Carlos está libre el miércoles por la tarde?", "expected": "question" },
+    { "id": "i19", "text": "A ver si puede ir mi madre a por el niño el jueves", "expected": "delegate" },
+    { "id": "i20", "text": "Lo del dentista pásalo a la semana que viene", "expected": "move" },
+    { "id": "i21", "text": "Guarda que la profe dijo que hay reunión pronto, sin fecha todavía", "expected": "note" },
+    { "id": "i22", "text": "Que falta detergente", "expected": "shopping" },
+
+    { "id": "i23", "text": "Es que el lunes entro a las nueve en vez de a las ocho", "expected": "move" },
+    { "id": "i24", "text": "Extraescolar de inglés, los martes de seis a siete", "expected": "stop" },
+    { "id": "i25", "text": "¿Qué me queda por hacer hoy?", "expected": "question" },
+    { "id": "i26", "text": "Dile a Carlos que ya que va al súper se lleve el libro", "expected": "delegate" },
+    { "id": "i27", "text": "Avísame media hora antes, que se me pasa", "expected": "reminder" },
+    { "id": "i28", "text": "Anota que hay que mirar campamentos de verano en algún momento", "expected": "note" },
+    { "id": "i29", "text": "Compra papel de horno que se acabó ayer", "expected": "shopping" },
+    { "id": "i30", "text": "Pues nada, que el niño sale del cole a las cinco y no a las cuatro y media como siempre", "expected": "move" }
+  ]
+}

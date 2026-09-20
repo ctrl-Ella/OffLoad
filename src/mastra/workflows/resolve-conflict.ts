@@ -436,8 +436,9 @@ const askPartner = createConfirmationStep({
       detail:
         `${time(conflict.next.startsAt)}–${time(conflict.next.endsAt)}` +
         (last ? ` · acabas a las ${time(last)}` : ""),
-      yesLabel: "Voy yo",
-      noLabel: "No puedo",
+      // The question is spoken, so it is Spanish; the buttons are screen.
+      yesLabel: "I'll go",
+      noLabel: "I can't",
     };
   },
 });
@@ -474,8 +475,8 @@ const askWhetherToCall = createConfirmationStep({
       recipientName: data.names[data.personId] ?? "",
       question: `${why} En tu red tienes a ${enumerate(data.supportNetwork)}. ¿Llamo a alguno?`,
       detail: "No sé si pueden. Para saberlo hay que preguntárselo.",
-      yesLabel: "Llama",
-      noLabel: "Ya lo veo yo",
+      yesLabel: "Call",
+      noLabel: "I'll sort it out",
     };
   },
 });

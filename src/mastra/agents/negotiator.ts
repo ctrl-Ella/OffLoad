@@ -110,19 +110,30 @@ function asTold(input: NegotiatorInput): string {
   ].join("\n");
 }
 
-export async function propose(input: NegotiatorInput): Promise<Proposal> {
+/**
+ * The model's answer with rule 3 already applied, and whether it had to be.
+ * Exposed apart from `propose` so the benchmark can count how often the model
+ * invents availability, which `propose` only logs.
+ */
+export async function proposeAndCorrect(
+  input: NegotiatorInput,
+): Promise<{ proposal: Proposal; inventedAvailability: boolean }> {
   const theCase = inputSchema.parse(input);
   const core = Object.keys(theCase.coreCalendars);
   const schema = proposalSchema(core, theCase.supportNetwork);
 
   const response = await negotiator.generate(asTold(theCase), {
     structuredOutput: { schema },
+    // Temperature zero, as the benchmark measured it: a decision about who is
+    // free should not come out different on the second ask.
+    modelSettings: { temperature: 0 },
   });
 
-  const { proposal, inventedAvailability } = correctInventedAvailability(
-    schema.parse(response.object),
-    theCase.supportNetwork,
-  );
+  return correctInventedAvailability(schema.parse(response.object), theCase.supportNetwork);
+}
+
+export async function propose(input: NegotiatorInput): Promise<Proposal> {
+  const { proposal, inventedAvailability } = await proposeAndCorrect(input);
 
   // No names: who is in the support network is personal data. What the log
   // needs is how often this happens, not to whom.

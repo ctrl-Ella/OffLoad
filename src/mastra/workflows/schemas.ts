@@ -78,15 +78,17 @@ export function dehydrateConflict(conflict: Conflict): SerialisedConflict {
  * Its shape is hard to change and worth knowing before touching: it is
  * serialised inside the run's snapshot in Postgres, and changing a field
  * leaves the runs suspended at that moment unreadable. The button labels
- * travel because the two cards do not ask the same thing — "Voy yo" is not
- * "Llama" — and this way the component does not have to know which it paints.
+ * travel because the two cards do not ask the same thing — "I'll go" is not
+ * "Call" — and this way the component does not have to know which it paints.
+ * The question is what Mia says out loud, so it is Spanish; the labels are
+ * screen, so they are English.
  */
 export const cardSchema = z.object({
   recipientId: z.string().describe("Who has to be asked. Comes from the database"),
   recipientName: z.string().describe("Their name, for the greeting"),
   question: z.string().describe("What Mia says, already worded"),
   detail: z.string().describe("The slot and the place, on one line"),
-  yesLabel: z.string().describe("What the accepting button says. It names the action, not «Sí»"),
+  yesLabel: z.string().describe("What the accepting button says. It names the action, not \"Yes\""),
   noLabel: z.string().describe("What the declining button says"),
 });
 

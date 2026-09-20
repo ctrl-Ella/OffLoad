@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "what": "the product's agents, as the application calls them",
+    "cases": [
+      {
+        "file": "agents-intent.json",
+        "sha256": "ba9a27895df174fdc3e575461fb9c40f680c0c41c4f6f4e3a4bf15bea3d8c2ad",
+        "count": 30
+      },
+      {
+        "file": "agents-grounding.json",
+        "sha256": "449ff82af802c41235aee1301757ed414331a6d4907a1557d0f648e45b76f39f",
+        "count": 6
+      }
+    ],
+    "baseUrl": "https://api.tokenfactory.nebius.com/v1",
+    "concurrency": 3,
+    "ranAt": "2026-09-20T01:06:08.105Z"
+  },
+  "results": [
+    {
+      "suite": "intent",
+      "model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+      "cases": 30,
+      "hits": 26,
+      "ms": [
+        1933.8941999999997,
+        1966.1449000000002,
+        2015.4341000000004,
+        859.0043999999998,
+        1355.0933999999988,
+        1450.8971999999994,
+        1447.3873999999996,
+        1169.6118999999999,
+        1312.3489000000009,
+        1208.6260000000002,
+        1469.1099999999988,
+        1334.1417000000001,
+        1030.0227000000014,
+        1109.2646999999997,
+        2113.497799999999,
+        879.0091000000011,
+        1003.5641999999989,
+        1313.3503999999994,
+        912.9846000000016,
+        1116.5292999999983,
+        1192.1667000000016,
+        1354.7620000000024,
+        1267.1735999999983,
+        1081.7219000000005,
+        1005.7596999999987,
+        1709.5335999999988,
+        988.3018000000011,
+        1425.811600000001,
+        1902.3941999999988,
+        88527.6488
+      ],
+      "inventedAvailability": 0,
+      "failures": [
+        {
+          "id": "i19",
+          "expected": "delegate",
+          "got": "question"
+        },
+        {
+          "id": "i21",
+          "expected": "note",
+          "got": "reminder"
+        },
+        {
+          "id": "i30",
+          "expected": "move",
+          "got": "stop"
+        },
+        {
+          "id": "i11",
+          "expected": "question",
+          "got": "(error: Structured output validation failed: - intents.0.place: Inva)"
+        }
+      ]
+    },
+    {
+      "suite": "grounding",
+      "model": "deepseek-ai/DeepSeek-V4-Pro",
+      "cases": 6,
+      "hits": 4,
+      "ms": [
+        7002.881100000013,
+        11798.232199999999,
+        13701.078699999998,
+        11651.908299999996,
+        26648.026499999993,
+        21298.753899999996
+      ],
+      "inventedAvailability": 0,
+      "failures": [
+        {
+          "id": "g04",
+          "expected": "call → someone in the network",
+          "got": "no-way-out → Carlos"
+        },
+        {
+          "id": "g06",
+          "expected": "propose → Carlos",
+          "got": "no-way-out → Carlos"
+        }
+      ]
+    }
+  ]
+}
